@@ -38,5 +38,11 @@ namespace ProceduralCity
             }
 
         }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            _renderer.Dispose();
+        }
     }
 }
