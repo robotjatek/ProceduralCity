@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using OpenTK.Graphics.OpenGL;
+using Serilog;
 
 namespace ProceduralCity.Renderer
 {
@@ -34,19 +35,19 @@ namespace ProceduralCity.Renderer
         private int LinkShaders(int vertexHandle, int fragmentHandle)
         {
             var programId = GL.CreateProgram();
-            GL.AttachShader(ProgramId, vertexHandle);
-            GL.AttachShader(ProgramId, fragmentHandle);
-            GL.LinkProgram(ProgramId);
+            GL.AttachShader(programId, vertexHandle);
+            GL.AttachShader(programId, fragmentHandle);
+            GL.LinkProgram(programId);
             return programId;
         }
 
-        private int CompileShader(string vertexFile, ShaderType type)
+        private int CompileShader(string shaderFile, ShaderType type)
         {
-            var vertexHandle = GL.CreateShader(type);
-            GL.ShaderSource(vertexHandle, vertexFile);
-            GL.CompileShader(vertexHandle);
-            CheckForCompilationErrors(vertexHandle);
-            return vertexHandle;
+            var shaderHandle = GL.CreateShader(type);
+            GL.ShaderSource(shaderHandle, shaderFile);
+            GL.CompileShader(shaderHandle);
+            CheckForCompilationErrors(shaderHandle);
+            return shaderHandle;
         }
 
         private void CheckForCompilationErrors(int shaderId)
@@ -55,11 +56,11 @@ namespace ProceduralCity.Renderer
             if (result != 1)
             {
                 var log = GL.GetShaderInfoLog(shaderId);
-                Console.WriteLine(log);
+                Log.Error(log);
             }
             else
             {
-                Console.WriteLine($"Compiled shader {shaderId} successfully");
+                Log.Information($"Compiled shader {shaderId} successfully");
             }
         }
 

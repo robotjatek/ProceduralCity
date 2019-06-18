@@ -6,9 +6,9 @@ namespace ProceduralCity.Renderer
 {
     interface IRenderable : IDisposable
     {
-        IEnumerable<Vector3> GetVertices();
-        IEnumerable<Vector2> GetUVs();
-        Texture GetTexture();
-        Shader GetShader();
+        IEnumerable<Vector3> Vertices { get; }
+        IEnumerable<Vector2> UVs { get; }
+        Texture Texture { get; }
+        Shader Shader { get; }
     }
 }

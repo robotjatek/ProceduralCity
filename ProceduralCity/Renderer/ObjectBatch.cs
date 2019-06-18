@@ -29,8 +29,8 @@ namespace ProceduralCity.Renderer
 
         public void AddRenderable(IRenderable r)
         {
-            _vertices.AddRange(r.GetVertices());
-            _UVs.AddRange(r.GetUVs());
+            _vertices.AddRange(r.Vertices);
+            _UVs.AddRange(r.UVs);
         }
 
         public void Draw(Matrix4 mvp)
@@ -80,6 +80,7 @@ namespace ProceduralCity.Renderer
                 _textureLocation = GL.GetUniformLocation(_shader.ProgramId, "tex");
             }
             _mvpLocation = GL.GetUniformLocation(_shader.ProgramId, "mvp");
+            var err = GL.GetError();
         }
 
         protected virtual void Dispose(bool disposing)

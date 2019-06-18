@@ -18,8 +18,8 @@ namespace ProceduralCity.Renderer
 
         public void AddToScene(IRenderable r)
         {
-            var textureId = r.GetTexture() != null ? r.GetTexture().Id : 0;
-            var shaderId = r.GetShader().ProgramId;
+            var textureId = r.Texture != null ? r.Texture.Id : 0;
+            var shaderId = r.Shader.ProgramId;
             var key = (textureId, shaderId);
 
             if (_batches.TryGetValue(key, out ObjectBatch batch))
@@ -28,7 +28,7 @@ namespace ProceduralCity.Renderer
             }
             else
             {
-                var toAdd = new ObjectBatch(r.GetShader(), r.GetTexture());
+                var toAdd = new ObjectBatch(r.Shader, r.Texture);
                 toAdd.AddRenderable(r);
                 _batches.Add(key, toAdd);
             }
