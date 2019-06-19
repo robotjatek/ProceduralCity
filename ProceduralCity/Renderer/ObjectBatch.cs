@@ -14,11 +14,16 @@ namespace ProceduralCity.Renderer
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Vector2> _UVs = new List<Vector2>();
 
+        private Vector3[] Vertices { get; set; }
+        private Vector2[] UVs { get; set; }
+
         private bool _ready = false;
         private int _vaoId;
         private int _vertexVboId;
         private int _uvVboId;
-        private int _mvpLocation;
+        private int _projectionLocation;
+        private int _viewLocation;
+        private int _modelLocation;
         private int _textureLocation;
 
         public ObjectBatch(Shader shader, Texture texture)
@@ -33,12 +38,15 @@ namespace ProceduralCity.Renderer
             _UVs.AddRange(r.UVs);
         }
 
-        public void Draw(Matrix4 mvp)
+        public void Draw(Matrix4 projection, Matrix4 view, Matrix4 model)
         {
             if (!_ready)
             {
                 Setup();
             }
+
+            _shader.Use();
+            GL.BindVertexArray(_vaoId);
 
             if (_texture != null)
             {
@@ -47,9 +55,11 @@ namespace ProceduralCity.Renderer
                 GL.Uniform1(_textureLocation, 0);
             }
 
-            GL.UniformMatrix4(_mvpLocation, false, ref mvp);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, _vertices.Count);
-            GL.BindVertexArray(0); //unbind vao
+            GL.UniformMatrix4(_projectionLocation, false, ref projection);
+            GL.UniformMatrix4(_viewLocation, false, ref view);
+            GL.UniformMatrix4(_modelLocation, false, ref model);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, Vertices.Length);
+            GL.BindVertexArray(0);
         }
 
         private void Setup()
@@ -57,18 +67,21 @@ namespace ProceduralCity.Renderer
             var vertexLayoutId = 0;
             var uvLayoutId = 2;
 
+            Vertices = _vertices.ToArray();
+            UVs = _UVs.ToArray();
+
             _vaoId = GL.GenVertexArray();
             GL.BindVertexArray(_vaoId);
 
             _vertexVboId = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexVboId);
-            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Count * Vector3.SizeInBytes, _vertices.ToArray(), BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(vertexLayoutId, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BufferData(BufferTarget.ArrayBuffer, Vertices.Length * Vector3.SizeInBytes, Vertices, BufferUsageHint.StaticDraw);
             GL.EnableVertexAttribArray(vertexLayoutId);
+            GL.VertexAttribPointer(vertexLayoutId, 3, VertexAttribPointerType.Float, false, 0, 0);
 
-            _uvVboId = GL.GenVertexArray();
+            _uvVboId = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _uvVboId);
-            GL.BufferData(BufferTarget.ArrayBuffer, _UVs.Count * Vector2.SizeInBytes, _UVs.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, _UVs.Count * Vector2.SizeInBytes, UVs, BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(uvLayoutId, 2, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(uvLayoutId);
 
@@ -79,8 +92,9 @@ namespace ProceduralCity.Renderer
             {
                 _textureLocation = GL.GetUniformLocation(_shader.ProgramId, "tex");
             }
-            _mvpLocation = GL.GetUniformLocation(_shader.ProgramId, "mvp");
-            var err = GL.GetError();
+            _projectionLocation = GL.GetUniformLocation(_shader.ProgramId, "_projection");
+            _viewLocation = GL.GetUniformLocation(_shader.ProgramId, "_view");
+            _modelLocation = GL.GetUniformLocation(_shader.ProgramId, "_model");
         }
 
         protected virtual void Dispose(bool disposing)

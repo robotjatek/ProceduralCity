@@ -16,49 +16,49 @@ namespace ProceduralCity.Renderer
         private readonly int _viewMatrixLocation;
         private readonly int _skyboxLocation;
 
-        private readonly float[] vertices = new[]
+        private readonly Vector3[] vertices = new[]
         {
-            -1.0f,  1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
+           new Vector3(-1.0f,  1.0f, -1.0f),
+            new Vector3(-1.0f, -1.0f, -1.0f),
+            new Vector3(1.0f, -1.0f, -1.0f),
+           new Vector3( 1.0f, -1.0f, -1.0f),
+            new Vector3(1.0f,  1.0f, -1.0f),
+          new Vector3(  -1.0f,  1.0f, -1.0f),
 
-            -1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
+          new Vector3(  -1.0f, -1.0f,  1.0f),
+          new Vector3(  -1.0f, -1.0f, -1.0f),
+           new Vector3( -1.0f,  1.0f, -1.0f),
+         new Vector3(   -1.0f,  1.0f, -1.0f),
+         new Vector3(   -1.0f,  1.0f,  1.0f),
+         new Vector3(   -1.0f, -1.0f,  1.0f),
 
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
+        new Vector3(    1.0f, -1.0f, -1.0f),
+        new Vector3(    1.0f, -1.0f,  1.0f),
+        new Vector3(    1.0f,  1.0f,  1.0f),
+        new Vector3(    1.0f,  1.0f,  1.0f),
+        new Vector3(    1.0f,  1.0f, -1.0f),
+        new Vector3(    1.0f, -1.0f, -1.0f),
 
-            -1.0f, -1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
+         new Vector3(   -1.0f, -1.0f,  1.0f),
+        new Vector3(    -1.0f,  1.0f,  1.0f),
+        new Vector3(    1.0f,  1.0f,  1.0f),
+        new Vector3(    1.0f,  1.0f,  1.0f),
+        new Vector3(    1.0f, -1.0f,  1.0f),
+        new Vector3(    -1.0f, -1.0f,  1.0f),
 
-            -1.0f,  1.0f, -1.0f,
-            1.0f,  1.0f, -1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f, -1.0f,
+         new Vector3(   -1.0f,  1.0f, -1.0f),
+        new Vector3(    1.0f,  1.0f, -1.0f),
+        new Vector3(    1.0f,  1.0f,  1.0f),
+        new Vector3(    1.0f,  1.0f,  1.0f),
+        new Vector3(    -1.0f,  1.0f,  1.0f),
+        new Vector3(    -1.0f,  1.0f, -1.0f),
 
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f
+         new Vector3(   -1.0f, -1.0f, -1.0f),
+         new Vector3(   -1.0f, -1.0f,  1.0f),
+         new Vector3(   1.0f, -1.0f, -1.0f),
+         new Vector3(   1.0f, -1.0f, -1.0f),
+         new Vector3(   -1.0f, -1.0f,  1.0f),
+        new Vector3(    1.0f, -1.0f,  1.0f)
         };
 
         public Skybox()
@@ -80,12 +80,14 @@ namespace ProceduralCity.Renderer
             _skyboxLocation = GL.GetUniformLocation(_shader.ProgramId, "skybox");
 
             _vaoId = GL.GenVertexArray();
-            _vboId = GL.GenBuffer();
             GL.BindVertexArray(_vaoId);
+
+            _vboId = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vboId);
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * Vector3.SizeInBytes, vertices, BufferUsageHint.StaticDraw);
             GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
+
             GL.BindVertexArray(0);
         }
 
@@ -104,7 +106,7 @@ namespace ProceduralCity.Renderer
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.Uniform1(_skyboxLocation, 0);
             GL.BindTexture(TextureTarget.TextureCubeMap, _texture.Id);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Length);
             GL.BindVertexArray(0);
 
             GL.CullFace(CullFaceMode.Back);

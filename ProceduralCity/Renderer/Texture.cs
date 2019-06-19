@@ -84,7 +84,7 @@ namespace ProceduralCity.Renderer
                     image.Width,
                     image.Height,
                     0,
-                    PixelFormat.Rgb,
+                    PixelFormat.Bgr,
                     PixelType.UnsignedByte,
                     bitmapData.Scan0);
                 image.UnlockBits(bitmapData);

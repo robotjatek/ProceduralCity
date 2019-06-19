@@ -39,7 +39,7 @@ namespace ProceduralCity
         {
             Texture = texture;
             Shader = shader;
-            var maxHeight = 200;
+            var maxHeight = 10.0f;
 
             //hátsó oldal
             _UVs.Add(new Vector2(area.X, 0));
@@ -110,12 +110,6 @@ namespace ProceduralCity
             _vertices.Add(new Vector3(position.X + area.X, position.Y + maxHeight, position.Z));
             _UVs.Add(new Vector2(0, 0));
             _vertices.Add(new Vector3(position.X + area.X, position.Y + maxHeight, position.Z + area.Y));
-        }
-
-        public void Dispose()
-        {
-            Shader.Dispose();
-            Texture.Dispose();
         }
     }
 }

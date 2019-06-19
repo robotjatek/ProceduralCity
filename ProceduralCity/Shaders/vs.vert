@@ -3,15 +3,18 @@ layout(location = 0) in vec3 vVertexData;
 //layout(location = 1) in vec3 vNormals;
 layout(location = 2) in vec2 vTexCoord;
 
-uniform mat4 MVP;
-//out fNormals;
+uniform mat4 _projection;
+uniform mat4 _view;
+uniform mat4 _model;
+
 out vec2 fTexCoord;
 out vec3 fVertexData;
 
 void main()
 {
-	//fNormals = vNormals;
 	fVertexData = vVertexData;
 	fTexCoord = vTexCoord;
-	gl_Position = MVP*vec4(vVertexData, 1.0f);
+
+	gl_Position = _projection* _view * _model * vec4(vVertexData, 1.0f);
+
 }

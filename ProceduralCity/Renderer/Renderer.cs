@@ -8,11 +8,11 @@ namespace ProceduralCity.Renderer
     {
         private readonly Dictionary<(int textureId, int shaderId), ObjectBatch> _batches = new Dictionary<(int, int), ObjectBatch>();
 
-        public void RenderScene(Matrix4 mvp)
+        public void RenderScene(Matrix4 projection, Matrix4 view, Matrix4 model)
         {
             foreach (var batch in _batches.Values)
             {
-                batch.Draw(mvp);
+                batch.Draw(projection, view, model);
             }
         }
 
