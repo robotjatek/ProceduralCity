@@ -8,13 +8,12 @@ using Serilog;
 
 namespace ProceduralCity
 {
-    //TODO: cull face
     public class Game : GameWindow
     {
         private readonly string _title;
         private readonly Renderer.Renderer _renderer;
         private readonly Skybox _skybox;
-        private readonly Camera _camera = new Camera(new Vector3(96, 70, -80), 50, 20);
+        private readonly Camera _camera = new Camera(new Vector3(-1, -1, -1), 0, 0);
 
         private Matrix4 _projectionMatrix = Matrix4.Identity;
         private Matrix4 _modelMatrix = Matrix4.Identity;
@@ -23,6 +22,7 @@ namespace ProceduralCity
         private readonly Texture _buildingTexture;
 
         private readonly Building _building;
+        private readonly World _world;
 
         public Game(int width, int height, GraphicsMode mode, string title) : base(width, height, mode, title)
         {
@@ -33,17 +33,21 @@ namespace ProceduralCity
             Log.Information($"Vendor: {glVendor} | Renderer: {glRenderer}");
 
             GL.Enable(EnableCap.DepthTest);
-         //   GL.Enable(EnableCap.CullFace);
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
+            GL.FrontFace(FrontFaceDirection.Cw);
+            GL.ClearColor(Color4.Green);
 
             _renderer = new Renderer.Renderer();
             _skybox = new Skybox();
-
-            GL.ClearColor(Color4.Green);
+            _world = new World();
 
             _buildingShader = new Shader("vs.vert", "fs.frag");
             _buildingTexture = new Texture("building/1.jpg");
             _building = new Building(new Vector3(0, 0, 0), new Vector2(10f, 10f), _buildingTexture, _buildingShader);
+
             _renderer.AddToScene(_building);
+            _renderer.AddToScene(_world.Renderables);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -123,7 +127,7 @@ namespace ProceduralCity
         {
             base.Dispose();
             Log.Information("Disposing objects");
-            _renderer.Dispose();
+            _renderer?.Dispose();
             _skybox?.Dispose();
 
             _buildingShader?.Dispose();

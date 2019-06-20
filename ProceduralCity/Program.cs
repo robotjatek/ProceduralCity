@@ -1,5 +1,6 @@
 ﻿using OpenTK.Graphics;
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace ProceduralCity
 {
@@ -9,12 +10,14 @@ namespace ProceduralCity
         {
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
+                .MinimumLevel.Verbose()
                 .CreateLogger();
             Log.Logger = logger;
 
             using (var g = new Game(800, 600, GraphicsMode.Default, "City"))
             {
-                g.Run(60.0f);
+                var frameRate = 60.0f;
+                g.Run(frameRate);
             }
 
             logger.Dispose();

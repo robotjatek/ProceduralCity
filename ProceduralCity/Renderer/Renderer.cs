@@ -16,6 +16,14 @@ namespace ProceduralCity.Renderer
             }
         }
 
+        public void AddToScene(IEnumerable<IRenderable> renderables)
+        {
+            foreach (var renderable in renderables)
+            {
+                AddToScene(renderable);
+            }
+        }
+
         public void AddToScene(IRenderable r)
         {
             var textureId = r.Texture != null ? r.Texture.Id : 0;

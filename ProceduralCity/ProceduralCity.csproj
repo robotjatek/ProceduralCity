@@ -59,6 +59,9 @@
     <Compile Include="Building.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Generators\BspTree.cs" />
+    <Compile Include="Generators\GroundGenerator.cs" />
+    <Compile Include="Generators\GroundNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Renderer\IRenderable.cs" />
     <Compile Include="Renderer\ObjectBatch.cs" />
@@ -66,6 +69,7 @@
     <Compile Include="Renderer\Shader.cs" />
     <Compile Include="Renderer\Skybox.cs" />
     <Compile Include="Renderer\Texture.cs" />
+    <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
