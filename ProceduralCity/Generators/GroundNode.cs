@@ -7,32 +7,32 @@ namespace ProceduralCity.Generators
 {
     class GroundNode
     {
-        private readonly Vector2 _startPosition;
-        private readonly Vector2 _endPosition;
+        public Vector2 StartPosition { get; private set; }
+        public Vector2 EndPosition { get; private set; }
 
         public List<GroundNode> Children { get; private set; } = new List<GroundNode>();
 
         public GroundNode(Vector2 startPosition, Vector2 endPosition)
         {
-            _startPosition = startPosition;
-            _endPosition = endPosition;
+            StartPosition = startPosition;
+            EndPosition = endPosition;
         }
 
-        public IEnumerable<GroundNode> Split()
+        public IEnumerable<GroundNode> Split(Random random)
         {
-            Log.Debug($"Splitting node ({_startPosition}, {_endPosition})");
-            var random = new Random();
-            var verticalSplit = random.Next(0, (int)_endPosition.X - (int)_startPosition.X);
-            var horizontalSplit = random.Next(0, (int)_endPosition.Y - (int)_startPosition.Y);
+            Log.Debug($"Splitting node ({StartPosition}, {EndPosition})");
 
-            var splitPoint = new Vector2(_startPosition.X + verticalSplit, _startPosition.Y + horizontalSplit);
+            var verticalSplit = random.Next(0, (int)EndPosition.X - (int)StartPosition.X);
+            var horizontalSplit = random.Next(0, (int)EndPosition.Y - (int)StartPosition.Y);
+
+            var splitPoint = new Vector2(StartPosition.X + verticalSplit, StartPosition.Y + horizontalSplit);
 
             var children = new[]
             {
-                new GroundNode(_startPosition, splitPoint),
-                new GroundNode(new Vector2(splitPoint.X,_startPosition.Y), new Vector2(_endPosition.X, splitPoint.Y)),
-                new GroundNode(new Vector2(_startPosition.X, splitPoint.Y), new Vector2(splitPoint.X, _endPosition.Y)),
-                new GroundNode(splitPoint, _endPosition)
+                new GroundNode(StartPosition, splitPoint),
+                new GroundNode(new Vector2(splitPoint.X,StartPosition.Y), new Vector2(EndPosition.X, splitPoint.Y)),
+                new GroundNode(new Vector2(StartPosition.X, splitPoint.Y), new Vector2(splitPoint.X, EndPosition.Y)),
+                new GroundNode(splitPoint, EndPosition)
             };
 
             Children.AddRange(children);

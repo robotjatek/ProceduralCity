@@ -3,6 +3,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
+using ProceduralCity.Generators;
 using ProceduralCity.Renderer;
 using Serilog;
 
@@ -18,10 +19,6 @@ namespace ProceduralCity
         private Matrix4 _projectionMatrix = Matrix4.Identity;
         private Matrix4 _modelMatrix = Matrix4.Identity;
 
-        private readonly Shader _buildingShader;
-        private readonly Texture _buildingTexture;
-
-        private readonly Building _building;
         private readonly World _world;
 
         public Game(int width, int height, GraphicsMode mode, string title) : base(width, height, mode, title)
@@ -40,13 +37,8 @@ namespace ProceduralCity
 
             _renderer = new Renderer.Renderer();
             _skybox = new Skybox();
-            _world = new World();
+            _world = new World(new GroundGenerator(new Vector2(2048, 2048)), new BuildingGenerator());
 
-            _buildingShader = new Shader("vs.vert", "fs.frag");
-            _buildingTexture = new Texture("building/1.jpg");
-            _building = new Building(new Vector3(0, 0, 0), new Vector2(10f, 10f), _buildingTexture, _buildingShader);
-
-            _renderer.AddToScene(_building);
             _renderer.AddToScene(_world.Renderables);
         }
 
@@ -129,9 +121,7 @@ namespace ProceduralCity
             Log.Information("Disposing objects");
             _renderer?.Dispose();
             _skybox?.Dispose();
-
-            _buildingShader?.Dispose();
-            _buildingTexture?.Dispose();
+            _world.Dispose();
         }
     }
 }

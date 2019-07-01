@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OpenTK;
 using Serilog;
 
@@ -7,6 +8,7 @@ namespace ProceduralCity.Generators
     class GroundGenerator
     {
         private Vector2 _worldSize;
+        private Random _random = new Random();
 
         public GroundGenerator(Vector2 worldSize)
         {
@@ -36,7 +38,7 @@ namespace ProceduralCity.Generators
 
             foreach (var node in nodes)
             {
-                SplitNodes(node.Split(), currentLevel, maxLevel);
+                SplitNodes(node.Split(_random), currentLevel, maxLevel);
             }
         }
     }

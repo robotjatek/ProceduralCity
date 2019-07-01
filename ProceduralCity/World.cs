@@ -1,15 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
 using ProceduralCity.Generators;
 using ProceduralCity.Renderer;
 using Serilog;
 
 namespace ProceduralCity
 {
-    class World
+    class World : IDisposable
     {
         private readonly List<IRenderable> _renderables = new List<IRenderable>();
+        private readonly GroundGenerator _groundGenerator;
+        private readonly BuildingGenerator _buildingGenerator;
+
+        public World(GroundGenerator groundGenerator, BuildingGenerator buildingGenerator)
+        {
+            _groundGenerator = groundGenerator;
+            _buildingGenerator = buildingGenerator;
+
+            var sites = _groundGenerator.Generate();
+            Log.Information($"Number of sites: {sites.ToArray().Length}");
+
+            var buildings = _buildingGenerator.GenerateBuildings(sites);
+            _renderables.AddRange(buildings);
+        }
 
         public IEnumerable<IRenderable> Renderables
         {
@@ -19,11 +33,24 @@ namespace ProceduralCity
             }
         }
 
-        public World()
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
         {
-            var groundGenearator = new GroundGenerator(new Vector2(2048, 2048));
-            var sites = groundGenearator.Generate();
-            Log.Information($"Number of sites: {sites.ToArray().Length}");
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _buildingGenerator.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }
