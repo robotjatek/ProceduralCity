@@ -9,13 +9,24 @@ namespace ProceduralCity.Generators
     class BuildingGenerator : IDisposable
     {
         private readonly Shader _buildingShader;
-        private readonly Texture _buildingTexture;
         private readonly Vector2 _areaBorder = new Vector2(3.5f, 3.5f);
+        private readonly Random _random = new Random();
+        private readonly Texture[] _buildingTextures;
 
         public BuildingGenerator()
         {
             _buildingShader = new Shader("vs.vert", "fs.frag");
-            _buildingTexture = new Texture("building/1.jpg");
+
+            _buildingTextures = new[]
+            {
+                new Texture("building/1.jpg"),
+                new Texture("building/2.jpg"),
+                new Texture("building/3.jpg"),
+                new Texture("building/4.jpg"),
+                new Texture("building/5.jpg"),
+                new Texture("building/6.jpg"),
+                new Texture("building/7.jpg"),
+            };
         }
 
         public IEnumerable<Building> GenerateBuildings(IEnumerable<GroundNode> sites)
@@ -26,9 +37,10 @@ namespace ProceduralCity.Generators
             foreach (var site in sites)
             {
                 var position = new Vector3(site.StartPosition.X, 0, site.StartPosition.Y);
-                var area = site.EndPosition - site.StartPosition - _areaBorder;
+                var area = site.EndPosition - site.StartPosition;// - _areaBorder;
+                var texture = _buildingTextures[_random.Next(_buildingTextures.Length)];
 
-                var building = new Building(position, area, _buildingTexture, _buildingShader);
+                var building = new Building(position, area, texture, _buildingShader, _random.Next(10, 10));
                 buildings.Add(building);
             }
 
@@ -45,7 +57,7 @@ namespace ProceduralCity.Generators
                 if (disposing)
                 {
                     _buildingShader.Dispose();
-                    _buildingTexture.Dispose();
+                    Array.ForEach(_buildingTextures, t => t.Dispose());
                 }
 
                 disposedValue = true;

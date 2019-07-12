@@ -14,7 +14,7 @@ namespace ProceduralCity
         private readonly string _title;
         private readonly Renderer.Renderer _renderer;
         private readonly Skybox _skybox;
-        private readonly Camera _camera = new Camera(new Vector3(-1, -1, -1), 0, 0);
+        private readonly Camera _camera = new Camera(new Vector3(-1, -1, -1), 90, 0);
 
         private Matrix4 _projectionMatrix = Matrix4.Identity;
         private Matrix4 _modelMatrix = Matrix4.Identity;
@@ -37,7 +37,7 @@ namespace ProceduralCity
 
             _renderer = new Renderer.Renderer();
             _skybox = new Skybox();
-            _world = new World(new GroundGenerator(new Vector2(2048, 2048)), new BuildingGenerator());
+            _world = new World(new GroundGenerator(new Vector2(1024, 1024)), new BuildingGenerator());
 
             _renderer.AddToScene(_world.Renderables);
         }

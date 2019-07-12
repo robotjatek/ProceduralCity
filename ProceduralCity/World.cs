@@ -19,7 +19,7 @@ namespace ProceduralCity
             _buildingGenerator = buildingGenerator;
 
             var sites = _groundGenerator.Generate();
-            Log.Information($"Number of sites: {sites.ToArray().Length}");
+            Log.Information($"Number of sites: {sites.Count()}");
 
             var buildings = _buildingGenerator.GenerateBuildings(sites);
             _renderables.AddRange(buildings);

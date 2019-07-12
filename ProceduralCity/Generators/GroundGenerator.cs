@@ -19,7 +19,7 @@ namespace ProceduralCity.Generators
         {
             Log.Information("Generating ground 2D tree");
             var tree = new BspTree(_worldSize);
-            SplitNode(tree.Root, maxLevel: 4);
+            SplitNode(tree.Root, maxLevel: 7);
             return tree.GetLeaves();
         }
 

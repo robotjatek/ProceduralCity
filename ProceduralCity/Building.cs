@@ -35,11 +35,11 @@ namespace ProceduralCity
             }
         }
 
-        public Building(Vector3 position, Vector2 area, Texture texture, Shader shader)
+        public Building(Vector3 position, Vector2 area, Texture texture, Shader shader, float height)
         {
             Texture = texture;
             Shader = shader;
-            var maxHeight = 10.0f;
+            var maxHeight = height;
 
             //hátsó oldal
             _UVs.Add(new Vector2(area.X, 0));

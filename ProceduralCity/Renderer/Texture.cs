@@ -105,6 +105,7 @@ namespace ProceduralCity.Renderer
 
         protected virtual void Dispose(bool disposing)
         {
+            Log.Debug($"Disposing Texture {Id}");
             if (!disposedValue)
             {
                 //if (disposing)
