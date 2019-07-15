@@ -8,7 +8,7 @@ namespace ProceduralCity.Generators
     class GroundGenerator
     {
         private Vector2 _worldSize;
-        private Random _random = new Random();
+        private readonly Random _random = new Random();
 
         public GroundGenerator(Vector2 worldSize)
         {
