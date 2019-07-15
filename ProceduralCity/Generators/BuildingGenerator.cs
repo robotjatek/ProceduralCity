@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
+using ProceduralCity.Config;
 using ProceduralCity.Renderer;
 using Serilog;
 
@@ -13,21 +15,13 @@ namespace ProceduralCity.Generators
         private readonly Random _random = new Random();
         private readonly Texture[] _buildingTextures;
         private readonly ILogger _logger;
+        private readonly IAppConfig _config;
 
-        public BuildingGenerator(ILogger logger)
+        public BuildingGenerator(ILogger logger, IAppConfig config)
         {
+            _config = config;
             _buildingShader = new Shader("vs.vert", "fs.frag");
-
-            _buildingTextures = new[]
-            {
-                new Texture("building/1.jpg"),
-                new Texture("building/2.jpg"),
-                new Texture("building/3.jpg"),
-                new Texture("building/4.jpg"),
-                new Texture("building/5.jpg"),
-                new Texture("building/6.jpg"),
-                new Texture("building/7.jpg"),
-            };
+            _buildingTextures = _config.BuildingTextures.Select(c => new Texture(c)).ToArray();
 
             _logger = logger;
         }
@@ -43,7 +37,7 @@ namespace ProceduralCity.Generators
                 var area = site.EndPosition - site.StartPosition - _areaBorder;
                 var texture = _buildingTextures[_random.Next(_buildingTextures.Length)];
 
-                var building = new Building(position, area, texture, _buildingShader, _random.Next(10, 40));
+                var building = new Building(position, area, texture, _buildingShader, _random.Next(_config.MinBuildingHeight, _config.MaxBuildingHeight));
                 buildings.Add(building);
             }
 
