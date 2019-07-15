@@ -37,10 +37,10 @@ namespace ProceduralCity.Generators
             foreach (var site in sites)
             {
                 var position = new Vector3(site.StartPosition.X, 0, site.StartPosition.Y);
-                var area = site.EndPosition - site.StartPosition;// - _areaBorder;
+                var area = site.EndPosition - site.StartPosition - _areaBorder;
                 var texture = _buildingTextures[_random.Next(_buildingTextures.Length)];
 
-                var building = new Building(position, area, texture, _buildingShader, _random.Next(10, 10));
+                var building = new Building(position, area, texture, _buildingShader, _random.Next(10, 40));
                 buildings.Add(building);
             }
 

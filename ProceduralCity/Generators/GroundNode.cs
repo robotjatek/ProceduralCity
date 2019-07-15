@@ -22,21 +22,30 @@ namespace ProceduralCity.Generators
         {
             Log.Debug($"Splitting node ({StartPosition}, {EndPosition})");
 
-            var verticalSplit = random.Next(0, (int)EndPosition.X - (int)StartPosition.X);
-            var horizontalSplit = random.Next(0, (int)EndPosition.Y - (int)StartPosition.Y);
+            var verticalLength = (int)EndPosition.X - (int)StartPosition.X;
+            var horizontalLength = (int)EndPosition.Y - (int)StartPosition.Y;
 
-            var splitPoint = new Vector2(StartPosition.X + verticalSplit, StartPosition.Y + horizontalSplit);
+            var verticalSliceLength = verticalLength / 3;
+            var horizontalSliceLength = horizontalLength / 3;
 
-            var children = new[]
+            if (verticalSliceLength > 10 && horizontalSliceLength > 10) //TODO: fine tune these arbitrary numbers
             {
+                var verticalSplit = random.Next(verticalSliceLength, verticalSliceLength * 2);
+                var horizontalSplit = random.Next(horizontalSliceLength, horizontalSliceLength * 2);
+
+                var splitPoint = new Vector2(StartPosition.X + verticalSplit, StartPosition.Y + horizontalSplit);
+
+                var children = new[]
+                {
                 new GroundNode(StartPosition, splitPoint),
                 new GroundNode(new Vector2(splitPoint.X,StartPosition.Y), new Vector2(EndPosition.X, splitPoint.Y)),
                 new GroundNode(new Vector2(StartPosition.X, splitPoint.Y), new Vector2(splitPoint.X, EndPosition.Y)),
                 new GroundNode(splitPoint, EndPosition)
             };
 
-            Children.AddRange(children);
-            return children;
+                Children.AddRange(children);
+            }
+            return Children;
         }
     }
 }
