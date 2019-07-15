@@ -3,31 +3,36 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-using ProceduralCity.Generators;
+using ProceduralCity.Config;
 using ProceduralCity.Renderer;
 using Serilog;
 
 namespace ProceduralCity
 {
-    public class Game : GameWindow
+    public class Game : IGame, IDisposable
     {
         private readonly string _title;
-        private readonly Renderer.Renderer _renderer;
-        private readonly Skybox _skybox;
-        private readonly Camera _camera = new Camera(new Vector3(-1, -1, -1), 90, 0);
-
         private Matrix4 _projectionMatrix = Matrix4.Identity;
         private Matrix4 _modelMatrix = Matrix4.Identity;
 
-        private readonly World _world;
+        private readonly IAppConfig _config;
+        private readonly ILogger _logger;
+        private readonly IRenderer _renderer;
+        private readonly ISkybox _skybox;
+        private readonly ICamera _camera;
+        private readonly IWorld _world;
 
-        public Game(int width, int height, GraphicsMode mode, string title) : base(width, height, mode, title)
+        private readonly OpenGlContext _context;
+
+        public Game(IAppConfig config, ILogger logger, ICamera camera, IWorld world, OpenGlContext context, IRenderer renderer, ISkybox skybox)
         {
-            _title = title;
+            _camera = camera;
+            _logger = logger;
+            _config = config;
+            _title = config.WindowTitle;
 
-            var glVendor = GL.GetString(StringName.Vendor);
-            var glRenderer = GL.GetString(StringName.Renderer);
-            Log.Information($"Vendor: {glVendor} | Renderer: {glRenderer}");
+            _context = context;
+            ConfigureContext();
 
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
@@ -35,22 +40,36 @@ namespace ProceduralCity
             GL.FrontFace(FrontFaceDirection.Cw);
             GL.ClearColor(Color4.Green);
 
-            _renderer = new Renderer.Renderer();
-            _skybox = new Skybox();
-            _world = new World(new GroundGenerator(new Vector2(1024, 1024)), new BuildingGenerator());
+            _renderer = renderer;
+            _skybox = skybox;
+            _world = world;
 
             _renderer.AddToScene(_world.Renderables);
         }
 
-        protected override void OnUpdateFrame(FrameEventArgs e)
+        private void ConfigureContext()
         {
-            base.OnUpdateFrame(e);
+            _context.RenderFrame += (sender, e) => this.OnRenderFrame(e);
+            _context.UpdateFrame += (sender, e) => this.OnUpdateFrame(e);
+            _context.Resize += (sender, e) => this.OnResize(e);
+            _context.KeyDown += (sender, e) => this.OnKeyDown(e);
+            _context.Width = _config.ResolutionWidth;
+            _context.Height = _config.ResolutionHeight;
+            _context.Title = _config.WindowTitle;
         }
 
-        protected override void OnRenderFrame(FrameEventArgs e)
+        public void RunGame()
         {
-            base.OnRenderFrame(e);
-            Title = $"{_title} - FPS: {Math.Round(1f / e.Time, 1)}";
+            _context.Run(_config.FrameRate);
+        }
+
+        private void OnUpdateFrame(FrameEventArgs e)
+        {
+        }
+
+        private void OnRenderFrame(FrameEventArgs e)
+        {
+            _context.Title = $"{_title} - FPS: {Math.Round(1f / e.Time, 1)}";
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -59,23 +78,21 @@ namespace ProceduralCity
             GL.DepthFunc(DepthFunction.Lequal);
             _renderer.RenderScene(_projectionMatrix, viewMatrix, _modelMatrix);
 
-            SwapBuffers();
+            _context.SwapBuffers();
         }
 
-        protected override void OnResize(EventArgs e)
+        private void OnResize(EventArgs e)
         {
-            base.OnResize(e);
-            Log.Information($"Window resized: {Width}x{Height}");
-            GL.Viewport(this.ClientRectangle);
-            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(90), (float)Width / Height, 0.1f, 5000.0f);
+            _logger.Information($"Window resized: {_context.Width}x{_context.Height}");
+            GL.Viewport(_context.ClientRectangle);
+            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(90), (float)_context.Width / _context.Height, 0.1f, 5000.0f);
         }
 
-        protected override void OnKeyDown(KeyboardKeyEventArgs e)
+        private void OnKeyDown(KeyboardKeyEventArgs e)
         {
-            base.OnKeyDown(e);
             if (e.Key == Key.Escape)
             {
-                this.Close();
+                _context.Close();
             }
 
             if (e.Key == Key.A)
@@ -115,13 +132,13 @@ namespace ProceduralCity
             }
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
-            base.Dispose();
-            Log.Information("Disposing objects");
+            _logger.Information("Disposing objects");
             _renderer?.Dispose();
             _skybox?.Dispose();
             _world.Dispose();
+            _context.Dispose();
         }
     }
 }

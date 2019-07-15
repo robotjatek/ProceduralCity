@@ -6,14 +6,15 @@ using Serilog;
 
 namespace ProceduralCity.Generators
 {
-    class BuildingGenerator : IDisposable
+    class BuildingGenerator : IDisposable, IBuildingGenerator
     {
         private readonly Shader _buildingShader;
         private readonly Vector2 _areaBorder = new Vector2(3.5f, 3.5f);
         private readonly Random _random = new Random();
         private readonly Texture[] _buildingTextures;
+        private readonly ILogger _logger;
 
-        public BuildingGenerator()
+        public BuildingGenerator(ILogger logger)
         {
             _buildingShader = new Shader("vs.vert", "fs.frag");
 
@@ -27,11 +28,13 @@ namespace ProceduralCity.Generators
                 new Texture("building/6.jpg"),
                 new Texture("building/7.jpg"),
             };
+
+            _logger = logger;
         }
 
         public IEnumerable<Building> GenerateBuildings(IEnumerable<GroundNode> sites)
         {
-            Log.Information("Generating buildings");
+            _logger.Information("Generating buildings");
 
             var buildings = new List<Building>();
             foreach (var site in sites)

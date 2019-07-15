@@ -7,19 +7,21 @@ using Serilog;
 
 namespace ProceduralCity
 {
-    class World : IDisposable
+    class World : IDisposable, IWorld
     {
         private readonly List<IRenderable> _renderables = new List<IRenderable>();
-        private readonly GroundGenerator _groundGenerator;
-        private readonly BuildingGenerator _buildingGenerator;
+        private readonly IGroundGenerator _groundGenerator;
+        private readonly IBuildingGenerator _buildingGenerator;
+        private readonly ILogger _logger;
 
-        public World(GroundGenerator groundGenerator, BuildingGenerator buildingGenerator)
+        public World(IGroundGenerator groundGenerator, IBuildingGenerator buildingGenerator, ILogger logger)
         {
+            _logger = logger;
             _groundGenerator = groundGenerator;
             _buildingGenerator = buildingGenerator;
 
             var sites = _groundGenerator.Generate();
-            Log.Information($"Number of sites: {sites.Count()}");
+            _logger.Information($"Number of sites: {sites.Count()}");
 
             var buildings = _buildingGenerator.GenerateBuildings(sites);
             _renderables.AddRange(buildings);

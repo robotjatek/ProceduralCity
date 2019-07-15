@@ -3,7 +3,7 @@ using OpenTK;
 
 namespace ProceduralCity
 {
-    class Camera
+    class Camera : ICamera
     {
         private const int SPEED_MAGIC = 3;
         private Vector3 _position;

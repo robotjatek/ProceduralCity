@@ -4,7 +4,7 @@ using OpenTK;
 
 namespace ProceduralCity.Renderer
 {
-    class Renderer : IDisposable
+    class Renderer : IRenderer, IDisposable
     {
         private readonly Dictionary<(int textureId, int shaderId), ObjectBatch> _batches = new Dictionary<(int, int), ObjectBatch>();
 
@@ -24,7 +24,7 @@ namespace ProceduralCity.Renderer
             }
         }
 
-        public void AddToScene(IRenderable r)
+        private void AddToScene(IRenderable r)
         {
             var textureId = r.Texture != null ? r.Texture.Id : 0;
             var shaderId = r.Shader.ProgramId;

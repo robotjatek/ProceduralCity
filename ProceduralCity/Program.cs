@@ -1,4 +1,9 @@
-﻿using OpenTK.Graphics;
+﻿using Autofac;
+using OpenTK;
+using OpenTK.Graphics;
+using ProceduralCity.Config;
+using ProceduralCity.Generators;
+using ProceduralCity.Renderer;
 using Serilog;
 
 namespace ProceduralCity
@@ -10,17 +15,29 @@ namespace ProceduralCity
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .MinimumLevel.Verbose()
+                .Enrich.FromLogContext()
                 .CreateLogger();
             Log.Logger = logger;
+            var context = new OpenGlContext(640, 480, GraphicsMode.Default, "Dummy Context", logger); //this is a hack to create a context before any opengl calls
 
-            var config = new AppConfig();
+            var builder = new ContainerBuilder();
+            builder.Register(c => context).As<OpenGlContext>().SingleInstance();
+            builder.Register(c => logger).As<ILogger>().SingleInstance();
+            builder.RegisterType<Game>().As<IGame>().OnRelease(game => game.Dispose()).InstancePerLifetimeScope();
+            builder.RegisterType<AppConfig>().As<IAppConfig>().SingleInstance();
+            builder.Register(c => new Camera(new Vector3(-1, -1, -1), 90, 0)).As<ICamera>().SingleInstance();
+            builder.RegisterType<GroundGenerator>().As<IGroundGenerator>().SingleInstance();
+            builder.RegisterType<BuildingGenerator>().As<IBuildingGenerator>().SingleInstance();
+            builder.RegisterType<World>().As<IWorld>().SingleInstance();
+            builder.RegisterType<Renderer.Renderer>().As<IRenderer>().SingleInstance();
+            builder.RegisterType<Skybox>().As<ISkybox>().SingleInstance();
 
-            using (var g = new Game(config.ResolutionWidth, config.ResolutionHeight, GraphicsMode.Default, config.WindowTitle))
+            var container = builder.Build();
+            using (var scope = container.BeginLifetimeScope())
             {
-                g.Run(config.FrameRate);
+                var g = scope.Resolve<IGame>();
+                g.RunGame();
             }
-
-            logger.Dispose();
         }
     }
 }

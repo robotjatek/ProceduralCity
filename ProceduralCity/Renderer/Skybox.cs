@@ -5,7 +5,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace ProceduralCity.Renderer
 {
-    class Skybox : IDisposable
+    class Skybox : ISkybox, IDisposable
     {
         private readonly int _vaoId;
         private readonly int _vboId;

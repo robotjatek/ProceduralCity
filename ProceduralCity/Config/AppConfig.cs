@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 
-namespace ProceduralCity
+namespace ProceduralCity.Config
 {
-    class AppConfig
+    class AppConfig : IAppConfig
     {
         public AppConfig()
         {
@@ -30,5 +30,7 @@ namespace ProceduralCity
         public int AreaMaxLength { get; set; }
 
         public IEnumerable<string> BuildingTextures { get; set; }
+
+        public int WorldSize { get; set; }
     }
 }

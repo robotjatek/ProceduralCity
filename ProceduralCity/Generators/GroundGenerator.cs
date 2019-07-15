@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenTK;
+using ProceduralCity.Config;
 using Serilog;
 
 namespace ProceduralCity.Generators
 {
-    class GroundGenerator
+    class GroundGenerator : IGroundGenerator
     {
         private Vector2 _worldSize;
         private readonly Random _random = new Random();
+        private readonly ILogger _logger;
 
-        public GroundGenerator(Vector2 worldSize)
+        public GroundGenerator(IAppConfig config, ILogger logger)
         {
-            _worldSize = worldSize;
+            _logger = logger;
+            _worldSize = new Vector2(config.WorldSize);
         }
 
         public IEnumerable<GroundNode> Generate()
         {
-            Log.Information("Generating ground 2D tree");
+            _logger.Information("Generating ground 2D tree");
             var tree = new BspTree(_worldSize);
             SplitNode(tree.Root, maxLevel: 7);
             return tree.GetLeaves();

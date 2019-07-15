@@ -5,7 +5,7 @@ using Serilog;
 
 namespace ProceduralCity.Renderer
 {
-    class Shader : IDisposable
+    public class Shader : IDisposable
     {
         public int ProgramId
         {

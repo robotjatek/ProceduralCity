@@ -7,7 +7,7 @@ using Serilog;
 
 namespace ProceduralCity.Renderer
 {
-    class Texture : IDisposable
+    public class Texture : IDisposable
     {
         public int Id
         {
