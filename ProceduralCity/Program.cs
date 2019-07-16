@@ -12,15 +12,27 @@ namespace ProceduralCity
     {
         public static void Main()
         {
+            var container = RegisterDependencies();
+            using (var scope = container.BeginLifetimeScope())
+            {
+                var g = scope.Resolve<IGame>();
+                g.RunGame();
+            }
+        }
+
+        private static IContainer RegisterDependencies()
+        {
+            var builder = new ContainerBuilder();
+
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
                 .CreateLogger();
             Log.Logger = logger;
+
             var context = new OpenGlContext(640, 480, GraphicsMode.Default, "Dummy Context", logger); //this is a hack to create a context before any opengl calls
 
-            var builder = new ContainerBuilder();
             builder.Register(c => context).As<OpenGlContext>().SingleInstance();
             builder.Register(c => logger).As<ILogger>().SingleInstance();
             builder.RegisterType<Game>().As<IGame>().OnRelease(game => game.Dispose()).InstancePerLifetimeScope();
@@ -32,12 +44,7 @@ namespace ProceduralCity
             builder.RegisterType<Renderer.Renderer>().As<IRenderer>().SingleInstance();
             builder.RegisterType<Skybox>().As<ISkybox>().SingleInstance();
 
-            var container = builder.Build();
-            using (var scope = container.BeginLifetimeScope())
-            {
-                var g = scope.Resolve<IGame>();
-                g.RunGame();
-            }
+            return builder.Build();
         }
     }
 }
