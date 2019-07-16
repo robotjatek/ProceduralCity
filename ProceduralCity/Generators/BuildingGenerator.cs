@@ -8,7 +8,7 @@ using Serilog;
 
 namespace ProceduralCity.Generators
 {
-    class BuildingGenerator : IDisposable, IBuildingGenerator
+    class BuildingGenerator : IBuildingGenerator
     {
         private readonly Shader _buildingShader;
         private readonly Vector2 _areaBorder = new Vector2(3.5f, 3.5f);
@@ -33,7 +33,7 @@ namespace ProceduralCity.Generators
             var buildings = new List<Building>();
             foreach (var site in sites)
             {
-                var position = new Vector3(site.StartPosition.X, 0, site.StartPosition.Y);
+                var position = new Vector3(site.StartPosition.X + _areaBorder.X, 0, site.StartPosition.Y + _areaBorder.Y);
                 var area = site.EndPosition - site.StartPosition - _areaBorder;
                 var texture = _buildingTextures[_random.Next(_buildingTextures.Length)];
 
@@ -41,7 +41,7 @@ namespace ProceduralCity.Generators
                 buildings.Add(building);
             }
 
-            Log.Information($"Number of buildings: {buildings.Count}");
+            _logger.Information($"Number of buildings: {buildings.Count}");
 
             return buildings;
         }

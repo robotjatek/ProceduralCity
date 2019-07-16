@@ -37,11 +37,11 @@ namespace ProceduralCity.Generators
 
                 var children = new[]
                 {
-                new GroundNode(StartPosition, splitPoint),
-                new GroundNode(new Vector2(splitPoint.X,StartPosition.Y), new Vector2(EndPosition.X, splitPoint.Y)),
-                new GroundNode(new Vector2(StartPosition.X, splitPoint.Y), new Vector2(splitPoint.X, EndPosition.Y)),
-                new GroundNode(splitPoint, EndPosition)
-            };
+                    new GroundNode(StartPosition, splitPoint),
+                    new GroundNode(new Vector2(splitPoint.X,StartPosition.Y), new Vector2(EndPosition.X, splitPoint.Y)),
+                    new GroundNode(new Vector2(StartPosition.X, splitPoint.Y), new Vector2(splitPoint.X, EndPosition.Y)),
+                    new GroundNode(splitPoint, EndPosition)
+                };
 
                 Children.AddRange(children);
             }
