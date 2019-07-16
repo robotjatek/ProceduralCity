@@ -11,7 +11,7 @@ namespace ProceduralCity.Generators
     class BuildingGenerator : IBuildingGenerator
     {
         private readonly Shader _buildingShader;
-        private readonly Vector2 _areaBorder = new Vector2(3.5f, 3.5f);
+        private readonly Vector2 _areaBorder;
         private readonly Random _random = new Random();
         private readonly Texture[] _buildingTextures;
         private readonly ILogger _logger;

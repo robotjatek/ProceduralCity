@@ -103,14 +103,12 @@ namespace ProceduralCity.Renderer
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects).
+                    // No managed objects to dispose at the moment
                 }
 
                 GL.DeleteVertexArray(_vaoId);
                 GL.DeleteBuffer(_vertexVboId);
                 GL.DeleteBuffer(_uvVboId);
-
-                // TODO: set large fields to null.
 
                 disposedValue = true;
             }
