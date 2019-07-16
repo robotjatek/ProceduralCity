@@ -22,7 +22,7 @@ namespace ProceduralCity.Generators
             _config = config;
             _buildingShader = new Shader("vs.vert", "fs.frag");
             _buildingTextures = _config.BuildingTextures.Select(c => new Texture(c)).ToArray();
-
+            _areaBorder = new Vector2(_config.AreaBorderSize);
             _logger = logger;
         }
 

@@ -25,9 +25,7 @@ namespace ProceduralCity.Config
 
         public int MaxBuildingHeight { get; set; }
 
-        public int AreaMinLength { get; set; }
-
-        public int AreaMaxLength { get; set; }
+        public float AreaBorderSize { get; set; }
 
         public IEnumerable<string> BuildingTextures { get; set; }
 

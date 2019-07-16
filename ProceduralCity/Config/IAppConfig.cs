@@ -16,9 +16,7 @@ namespace ProceduralCity.Config
 
         int MaxBuildingHeight { get; set; }
 
-        int AreaMinLength { get; set; }
-
-        int AreaMaxLength { get; set; }
+        float AreaBorderSize { get; set; }
 
         int WorldSize { get; set; }
 
