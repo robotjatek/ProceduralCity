@@ -11,9 +11,11 @@ namespace ProceduralCity.Generators
         private Vector2 _worldSize;
         private readonly Random _random = new Random();
         private readonly ILogger _logger;
+        private readonly IAppConfig _config;
 
         public GroundGenerator(IAppConfig config, ILogger logger)
         {
+            _config = config;
             _logger = logger;
             _worldSize = new Vector2(config.WorldSize);
         }
@@ -21,8 +23,8 @@ namespace ProceduralCity.Generators
         public IEnumerable<GroundNode> Generate()
         {
             _logger.Information("Generating ground 2D tree");
-            var tree = new BspTree(_worldSize);
-            SplitNode(tree.Root, maxLevel: 7);
+            var tree = new BspTree(_worldSize, _config);
+            SplitNode(tree.Root, maxLevel: 10);
             return tree.GetLeaves();
         }
 

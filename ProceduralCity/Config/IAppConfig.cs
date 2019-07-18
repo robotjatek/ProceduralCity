@@ -20,6 +20,10 @@ namespace ProceduralCity.Config
 
         int WorldSize { get; set; }
 
+        int MinVerticalBlockLength { get; set; }
+
+        int MinHorizontalBlockLength { get; set; }
+
         IEnumerable<string> BuildingTextures { get; set; }
     }
 }

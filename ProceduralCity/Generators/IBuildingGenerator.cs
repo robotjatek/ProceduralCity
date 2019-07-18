@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using ProceduralCity.Buildings;
 
 namespace ProceduralCity.Generators
 {
     public interface IBuildingGenerator : IDisposable
     {
-        IEnumerable<Building> GenerateBuildings(IEnumerable<GroundNode> sites);
+        IEnumerable<IBuilding> GenerateBuildings(IEnumerable<GroundNode> sites);
     }
 }

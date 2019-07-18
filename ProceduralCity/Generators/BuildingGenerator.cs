@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
+using ProceduralCity.Buildings;
 using ProceduralCity.Config;
 using ProceduralCity.Renderer;
 using Serilog;
@@ -26,18 +27,18 @@ namespace ProceduralCity.Generators
             _logger = logger;
         }
 
-        public IEnumerable<Building> GenerateBuildings(IEnumerable<GroundNode> sites)
+        public IEnumerable<IBuilding> GenerateBuildings(IEnumerable<GroundNode> sites)
         {
             _logger.Information("Generating buildings");
 
-            var buildings = new List<Building>();
+            var buildings = new List<IBuilding>();
             foreach (var site in sites)
             {
                 var position = new Vector3(site.StartPosition.X + _areaBorder.X, 0, site.StartPosition.Y + _areaBorder.Y);
                 var area = site.EndPosition - site.StartPosition - _areaBorder;
                 var texture = _buildingTextures[_random.Next(_buildingTextures.Length)];
 
-                var building = new Building(position, area, texture, _buildingShader, _random.Next(_config.MinBuildingHeight, _config.MaxBuildingHeight));
+                var building = new TowerBuilding(position, area, texture, _buildingShader, _random.Next(_config.MinBuildingHeight, _config.MaxBuildingHeight));
                 buildings.Add(building);
             }
 

@@ -59,8 +59,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Buildings\IBuilding.cs" />
+    <Compile Include="Buildings\TowerBuilding.cs" />
     <Compile Include="Config\AppConfig.cs" />
-    <Compile Include="Building.cs" />
+    <Compile Include="Buildings\Building.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Config\IAppConfig.cs" />
     <Compile Include="Game.cs" />

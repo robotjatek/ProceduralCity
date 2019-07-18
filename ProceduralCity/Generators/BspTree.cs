@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using OpenTK;
+using ProceduralCity.Config;
 
 namespace ProceduralCity.Generators
 {
@@ -7,9 +8,9 @@ namespace ProceduralCity.Generators
     {
         public GroundNode Root { get; private set; }
 
-        public BspTree(Vector2 quadSize)
+        public BspTree(Vector2 quadSize, IAppConfig config)
         {
-            Root = new GroundNode(Vector2.Zero, quadSize);
+            Root = new GroundNode(Vector2.Zero, quadSize, config);
         }
 
         public IEnumerable<GroundNode> GetLeaves()
