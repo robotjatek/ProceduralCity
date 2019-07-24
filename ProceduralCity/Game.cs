@@ -131,7 +131,7 @@ namespace ProceduralCity
                 _camera.SetHorizontal(1.0f);
             }
 
-            if(e.Alt && e.Key == Key.Enter)
+            if (e.Alt && e.Key == Key.Enter)
             {
                 _context.ToggleFullscreen();
             }
