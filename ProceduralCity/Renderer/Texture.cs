@@ -15,16 +15,28 @@ namespace ProceduralCity.Renderer
             private set;
         }
 
-        public Texture(string fileName)
+        public int Width
         {
-            LoadImage(fileName);
+            get;
+            private set;
         }
 
-        public Texture(List<string> fileNames)
+        public int Height
+        {
+            get;
+            private set;
+        }
+
+        public Texture(string fileName, string defaultFolder = "Textures")
+        {
+            LoadImage(fileName, defaultFolder);
+        }
+
+        public Texture(List<string> fileNames, string defaultFolder = "Textures")
         {
             if (fileNames.Count == 1)
             {
-                LoadImage(fileNames.First());
+                LoadImage(fileNames.First(), defaultFolder);
             }
             else if (fileNames.Count == 6)
             {
@@ -66,12 +78,15 @@ namespace ProceduralCity.Renderer
             }
         }
 
-        private void LoadImage(string fileName)
+        private void LoadImage(string fileName, string defaultFolder)
         {
             Id = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Id);
-            using (var image = new Bitmap($"Textures/{fileName}"))
+            using (var image = new Bitmap($"{defaultFolder}/{fileName}"))
             {
+                Width = image.Width;
+                Height = image.Height;
+                image.MakeTransparent();
                 var bitmapData = image.LockBits(
                     new Rectangle(0, 0, image.Width, image.Height),
                     System.Drawing.Imaging.ImageLockMode.ReadOnly,
@@ -84,7 +99,7 @@ namespace ProceduralCity.Renderer
                     image.Width,
                     image.Height,
                     0,
-                    PixelFormat.Bgr,
+                    PixelFormat.Bgra,
                     PixelType.UnsignedByte,
                     bitmapData.Scan0);
                 image.UnlockBits(bitmapData);
