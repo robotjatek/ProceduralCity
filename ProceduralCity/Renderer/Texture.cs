@@ -95,7 +95,7 @@ namespace ProceduralCity.Renderer
                 GL.TexImage2D(
                     TextureTarget.Texture2D,
                     0,
-                    PixelInternalFormat.Rgb,
+                    PixelInternalFormat.Rgba,
                     image.Width,
                     image.Height,
                     0,

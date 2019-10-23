@@ -28,7 +28,15 @@ namespace ProceduralCity
 
         private readonly OpenGlContext _context;
 
-        public Game(IAppConfig config, ILogger logger, ICamera camera, IWorld world, OpenGlContext context, IRenderer renderer, IRenderer bufferRenderer, ISkybox skybox)
+        public Game(
+            IAppConfig config,
+            ILogger logger,
+            ICamera camera,
+            IWorld world,
+            OpenGlContext context,
+            IRenderer renderer,
+            IRenderer bufferRenderer,
+            ISkybox skybox)
         {
             _camera = camera;
             _logger = logger;
@@ -43,9 +51,18 @@ namespace ProceduralCity
             GL.CullFace(CullFaceMode.Back);
             GL.FrontFace(FrontFaceDirection.Cw);
             GL.ClearColor(Color4.Green);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             _renderer = renderer;
             _bufferRenderer = bufferRenderer;
+            _bufferRenderer.BeforeRender = () =>
+            {
+                GL.Enable(EnableCap.Blend);
+            };
+            _bufferRenderer.AfterRender = () =>
+            {
+                GL.Disable(EnableCap.Blend);
+            };
             _skybox = skybox;
             _world = world;
 
