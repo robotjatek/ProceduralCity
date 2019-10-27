@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using ProceduralCity.Renderer.Uniform;
 
 namespace ProceduralCity.Renderer
 {
@@ -13,6 +14,8 @@ namespace ProceduralCity.Renderer
         private readonly Texture _texture;
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Vector2> _UVs = new List<Vector2>();
+        private readonly Dictionary<string, int> _uniformLocations = new Dictionary<string, int>();
+        private readonly UniformHandler _uniformHandler = new UniformHandler();
 
         private Vector3[] Vertices { get; set; }
         private Vector2[] UVs { get; set; }
@@ -48,6 +51,8 @@ namespace ProceduralCity.Renderer
             _shader.Use();
             GL.BindVertexArray(_vaoId);
 
+            SetUniforms();
+
             if (_texture != null)
             {
                 GL.BindTexture(TextureTarget.Texture2D, _texture.Id);
@@ -60,6 +65,24 @@ namespace ProceduralCity.Renderer
             GL.UniformMatrix4(_modelLocation, false, ref model);
             GL.DrawArrays(PrimitiveType.Triangles, 0, Vertices.Length);
             GL.BindVertexArray(0);
+        }
+
+        private void SetUniforms()
+        {
+            var uniforms = _shader.Uniforms;
+            foreach (var uniform in uniforms)
+            {
+                if (_uniformLocations.TryGetValue(uniform.Key, out int location) == false)
+                {
+                    location = GL.GetUniformLocation(_shader._programId, uniform.Key);
+                    _uniformLocations.Add(uniform.Key, location);
+                }
+
+                if (location != -1)
+                {
+                    uniform.Value.Visit(location, _uniformHandler);
+                }
+            }
         }
 
         private void Setup()
@@ -90,11 +113,11 @@ namespace ProceduralCity.Renderer
             _shader.Use();
             if (_texture != null)
             {
-                _textureLocation = GL.GetUniformLocation(_shader.ProgramId, "tex");
+                _textureLocation = GL.GetUniformLocation(_shader._programId, "tex");
             }
-            _projectionLocation = GL.GetUniformLocation(_shader.ProgramId, "_projection");
-            _viewLocation = GL.GetUniformLocation(_shader.ProgramId, "_view");
-            _modelLocation = GL.GetUniformLocation(_shader.ProgramId, "_model");
+            _projectionLocation = GL.GetUniformLocation(_shader._programId, "_projection");
+            _viewLocation = GL.GetUniformLocation(_shader._programId, "_view");
+            _modelLocation = GL.GetUniformLocation(_shader._programId, "_model");
         }
 
         protected virtual void Dispose(bool disposing)

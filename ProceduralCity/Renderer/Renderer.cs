@@ -8,12 +8,18 @@ namespace ProceduralCity.Renderer
     {
         private readonly Dictionary<(int textureId, int shaderId), ObjectBatch> _batches = new Dictionary<(int, int), ObjectBatch>();
 
+        public Action BeforeRender { get; set; }
+
+        public Action AfterRender { get; set; }
+
         public void RenderScene(Matrix4 projection, Matrix4 view, Matrix4 model)
         {
+            BeforeRender?.Invoke();
             foreach (var batch in _batches.Values)
             {
                 batch.Draw(projection, view, model);
             }
+            AfterRender?.Invoke();
         }
 
         public void AddToScene(IEnumerable<IRenderable> renderables)
@@ -27,7 +33,7 @@ namespace ProceduralCity.Renderer
         private void AddToScene(IRenderable r)
         {
             var textureId = r.Texture != null ? r.Texture.Id : 0;
-            var shaderId = r.Shader.ProgramId;
+            var shaderId = r.Shader._programId;
             var key = (textureId, shaderId);
 
             if (_batches.TryGetValue(key, out ObjectBatch batch))

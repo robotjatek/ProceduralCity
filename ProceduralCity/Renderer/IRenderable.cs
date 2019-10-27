@@ -3,7 +3,7 @@ using OpenTK;
 
 namespace ProceduralCity.Renderer
 {
-    public interface IRenderable
+    interface IRenderable
     {
         IEnumerable<Vector3> Vertices { get; }
         IEnumerable<Vector2> UVs { get; }

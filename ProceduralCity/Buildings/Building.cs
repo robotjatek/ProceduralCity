@@ -4,7 +4,7 @@ using ProceduralCity.Renderer;
 
 namespace ProceduralCity.Buildings
 {
-    public class Building : IBuilding
+    class Building : IBuilding
     {
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Vector2> _UVs = new List<Vector2>();

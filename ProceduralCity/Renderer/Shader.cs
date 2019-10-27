@@ -1,16 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using OpenTK.Graphics.OpenGL;
+using ProceduralCity.Renderer.Uniform;
 using Serilog;
 
 namespace ProceduralCity.Renderer
 {
-    public class Shader : IDisposable
+    class Shader : IDisposable
     {
-        public int ProgramId
+        private readonly Dictionary<string, IUniformValue> _uniformValues = new Dictionary<string, IUniformValue>();
+
+        public int _programId
         {
             get;
             private set;
+        }
+
+        public IEnumerable<KeyValuePair<string, IUniformValue>> Uniforms
+        {
+            get
+            {
+                return _uniformValues;
+            }
         }
 
         public Shader(string vertexShader, string fragmentShader)
@@ -21,15 +33,20 @@ namespace ProceduralCity.Renderer
             var vertexHandle = CompileShader(vertexFile, ShaderType.VertexShader);
             var fragmentHandle = CompileShader(fragmentFile, ShaderType.FragmentShader);
 
-            ProgramId = LinkShaders(vertexHandle, fragmentHandle);
+            _programId = LinkShaders(vertexHandle, fragmentHandle);
 
             GL.DeleteShader(vertexHandle);
             GL.DeleteShader(fragmentHandle);
         }
 
+        public void SetUniformValue<T>(string uniformName, T value) where T : IUniformValue
+        {
+            _uniformValues[uniformName] = value;
+        }
+
         public void Use()
         {
-            GL.UseProgram(ProgramId);
+            GL.UseProgram(_programId);
         }
 
         private int LinkShaders(int vertexHandle, int fragmentHandle)
@@ -79,7 +96,7 @@ namespace ProceduralCity.Renderer
                 //{
                 //}
 
-                GL.DeleteProgram(ProgramId);
+                GL.DeleteProgram(_programId);
                 disposedValue = true;
             }
         }

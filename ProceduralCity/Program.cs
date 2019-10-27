@@ -41,7 +41,7 @@ namespace ProceduralCity
             builder.RegisterType<GroundGenerator>().As<IGroundGenerator>().SingleInstance();
             builder.RegisterType<BuildingGenerator>().As<IBuildingGenerator>().SingleInstance();
             builder.RegisterType<World>().As<IWorld>().SingleInstance();
-            builder.RegisterType<Renderer.Renderer>().As<IRenderer>().SingleInstance();
+            builder.RegisterType<Renderer.Renderer>().As<IRenderer>().InstancePerDependency();
             builder.RegisterType<Skybox>().As<ISkybox>().SingleInstance();
 
             return builder.Build();

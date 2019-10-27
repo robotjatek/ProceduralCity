@@ -4,7 +4,7 @@ using ProceduralCity.Renderer;
 
 namespace ProceduralCity
 {
-    public interface IWorld : IDisposable
+    interface IWorld : IDisposable
     {
         IEnumerable<IRenderable> Renderables { get; }
     }

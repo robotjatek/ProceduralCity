@@ -75,9 +75,9 @@ namespace ProceduralCity.Renderer
 
             _texture = new Texture(filenames.ToList());
             _shader = new Shader("skybox.vert", "skybox.fs");
-            _projectionMatrixLocation = GL.GetUniformLocation(_shader.ProgramId, "projection");
-            _viewMatrixLocation = GL.GetUniformLocation(_shader.ProgramId, "view");
-            _skyboxLocation = GL.GetUniformLocation(_shader.ProgramId, "skybox");
+            _projectionMatrixLocation = GL.GetUniformLocation(_shader._programId, "projection");
+            _viewMatrixLocation = GL.GetUniformLocation(_shader._programId, "view");
+            _skyboxLocation = GL.GetUniformLocation(_shader._programId, "skybox");
 
             _vaoId = GL.GenVertexArray();
             GL.BindVertexArray(_vaoId);

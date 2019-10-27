@@ -9,22 +9,35 @@ using Serilog;
 
 namespace ProceduralCity
 {
-    public class Game : IGame, IDisposable
+    class Game : IGame, IDisposable
     {
         private readonly string _title;
         private Matrix4 _projectionMatrix = Matrix4.Identity;
         private Matrix4 _modelMatrix = Matrix4.Identity;
 
+        private Matrix4 _backbufferMatrix = Matrix4.Identity;
+        private readonly Textbox _text = new Textbox("Consolas");
+        private readonly Textbox _text1 = new Textbox("Consolas");
+
         private readonly IAppConfig _config;
         private readonly ILogger _logger;
         private readonly IRenderer _renderer;
+        private readonly IRenderer _bufferRenderer;
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
         private readonly IWorld _world;
 
         private readonly OpenGlContext _context;
 
-        public Game(IAppConfig config, ILogger logger, ICamera camera, IWorld world, OpenGlContext context, IRenderer renderer, ISkybox skybox)
+        public Game(
+            IAppConfig config,
+            ILogger logger,
+            ICamera camera,
+            IWorld world,
+            OpenGlContext context,
+            IRenderer renderer,
+            IRenderer bufferRenderer,
+            ISkybox skybox)
         {
             _camera = camera;
             _logger = logger;
@@ -39,12 +52,29 @@ namespace ProceduralCity
             GL.CullFace(CullFaceMode.Back);
             GL.FrontFace(FrontFaceDirection.Cw);
             GL.ClearColor(Color4.Green);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             _renderer = renderer;
+            _bufferRenderer = bufferRenderer;
+            _bufferRenderer.BeforeRender = () =>
+            {
+                GL.Enable(EnableCap.Blend);
+            };
+            _bufferRenderer.AfterRender = () =>
+            {
+                GL.Disable(EnableCap.Blend);
+            };
             _skybox = skybox;
             _world = world;
 
             _renderer.AddToScene(_world.Renderables);
+
+            _text.WithText("Árvíztűrő tükörfúrógép", new Vector2(0, 200), 1.0f);
+            _text.Saturation = 1;
+            _bufferRenderer.AddToScene(_text.Text);
+
+            _text1.WithText("The quick brown fox jumps over the lazy dog.", new Vector2(0, 100), 0.6f);
+            _bufferRenderer.AddToScene(_text1.Text);
         }
 
         private void ConfigureContext()
@@ -69,7 +99,7 @@ namespace ProceduralCity
 
         private void OnRenderFrame(FrameEventArgs e)
         {
-            _context.Title = $"{_title} - FPS: {Math.Round(1f / e.Time, 1)}";
+            _context.Title = $"{_title} - FPS: {Math.Round(1f / e.Time, 0)}";
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -77,7 +107,7 @@ namespace ProceduralCity
             _skybox.Render(_projectionMatrix, viewMatrix);
             GL.DepthFunc(DepthFunction.Lequal);
             _renderer.RenderScene(_projectionMatrix, viewMatrix, _modelMatrix);
-
+            _bufferRenderer.RenderScene(_backbufferMatrix, Matrix4.Identity, Matrix4.Identity);
             _context.SwapBuffers();
         }
 
@@ -86,6 +116,7 @@ namespace ProceduralCity
             _logger.Information($"Window resized: {_context.Width}x{_context.Height}");
             GL.Viewport(_context.ClientRectangle);
             _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(90), (float)_context.Width / _context.Height, 0.1f, 5000.0f);
+            _backbufferMatrix = Matrix4.CreateOrthographicOffCenter(0, _context.Width, _context.Height, 0, -1, 1);
         }
 
         private void OnKeyDown(KeyboardKeyEventArgs e)
@@ -135,6 +166,20 @@ namespace ProceduralCity
             {
                 _context.ToggleFullscreen();
             }
+
+            if (e.Key == Key.F1)
+            {
+                _context.ToggleVSync();
+            }
+
+            if (e.Key == Key.KeypadPlus)
+            {
+                _text.Hue += 0.01f;
+            }
+            else if (e.Key == Key.KeypadMinus)
+            {
+                _text.Hue -= 0.01f;
+            }
         }
 
         public void Dispose()
@@ -144,6 +189,8 @@ namespace ProceduralCity
             _skybox?.Dispose();
             _world.Dispose();
             _context.Dispose();
+            _text.Dispose();
+            _text1.Dispose();
         }
     }
 }
