@@ -4,7 +4,7 @@ using ProceduralCity.Buildings;
 
 namespace ProceduralCity.Generators
 {
-    public interface IBuildingGenerator : IDisposable
+    interface IBuildingGenerator : IDisposable
     {
         IEnumerable<IBuilding> GenerateBuildings(IEnumerable<GroundNode> sites);
     }

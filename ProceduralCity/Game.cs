@@ -9,7 +9,7 @@ using Serilog;
 
 namespace ProceduralCity
 {
-    public class Game : IGame, IDisposable
+    class Game : IGame, IDisposable
     {
         private readonly string _title;
         private Matrix4 _projectionMatrix = Matrix4.Identity;
@@ -17,6 +17,7 @@ namespace ProceduralCity
 
         private Matrix4 _backbufferMatrix = Matrix4.Identity;
         private readonly Textbox _text = new Textbox("Consolas");
+        private readonly Textbox _text1 = new Textbox("Consolas");
 
         private readonly IAppConfig _config;
         private readonly ILogger _logger;
@@ -68,8 +69,12 @@ namespace ProceduralCity
 
             _renderer.AddToScene(_world.Renderables);
 
-            _text.WithText("Árvíztűrő tükörfúrógép");
+            _text.WithText("Árvíztűrő tükörfúrógép", new Vector2(0, 200), 1.0f);
+            _text.Saturation = 1;
             _bufferRenderer.AddToScene(_text.Text);
+
+            _text1.WithText("The quick brown fox jumps over the lazy dog.", new Vector2(0, 100), 0.6f);
+            _bufferRenderer.AddToScene(_text1.Text);
         }
 
         private void ConfigureContext()
@@ -161,6 +166,20 @@ namespace ProceduralCity
             {
                 _context.ToggleFullscreen();
             }
+
+            if (e.Key == Key.F1)
+            {
+                _context.ToggleVSync();
+            }
+
+            if (e.Key == Key.KeypadPlus)
+            {
+                _text.Hue += 0.01f;
+            }
+            else if (e.Key == Key.KeypadMinus)
+            {
+                _text.Hue -= 0.01f;
+            }
         }
 
         public void Dispose()
@@ -171,6 +190,7 @@ namespace ProceduralCity
             _world.Dispose();
             _context.Dispose();
             _text.Dispose();
+            _text1.Dispose();
         }
     }
 }

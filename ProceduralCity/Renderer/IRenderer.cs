@@ -4,7 +4,7 @@ using OpenTK;
 
 namespace ProceduralCity.Renderer
 {
-    public interface IRenderer : IDisposable
+    interface IRenderer : IDisposable
     {
         Action BeforeRender { get; set; }
 

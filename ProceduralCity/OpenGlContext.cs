@@ -17,6 +17,7 @@ namespace ProceduralCity
             var glVendor = GL.GetString(StringName.Vendor);
             var glRenderer = GL.GetString(StringName.Renderer);
             _logger.Information($"Vendor: {glVendor} | Renderer: {glRenderer}");
+            VSync = VSyncMode.Off;
         }
 
         public void ToggleFullscreen()
@@ -33,6 +34,18 @@ namespace ProceduralCity
             }
 
             IsFullscreen = !IsFullscreen;
+        }
+
+        public void ToggleVSync()
+        {
+            if (VSync == VSyncMode.On)
+            {
+                this.VSync = VSyncMode.Off;
+            }
+            else if (VSync == VSyncMode.Off)
+            {
+                this.VSync = VSyncMode.On;
+            }
         }
     }
 }

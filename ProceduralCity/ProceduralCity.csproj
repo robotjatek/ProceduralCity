@@ -50,7 +50,7 @@
     </None>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
-    <None Include="Shaders\color.frag">
+    <None Include="Shaders\font.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\fs.frag">
@@ -73,6 +73,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\MathExtensions.cs" />
+    <Compile Include="Renderer\Uniform\FloatUniform.cs" />
+    <Compile Include="Renderer\Uniform\IntUniform.cs" />
+    <Compile Include="Renderer\Uniform\IUniformValue.cs" />
+    <Compile Include="Renderer\Uniform\UniformHandler.cs" />
     <Compile Include="Textbox.cs" />
     <Compile Include="Buildings\IBuilding.cs" />
     <Compile Include="Buildings\TowerBuilding.cs" />

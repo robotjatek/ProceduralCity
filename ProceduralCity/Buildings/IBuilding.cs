@@ -2,7 +2,7 @@
 
 namespace ProceduralCity.Buildings
 {
-    public interface IBuilding : IRenderable
+    interface IBuilding : IRenderable
     {
     }
 }
