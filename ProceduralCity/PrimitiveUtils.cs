@@ -30,5 +30,44 @@ namespace ProceduralCity
                 new Vector2(position.X + width, position.Y + height),
             };
         }
+
+        public static IEnumerable<Vector2> CreateGuiUVs()
+        {
+            return new[]
+            {
+                new Vector2(0, 1),
+                new Vector2(1, 1),
+                new Vector2(0, 0),
+                new Vector2(0, 0),
+                new Vector2(1, 1),
+                new Vector2(1, 0),
+            };
+        }
+
+        public static IEnumerable<Vector3> CreateNDCFullscreenGuiVertices()
+        {
+            return new[]
+            {
+                new Vector3(-1, 1, 0),
+                new Vector3(1, 1, 0),
+                new Vector3(1, -1, 0),
+                new Vector3(-1, 1, 0),
+                new Vector3(1, -1, 0),
+                new Vector3(-1, -1, 0)
+            };
+        }
+
+        public static IEnumerable<Vector2> CreateNDCFullscreenUVs()
+        {
+            return new[]
+            {
+                new Vector2(0, 1),
+                new Vector2(1, 1),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(1, 0),
+                new Vector2(0, 0),
+            };
+        }
     }
 }

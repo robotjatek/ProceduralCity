@@ -27,6 +27,18 @@ namespace ProceduralCity.Renderer
             private set;
         }
 
+        public Texture(int width, int height)
+        {
+            Width = width;
+            Height = height;
+
+            Id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, Id);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+        }
+
         public Texture(string fileName, string defaultFolder = "Textures")
         {
             LoadImage(fileName, defaultFolder);
@@ -120,7 +132,7 @@ namespace ProceduralCity.Renderer
 
         protected virtual void Dispose(bool disposing)
         {
-            Log.Debug($"Disposing Texture {Id}");
+            Log.Information($"Disposing Texture {Id}");
             if (!disposedValue)
             {
                 //if (disposing)

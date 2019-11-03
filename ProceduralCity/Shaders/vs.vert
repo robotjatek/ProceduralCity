@@ -8,13 +8,10 @@ uniform mat4 _view;
 uniform mat4 _model;
 
 out vec2 fTexCoord;
-out vec3 fVertexData;
 
 void main()
 {
-	fVertexData = vVertexData;
 	fTexCoord = vTexCoord;
-
 	gl_Position = _projection* _view * _model * vec4(vVertexData, 1.0f);
 
 }

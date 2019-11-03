@@ -5,6 +5,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using ProceduralCity.Config;
 using ProceduralCity.Renderer;
+using ProceduralCity.Renderer.Utils;
 using Serilog;
 
 namespace ProceduralCity
@@ -15,19 +16,25 @@ namespace ProceduralCity
         private Matrix4 _projectionMatrix = Matrix4.Identity;
         private Matrix4 _modelMatrix = Matrix4.Identity;
 
-        private Matrix4 _backbufferMatrix = Matrix4.Identity;
+        private Matrix4 _textRendererMatrix = Matrix4.Identity;
+        private Matrix4 _ndcRendererMatrix;
         private readonly Textbox _text = new Textbox("Consolas");
-        private readonly Textbox _text1 = new Textbox("Consolas");
 
         private readonly IAppConfig _config;
         private readonly ILogger _logger;
         private readonly IRenderer _renderer;
-        private readonly IRenderer _bufferRenderer;
+        private readonly IRenderer _textRenderer;
+        private readonly IRenderer _ndcRenderer;
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
         private readonly IWorld _world;
 
         private readonly OpenGlContext _context;
+
+        private readonly BackBufferRenderer _billboardRenderer;
+        private readonly BackBufferRenderer _worldRenderer;
+
+        private double _elapsedFrameTime = 0;
 
         public Game(
             IAppConfig config,
@@ -36,7 +43,8 @@ namespace ProceduralCity
             IWorld world,
             OpenGlContext context,
             IRenderer renderer,
-            IRenderer bufferRenderer,
+            IRenderer textRenderer,
+            IRenderer ndcRenderer,
             ISkybox skybox)
         {
             _camera = camera;
@@ -55,26 +63,44 @@ namespace ProceduralCity
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             _renderer = renderer;
-            _bufferRenderer = bufferRenderer;
-            _bufferRenderer.BeforeRender = () =>
+            _textRenderer = textRenderer;
+            _textRenderer.BeforeRender = () =>
             {
                 GL.Enable(EnableCap.Blend);
             };
-            _bufferRenderer.AfterRender = () =>
+            _textRenderer.AfterRender = () =>
             {
                 GL.Disable(EnableCap.Blend);
             };
+            _ndcRenderer = ndcRenderer;
             _skybox = skybox;
             _world = world;
 
             _renderer.AddToScene(_world.Renderables);
 
+            _worldRenderer = new BackBufferRenderer(
+                _logger,
+                _config.ResolutionWidth,
+                _config.ResolutionHeight,
+                useDepthBuffer: true);
+
             _text.WithText("Árvíztűrő tükörfúrógép", new Vector2(0, 200), 1.0f);
             _text.Saturation = 1;
-            _bufferRenderer.AddToScene(_text.Text);
+            _textRenderer.AddToScene(_text.Text);
 
-            _text1.WithText("The quick brown fox jumps over the lazy dog.", new Vector2(0, 100), 0.6f);
-            _bufferRenderer.AddToScene(_text1.Text);
+            _ndcRenderer.AddToScene(new FullScreenQuad(_worldRenderer.Texture));
+
+            //var w = 320;
+            //var h = 240;
+            //_billboardRenderer = new BackBufferRenderer(_logger, w, h, useDepthBuffer: false);
+            //var r = new Renderer.Renderer();
+            //var text = new Textbox("Consolas").WithText("Yaaaay!!!", new Vector2(0, 0), 1);
+            //r.AddToScene(text.Text);
+            //var p = Matrix4.CreateOrthographicOffCenter(0, w, h, 0, -1, 1);
+            //_billboardRenderer.RenderToTexture(r, p, Matrix4.Identity, Matrix4.Identity);
+
+            //var b = new Billboard(_billboardRenderer.Texture);
+            //_textRenderer.AddToScene(new[] { b }); //TODO: billboards should be rendered with a different renderer with blending enabled
         }
 
         private void ConfigureContext()
@@ -99,16 +125,29 @@ namespace ProceduralCity
 
         private void OnRenderFrame(FrameEventArgs e)
         {
-            _context.Title = $"{_title} - FPS: {Math.Round(1f / e.Time, 0)}";
-
+            CountFps(e);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             var viewMatrix = _camera.Use();
             _skybox.Render(_projectionMatrix, viewMatrix);
             GL.DepthFunc(DepthFunction.Lequal);
-            _renderer.RenderScene(_projectionMatrix, viewMatrix, _modelMatrix);
-            _bufferRenderer.RenderScene(_backbufferMatrix, Matrix4.Identity, Matrix4.Identity);
+
+            _worldRenderer.Clear();
+            _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix, _modelMatrix);
+            _worldRenderer.RenderToTexture(_textRenderer, _textRendererMatrix, Matrix4.Identity, Matrix4.Identity);
+
+            _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity, Matrix4.Identity);
             _context.SwapBuffers();
+        }
+
+        private void CountFps(FrameEventArgs e)
+        {
+            _elapsedFrameTime += e.Time;
+            if (_elapsedFrameTime >= 0.5)
+            {
+                _context.Title = $"{_title} - FPS: {Math.Round(1f / e.Time, 0)}";
+                _elapsedFrameTime = 0;
+            }
         }
 
         private void OnResize(EventArgs e)
@@ -116,7 +155,9 @@ namespace ProceduralCity
             _logger.Information($"Window resized: {_context.Width}x{_context.Height}");
             GL.Viewport(_context.ClientRectangle);
             _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(90), (float)_context.Width / _context.Height, 0.1f, 5000.0f);
-            _backbufferMatrix = Matrix4.CreateOrthographicOffCenter(0, _context.Width, _context.Height, 0, -1, 1);
+            _textRendererMatrix = Matrix4.CreateOrthographicOffCenter(0, _context.Width, _context.Height, 0, -1, 1);
+            _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
+            _worldRenderer.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height);
         }
 
         private void OnKeyDown(KeyboardKeyEventArgs e)
@@ -190,7 +231,8 @@ namespace ProceduralCity
             _world.Dispose();
             _context.Dispose();
             _text.Dispose();
-            _text1.Dispose();
+            _worldRenderer.Dispose();
+            _ndcRenderer.Dispose();
         }
     }
 }

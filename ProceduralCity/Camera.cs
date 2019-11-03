@@ -16,7 +16,7 @@ namespace ProceduralCity
             _position = position;
             _horizontalAngle = horizontalAngle;
             _verticalAngle = verticalAngle;
-            _velocity = 0.3f;
+            _velocity = 0.5f;
         }
 
         public void MoveForward()

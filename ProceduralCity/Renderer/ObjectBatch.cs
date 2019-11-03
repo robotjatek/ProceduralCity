@@ -113,9 +113,9 @@ namespace ProceduralCity.Renderer
             _shader.Use();
             if (_texture != null)
             {
-                _textureLocation = GL.GetUniformLocation(_shader._programId, "tex");
+                _textureLocation = GL.GetUniformLocation(_shader._programId, "tex"); //TODO: set texture uniform by hand using shader class
             }
-            _projectionLocation = GL.GetUniformLocation(_shader._programId, "_projection");
+            _projectionLocation = GL.GetUniformLocation(_shader._programId, "_projection"); //TODO: set matrices by hand using the shader class
             _viewLocation = GL.GetUniformLocation(_shader._programId, "_view");
             _modelLocation = GL.GetUniformLocation(_shader._programId, "_model");
         }

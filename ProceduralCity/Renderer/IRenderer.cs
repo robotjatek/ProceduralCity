@@ -13,5 +13,7 @@ namespace ProceduralCity.Renderer
         void RenderScene(Matrix4 projection, Matrix4 view, Matrix4 model);
 
         void AddToScene(IEnumerable<IRenderable> renderables);
+
+        void AddToScene(IRenderable renderable);
     }
 }
