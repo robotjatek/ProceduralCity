@@ -1,65 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
+using ProceduralCity.Renderer.Uniform;
 
 namespace ProceduralCity.Renderer
 {
-    class Skybox : ISkybox, IDisposable
+    class Skybox : ISkybox, IRenderable, IDisposable
     {
-        private readonly int _vaoId;
-        private readonly int _vboId;
-        private readonly Texture _texture;
-        private readonly Shader _shader;
-
-        private readonly int _projectionMatrixLocation;
-        private readonly int _viewMatrixLocation;
-        private readonly int _skyboxLocation;
-
-        private readonly Vector3[] vertices = new[]
+        public IEnumerable<Vector3> Vertices
         {
-           new Vector3(-1.0f,  1.0f, -1.0f),
-            new Vector3(-1.0f, -1.0f, -1.0f),
-            new Vector3(1.0f, -1.0f, -1.0f),
-           new Vector3( 1.0f, -1.0f, -1.0f),
-            new Vector3(1.0f,  1.0f, -1.0f),
-          new Vector3(  -1.0f,  1.0f, -1.0f),
+            get;
+            private set;
+        }
 
-          new Vector3(  -1.0f, -1.0f,  1.0f),
-          new Vector3(  -1.0f, -1.0f, -1.0f),
-           new Vector3( -1.0f,  1.0f, -1.0f),
-         new Vector3(   -1.0f,  1.0f, -1.0f),
-         new Vector3(   -1.0f,  1.0f,  1.0f),
-         new Vector3(   -1.0f, -1.0f,  1.0f),
+        public IEnumerable<Vector2> UVs
+        {
+            get;
+            private set;
+        }
 
-        new Vector3(    1.0f, -1.0f, -1.0f),
-        new Vector3(    1.0f, -1.0f,  1.0f),
-        new Vector3(    1.0f,  1.0f,  1.0f),
-        new Vector3(    1.0f,  1.0f,  1.0f),
-        new Vector3(    1.0f,  1.0f, -1.0f),
-        new Vector3(    1.0f, -1.0f, -1.0f),
+        public ITexture Texture
+        {
+            get;
+            private set;
+        }
 
-         new Vector3(   -1.0f, -1.0f,  1.0f),
-        new Vector3(    -1.0f,  1.0f,  1.0f),
-        new Vector3(    1.0f,  1.0f,  1.0f),
-        new Vector3(    1.0f,  1.0f,  1.0f),
-        new Vector3(    1.0f, -1.0f,  1.0f),
-        new Vector3(    -1.0f, -1.0f,  1.0f),
-
-         new Vector3(   -1.0f,  1.0f, -1.0f),
-        new Vector3(    1.0f,  1.0f, -1.0f),
-        new Vector3(    1.0f,  1.0f,  1.0f),
-        new Vector3(    1.0f,  1.0f,  1.0f),
-        new Vector3(    -1.0f,  1.0f,  1.0f),
-        new Vector3(    -1.0f,  1.0f, -1.0f),
-
-         new Vector3(   -1.0f, -1.0f, -1.0f),
-         new Vector3(   -1.0f, -1.0f,  1.0f),
-         new Vector3(   1.0f, -1.0f, -1.0f),
-         new Vector3(   1.0f, -1.0f, -1.0f),
-         new Vector3(   -1.0f, -1.0f,  1.0f),
-        new Vector3(    1.0f, -1.0f,  1.0f)
-        };
+        public Shader Shader
+        {
+            get;
+            private set;
+        }
 
         public Skybox()
         {
@@ -73,43 +44,63 @@ namespace ProceduralCity.Renderer
                 "skybox/hq/front.jpg",
             };
 
-            _texture = new Texture(filenames.ToList());
-            _shader = new Shader("skybox.vert", "skybox.fs");
-            _projectionMatrixLocation = GL.GetUniformLocation(_shader._programId, "projection");
-            _viewMatrixLocation = GL.GetUniformLocation(_shader._programId, "view");
-            _skyboxLocation = GL.GetUniformLocation(_shader._programId, "skybox");
+            Texture = new CubemapTexture(filenames.ToList());
+            Shader = new Shader("skybox.vert", "skybox.fs");
+            Shader.SetUniformValue("skybox", new IntUniform
+            {
+                Value = 0
+            });
 
-            _vaoId = GL.GenVertexArray();
-            GL.BindVertexArray(_vaoId);
-
-            _vboId = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vboId);
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * Vector3.SizeInBytes, vertices, BufferUsageHint.StaticDraw);
-            GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
-
-            GL.BindVertexArray(0);
+            Vertices = CreateVertices();
+            UVs = Enumerable.Empty<Vector2>();
         }
 
-        public void Render(Matrix4 proj, Matrix4 view)
+        private IEnumerable<Vector3> CreateVertices()
         {
-            GL.DepthFunc(DepthFunction.Lequal);
-            GL.CullFace(CullFaceMode.Front);
-            _shader.Use();
+            return new[]
+            {
+                new Vector3(-1.0f,  1.0f, -1.0f),
+                new Vector3(-1.0f, -1.0f, -1.0f),
+                new Vector3(1.0f, -1.0f, -1.0f),
+                new Vector3( 1.0f, -1.0f, -1.0f),
+                new Vector3(1.0f,  1.0f, -1.0f),
+                new Vector3(-1.0f,  1.0f, -1.0f),
 
-            var skyView = new Matrix4(new Matrix3(view));
+                new Vector3(-1.0f, -1.0f,  1.0f),
+                new Vector3(-1.0f, -1.0f, -1.0f),
+                new Vector3( -1.0f,  1.0f, -1.0f),
+                new Vector3(-1.0f,  1.0f, -1.0f),
+                new Vector3(-1.0f,  1.0f,  1.0f),
+                new Vector3(-1.0f, -1.0f,  1.0f),
 
-            GL.UniformMatrix4(_projectionMatrixLocation, false, ref proj);
-            GL.UniformMatrix4(_viewMatrixLocation, false, ref skyView);
+                new Vector3(1.0f, -1.0f, -1.0f),
+                new Vector3(1.0f, -1.0f,  1.0f),
+                new Vector3(1.0f,  1.0f,  1.0f),
+                new Vector3(1.0f,  1.0f,  1.0f),
+                new Vector3(1.0f,  1.0f, -1.0f),
+                new Vector3(1.0f, -1.0f, -1.0f),
 
-            GL.BindVertexArray(_vaoId);
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.Uniform1(_skyboxLocation, 0);
-            GL.BindTexture(TextureTarget.TextureCubeMap, _texture.Id);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, vertices.Length);
-            GL.BindVertexArray(0);
+                new Vector3(-1.0f, -1.0f,  1.0f),
+                new Vector3(-1.0f,  1.0f,  1.0f),
+                new Vector3(1.0f,  1.0f,  1.0f),
+                new Vector3(1.0f,  1.0f,  1.0f),
+                new Vector3(1.0f, -1.0f,  1.0f),
+                new Vector3(-1.0f, -1.0f,  1.0f),
 
-            GL.CullFace(CullFaceMode.Back);
+                new Vector3(-1.0f,  1.0f, -1.0f),
+                new Vector3(1.0f,  1.0f, -1.0f),
+                new Vector3(1.0f,  1.0f,  1.0f),
+                new Vector3(1.0f,  1.0f,  1.0f),
+                new Vector3(-1.0f,  1.0f,  1.0f),
+                new Vector3(-1.0f,  1.0f, -1.0f),
+
+                new Vector3(-1.0f, -1.0f, -1.0f),
+                new Vector3(-1.0f, -1.0f,  1.0f),
+                new Vector3(1.0f, -1.0f, -1.0f),
+                new Vector3(1.0f, -1.0f, -1.0f),
+                new Vector3(-1.0f, -1.0f,  1.0f),
+                new Vector3(1.0f, -1.0f,  1.0f)
+            };
         }
 
         private bool disposedValue = false;
@@ -120,12 +111,9 @@ namespace ProceduralCity.Renderer
             {
                 if (disposing)
                 {
-                    _shader.Dispose();
-                    _texture.Dispose();
+                    Shader.Dispose();
+                    Texture.Dispose();
                 }
-
-                GL.DeleteVertexArray(_vaoId);
-                GL.DeleteBuffer(_vboId);
 
                 disposedValue = true;
             }

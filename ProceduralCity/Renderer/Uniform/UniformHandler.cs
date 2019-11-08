@@ -13,5 +13,11 @@ namespace ProceduralCity.Renderer.Uniform
         {
             GL.Uniform1(location, value.Value);
         }
+
+        public void Dispatch(int location, Matrix4Uniform value)
+        {
+            var matrix = value.Value;
+            GL.UniformMatrix4(location, false, ref matrix);
+        }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using System;
-using OpenTK;
 
 namespace ProceduralCity.Renderer
 {
-    public interface ISkybox : IDisposable
+    interface ISkybox : IRenderable, IDisposable
     {
-        void Render(Matrix4 proj, Matrix4 view);
     }
 }

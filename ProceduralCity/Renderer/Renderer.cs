@@ -30,10 +30,10 @@ namespace ProceduralCity.Renderer
             }
         }
 
-        private void AddToScene(IRenderable r)
+        public void AddToScene(IRenderable r)
         {
             var textureId = r.Texture != null ? r.Texture.Id : 0;
-            var shaderId = r.Shader._programId;
+            var shaderId = r.Shader.ProgramId;
             var key = (textureId, shaderId);
 
             if (_batches.TryGetValue(key, out ObjectBatch batch))
