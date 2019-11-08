@@ -11,7 +11,7 @@ namespace ProceduralCity
 
         public IEnumerable<Vector2> UVs { get; private set; }
 
-        public Texture Texture { get; private set; }
+        public ITexture Texture { get; private set; }
 
         public Shader Shader { get; private set; }
 

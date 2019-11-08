@@ -25,6 +25,7 @@ namespace ProceduralCity
         private readonly IRenderer _renderer;
         private readonly IRenderer _textRenderer;
         private readonly IRenderer _ndcRenderer;
+        private readonly IRenderer _skyboxRenderer;
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
         private readonly IWorld _world;
@@ -45,6 +46,7 @@ namespace ProceduralCity
             IRenderer renderer,
             IRenderer textRenderer,
             IRenderer ndcRenderer,
+            IRenderer skyboxRenderer,
             ISkybox skybox)
         {
             _camera = camera;
@@ -54,6 +56,9 @@ namespace ProceduralCity
 
             _context = context;
             ConfigureContext();
+
+            _skybox = skybox;
+            _world = world;
 
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
@@ -73,8 +78,18 @@ namespace ProceduralCity
                 GL.Disable(EnableCap.Blend);
             };
             _ndcRenderer = ndcRenderer;
-            _skybox = skybox;
-            _world = world;
+            
+            _skyboxRenderer = skyboxRenderer;
+            _skyboxRenderer.BeforeRender = () =>
+            {
+                GL.DepthFunc(DepthFunction.Lequal);
+                GL.CullFace(CullFaceMode.Front);
+            };
+            _skyboxRenderer.AfterRender = () =>
+            {
+                GL.CullFace(CullFaceMode.Back);
+            };
+            _skyboxRenderer.AddToScene(skybox);
 
             _renderer.AddToScene(_world.Renderables);
 
@@ -129,10 +144,9 @@ namespace ProceduralCity
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             var viewMatrix = _camera.Use();
-            _skybox.Render(_projectionMatrix, viewMatrix);
-            GL.DepthFunc(DepthFunction.Lequal);
 
             _worldRenderer.Clear();
+            _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)), Matrix4.Identity);
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix, _modelMatrix);
             _worldRenderer.RenderToTexture(_textRenderer, _textRendererMatrix, Matrix4.Identity, Matrix4.Identity);
 
@@ -233,6 +247,7 @@ namespace ProceduralCity
             _text.Dispose();
             _worldRenderer.Dispose();
             _ndcRenderer.Dispose();
+            _skyboxRenderer.Dispose();
         }
     }
 }

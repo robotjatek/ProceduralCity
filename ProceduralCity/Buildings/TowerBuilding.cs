@@ -26,7 +26,7 @@ namespace ProceduralCity.Buildings
             }
         }
 
-        public Texture Texture { get; private set; }
+        public ITexture Texture { get; private set; }
 
         public Shader Shader { get; private set; }
 

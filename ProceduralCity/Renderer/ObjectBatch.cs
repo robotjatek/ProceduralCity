@@ -11,7 +11,7 @@ namespace ProceduralCity.Renderer
         private bool disposedValue = false;
 
         private readonly Shader _shader;
-        private readonly Texture _texture;
+        private readonly ITexture _texture;
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Vector2> _UVs = new List<Vector2>();
 
@@ -23,7 +23,7 @@ namespace ProceduralCity.Renderer
         private int _vertexVboId;
         private int _uvVboId;
 
-        public ObjectBatch(Shader shader, Texture texture)
+        public ObjectBatch(Shader shader, ITexture texture)
         {
             _shader = shader;
             _texture = texture;
@@ -46,8 +46,7 @@ namespace ProceduralCity.Renderer
 
             if (_texture != null)
             {
-                GL.ActiveTexture(TextureUnit.Texture0);
-                GL.BindTexture(TextureTarget.Texture2D, _texture.Id);
+                _texture.Bind(TextureUnit.Texture0);
             }
 
             _shader.SetUniformValue("_projection", new Matrix4Uniform

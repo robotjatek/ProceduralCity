@@ -9,7 +9,7 @@ namespace ProceduralCity.Buildings
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Vector2> _UVs = new List<Vector2>();
 
-        public Texture Texture
+        public ITexture Texture
         {
             get; private set;
         }

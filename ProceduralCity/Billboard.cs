@@ -18,7 +18,7 @@ namespace ProceduralCity
             private set;
         }
 
-        public Texture Texture
+        public ITexture Texture
         {
             get;
             private set;
