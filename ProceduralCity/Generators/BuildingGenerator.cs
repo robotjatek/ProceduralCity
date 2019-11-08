@@ -5,6 +5,7 @@ using OpenTK;
 using ProceduralCity.Buildings;
 using ProceduralCity.Config;
 using ProceduralCity.Renderer;
+using ProceduralCity.Renderer.Uniform;
 using Serilog;
 
 namespace ProceduralCity.Generators
@@ -29,6 +30,10 @@ namespace ProceduralCity.Generators
         {
             _config = config;
             _buildingShader = new Shader("vs.vert", "fs.frag");
+            _buildingShader.SetUniformValue("tex", new IntUniform
+            {
+                Value = 0
+            });
             _buildingTextures = _config.BuildingTextures.Select(c => new Texture(c)).ToArray();
             _areaBorder = new Vector2(_config.AreaBorderSize);
             _logger = logger;

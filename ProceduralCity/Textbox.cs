@@ -82,6 +82,10 @@ namespace ProceduralCity
             _fontmap = new Texture($"{fontName}/font.png", "Fonts");
             _fontConfig = new FontConfig(fontName);
             _shader = new Shader("vs.vert", "font.frag");
+            _shader.SetUniformValue("tex", new IntUniform
+            {
+                Value = 0
+            });
             _shader.Use();
             Hue = 1;
             Saturation = 0;

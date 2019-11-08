@@ -9,20 +9,13 @@ namespace ProceduralCity.Renderer
 {
     class Shader : IDisposable
     {
-        private readonly Dictionary<string, IUniformValue> _uniformValues = new Dictionary<string, IUniformValue>();
+        private readonly Dictionary<string, int> _uniformLocations = new Dictionary<string, int>();
+        private readonly UniformHandler _uniformHandler = new UniformHandler();
 
-        public int _programId
+        public int ProgramId
         {
             get;
             private set;
-        }
-
-        public IEnumerable<KeyValuePair<string, IUniformValue>> Uniforms
-        {
-            get
-            {
-                return _uniformValues;
-            }
         }
 
         public Shader(string vertexShader, string fragmentShader)
@@ -33,7 +26,7 @@ namespace ProceduralCity.Renderer
             var vertexHandle = CompileShader(vertexFile, ShaderType.VertexShader);
             var fragmentHandle = CompileShader(fragmentFile, ShaderType.FragmentShader);
 
-            _programId = LinkShaders(vertexHandle, fragmentHandle);
+            ProgramId = LinkShaders(vertexHandle, fragmentHandle);
 
             GL.DeleteShader(vertexHandle);
             GL.DeleteShader(fragmentHandle);
@@ -41,12 +34,28 @@ namespace ProceduralCity.Renderer
 
         public void SetUniformValue<T>(string uniformName, T value) where T : IUniformValue
         {
-            _uniformValues[uniformName] = value;
+            this.Use();
+            if (_uniformLocations.TryGetValue(uniformName, out int location) == false)
+            {
+                location = GL.GetUniformLocation(ProgramId, uniformName);
+                _uniformLocations.Add(uniformName, location);
+            }
+
+            if(location != -1)
+            {
+                value.Visit(location, _uniformHandler);
+            }
+            this.Unbind();
         }
 
         public void Use()
         {
-            GL.UseProgram(_programId);
+            GL.UseProgram(ProgramId);
+        }
+
+        public void Unbind()
+        {
+            GL.UseProgram(0);
         }
 
         private int LinkShaders(int vertexHandle, int fragmentHandle)
@@ -96,7 +105,7 @@ namespace ProceduralCity.Renderer
                 //{
                 //}
 
-                GL.DeleteProgram(_programId);
+                GL.DeleteProgram(ProgramId);
                 disposedValue = true;
             }
         }

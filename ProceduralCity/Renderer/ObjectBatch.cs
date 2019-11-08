@@ -14,8 +14,6 @@ namespace ProceduralCity.Renderer
         private readonly Texture _texture;
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Vector2> _UVs = new List<Vector2>();
-        private readonly Dictionary<string, int> _uniformLocations = new Dictionary<string, int>();
-        private readonly UniformHandler _uniformHandler = new UniformHandler();
 
         private Vector3[] Vertices { get; set; }
         private Vector2[] UVs { get; set; }
@@ -24,10 +22,6 @@ namespace ProceduralCity.Renderer
         private int _vaoId;
         private int _vertexVboId;
         private int _uvVboId;
-        private int _projectionLocation;
-        private int _viewLocation;
-        private int _modelLocation;
-        private int _textureLocation;
 
         public ObjectBatch(Shader shader, Texture texture)
         {
@@ -48,41 +42,30 @@ namespace ProceduralCity.Renderer
                 Setup();
             }
 
-            _shader.Use();
             GL.BindVertexArray(_vaoId);
-
-            SetUniforms();
 
             if (_texture != null)
             {
-                GL.BindTexture(TextureTarget.Texture2D, _texture.Id);
                 GL.ActiveTexture(TextureUnit.Texture0);
-                GL.Uniform1(_textureLocation, 0);
+                GL.BindTexture(TextureTarget.Texture2D, _texture.Id);
             }
 
-            GL.UniformMatrix4(_projectionLocation, false, ref projection);
-            GL.UniformMatrix4(_viewLocation, false, ref view);
-            GL.UniformMatrix4(_modelLocation, false, ref model);
+            _shader.SetUniformValue("_projection", new Matrix4Uniform
+            {
+                Value = projection
+            });
+            _shader.SetUniformValue("_view", new Matrix4Uniform
+            {
+                Value = view
+            });
+            _shader.SetUniformValue("_model", new Matrix4Uniform
+            {
+                Value = model
+            });
+            _shader.Use();
+
             GL.DrawArrays(PrimitiveType.Triangles, 0, Vertices.Length);
             GL.BindVertexArray(0);
-        }
-
-        private void SetUniforms()
-        {
-            var uniforms = _shader.Uniforms;
-            foreach (var uniform in uniforms)
-            {
-                if (_uniformLocations.TryGetValue(uniform.Key, out int location) == false)
-                {
-                    location = GL.GetUniformLocation(_shader._programId, uniform.Key);
-                    _uniformLocations.Add(uniform.Key, location);
-                }
-
-                if (location != -1)
-                {
-                    uniform.Value.Visit(location, _uniformHandler);
-                }
-            }
         }
 
         private void Setup()
@@ -111,13 +94,6 @@ namespace ProceduralCity.Renderer
             GL.BindVertexArray(0);
             _ready = true;
             _shader.Use();
-            if (_texture != null)
-            {
-                _textureLocation = GL.GetUniformLocation(_shader._programId, "tex"); //TODO: set texture uniform by hand using shader class
-            }
-            _projectionLocation = GL.GetUniformLocation(_shader._programId, "_projection"); //TODO: set matrices by hand using the shader class
-            _viewLocation = GL.GetUniformLocation(_shader._programId, "_view");
-            _modelLocation = GL.GetUniformLocation(_shader._programId, "_model");
         }
 
         protected virtual void Dispose(bool disposing)
