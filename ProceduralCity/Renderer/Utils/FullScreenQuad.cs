@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OpenTK;
+using ProceduralCity.Renderer.Uniform;
 
 namespace ProceduralCity.Renderer.Utils
 {
-    class FullScreenQuad : IRenderable
+    class FullScreenQuad : IRenderable, IDisposable
     {
         public IEnumerable<Vector3> Vertices
         {
@@ -32,9 +34,18 @@ namespace ProceduralCity.Renderer.Utils
         public FullScreenQuad(Texture texture)
         {
             Texture = texture;
-            Shader = new Shader("vs.vert", "fs.frag"); //TODO: dispose
+            Shader = new Shader("vs.vert", "fs.frag");
+            Shader.SetUniformValue("tex", new IntUniform
+            {
+                Value = 0
+            });
             UVs = PrimitiveUtils.CreateNDCFullscreenUVs();
             Vertices = PrimitiveUtils.CreateNDCFullscreenGuiVertices();
+        }
+
+        public void Dispose()
+        {
+            Shader.Dispose();
         }
     }
 }

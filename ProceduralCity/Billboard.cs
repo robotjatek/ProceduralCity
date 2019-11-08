@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OpenTK;
 using ProceduralCity.Renderer;
 
 namespace ProceduralCity
 {
-    class Billboard : IRenderable
+    class Billboard : IRenderable, IDisposable
     {
         public IEnumerable<Vector3> Vertices
         {
@@ -34,8 +35,13 @@ namespace ProceduralCity
         {
             Vertices = PrimitiveUtils.CreateSpriteVertices(new Vector2(100, 100), 200, 200);
             UVs = PrimitiveUtils.CreateGuiUVs();
-            Shader = new Shader("vs.vert", "fs.frag");  //TODO: dispose shader
+            Shader = new Shader("vs.vert", "fs.frag");
             Texture = texture;
+        }
+
+        public void Dispose()
+        {
+            Shader.Dispose();
         }
     }
 }

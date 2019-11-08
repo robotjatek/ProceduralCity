@@ -31,9 +31,8 @@ namespace ProceduralCity
         private readonly IWorld _world;
 
         private readonly OpenGlContext _context;
-
-        private readonly BackBufferRenderer _billboardRenderer;
         private readonly BackBufferRenderer _worldRenderer;
+        private readonly FullScreenQuad _fullScreenQuad;
 
         private double _elapsedFrameTime = 0;
 
@@ -103,19 +102,8 @@ namespace ProceduralCity
             _text.Saturation = 1;
             _textRenderer.AddToScene(_text.Text);
 
-            _ndcRenderer.AddToScene(new FullScreenQuad(_worldRenderer.Texture));
-
-            //var w = 320;
-            //var h = 240;
-            //_billboardRenderer = new BackBufferRenderer(_logger, w, h, useDepthBuffer: false);
-            //var r = new Renderer.Renderer();
-            //var text = new Textbox("Consolas").WithText("Yaaaay!!!", new Vector2(0, 0), 1);
-            //r.AddToScene(text.Text);
-            //var p = Matrix4.CreateOrthographicOffCenter(0, w, h, 0, -1, 1);
-            //_billboardRenderer.RenderToTexture(r, p, Matrix4.Identity, Matrix4.Identity);
-
-            //var b = new Billboard(_billboardRenderer.Texture);
-            //_textRenderer.AddToScene(new[] { b }); //TODO: billboards should be rendered with a different renderer with blending enabled
+            _fullScreenQuad = new FullScreenQuad(_worldRenderer.Texture);
+            _ndcRenderer.AddToScene(_fullScreenQuad);
         }
 
         private void ConfigureContext()
@@ -248,6 +236,7 @@ namespace ProceduralCity
             _worldRenderer.Dispose();
             _ndcRenderer.Dispose();
             _skyboxRenderer.Dispose();
+            _fullScreenQuad.Dispose();
         }
     }
 }
