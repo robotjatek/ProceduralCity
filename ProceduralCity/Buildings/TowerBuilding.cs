@@ -67,12 +67,24 @@ namespace ProceduralCity.Buildings
             var eastWestSideLength = area.Y;
             if (northSouthSideLength > eastWestSideLength)
             {
+                if (northSouthSideLength < builder.CalculateBillboardWidth(3))
+                {
+                    HasBillboard = false;
+                    return null;
+                }
+
                 return CoinFlip.Flip() ?
                     builder.CreateNorthFacingBillboard(position, area, 3) :
                     builder.CreateSouthFacingBillboard(position, area, 3);
             }
             else
             {
+                if (eastWestSideLength < builder.CalculateBillboardWidth(3))
+                {
+                    HasBillboard = false;
+                    return null;
+                }
+
                 return CoinFlip.Flip() ?
                     builder.CreateWestFacingBillboard(position, area, 3) :
                     builder.CreateEastFacingBillboard(position, area, 3);

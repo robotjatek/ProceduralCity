@@ -9,7 +9,6 @@ namespace ProceduralCity.Generators
 {
     class BillboardBuilder : IBillboardBuilder, IDisposable
     {
-        //TODO: do not add billboards to small buildings
         //TODO: generate billboard coordinates in model space, then transform them with a model matrix
         private readonly Random _random = new Random();
         private readonly Texture[] _billboardTextures;
@@ -79,7 +78,7 @@ namespace ProceduralCity.Generators
             var width = CalculateBillboardWidth(height);
             position.Z = position.Z + area.Y - width; //compensate position because of the worldspace coordinates
             area.Y = width;
-            position.X += 1.05f;
+            position.X += 0.05f;
 
             return new Billboard(
                 texture,
