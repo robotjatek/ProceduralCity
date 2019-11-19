@@ -25,6 +25,8 @@ namespace ProceduralCity
 
             var buildings = _buildingGenerator.GenerateBuildings(sites);
             _renderables.AddRange(buildings);
+            var billboards = buildings.Where(b => b.HasBillboard).Select(b => b.Billboard);
+            _renderables.AddRange(billboards);
         }
 
         public IEnumerable<IRenderable> Renderables

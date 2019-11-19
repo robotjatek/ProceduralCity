@@ -34,5 +34,13 @@ namespace ProceduralCity.Config
         public int MinVerticalBlockLength { get; set; }
 
         public int MinHorizontalBlockLength { get; set; }
+
+        public int BillboardTextureNumber { get; set; }
+
+        public int BillboardTextureWidth { get; set; }
+
+        public int BillboardTextureHeight { get; set; }
+
+        public int BillboardLineHeight { get; set; }
     }
 }

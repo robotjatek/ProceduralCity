@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using OpenTK;
 using ProceduralCity.Renderer.Uniform;
+using ProceduralCity.Utils;
 
 namespace ProceduralCity.Renderer.Utils
 {

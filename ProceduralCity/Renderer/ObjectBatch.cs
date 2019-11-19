@@ -59,7 +59,7 @@ namespace ProceduralCity.Renderer
             });
             _shader.SetUniformValue("_model", new Matrix4Uniform
             {
-                Value = model
+                Value = model //TODO: set model matrix from outside of the renderer
             });
             _shader.Use();
 

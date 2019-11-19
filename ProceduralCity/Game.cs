@@ -15,15 +15,11 @@ namespace ProceduralCity
         private readonly string _title;
         private Matrix4 _projectionMatrix = Matrix4.Identity;
         private Matrix4 _modelMatrix = Matrix4.Identity;
-
-        private Matrix4 _textRendererMatrix = Matrix4.Identity;
         private Matrix4 _ndcRendererMatrix;
-        private readonly Textbox _text = new Textbox("Consolas");
 
         private readonly IAppConfig _config;
         private readonly ILogger _logger;
         private readonly IRenderer _renderer;
-        private readonly IRenderer _textRenderer;
         private readonly IRenderer _ndcRenderer;
         private readonly IRenderer _skyboxRenderer;
         private readonly ISkybox _skybox;
@@ -32,6 +28,7 @@ namespace ProceduralCity
 
         private readonly OpenGlContext _context;
         private readonly BackBufferRenderer _worldRenderer;
+        private readonly Texture _backbufferTexture;
         private readonly FullScreenQuad _fullScreenQuad;
 
         private double _elapsedFrameTime = 0;
@@ -67,18 +64,9 @@ namespace ProceduralCity
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             _renderer = renderer;
-            _textRenderer = textRenderer;
-            _textRenderer.BeforeRender = () =>
-            {
-                GL.Enable(EnableCap.Blend);
-            };
-            _textRenderer.AfterRender = () =>
-            {
-                GL.Disable(EnableCap.Blend);
-            };
             _ndcRenderer = ndcRenderer;
-            
             _skyboxRenderer = skyboxRenderer;
+
             _skyboxRenderer.BeforeRender = () =>
             {
                 GL.DepthFunc(DepthFunction.Lequal);
@@ -92,15 +80,13 @@ namespace ProceduralCity
 
             _renderer.AddToScene(_world.Renderables);
 
+            _backbufferTexture = new Texture(_config.ResolutionWidth, config.ResolutionHeight);
             _worldRenderer = new BackBufferRenderer(
                 _logger,
+                _backbufferTexture,
                 _config.ResolutionWidth,
                 _config.ResolutionHeight,
                 useDepthBuffer: true);
-
-            _text.WithText("Árvíztűrő tükörfúrógép", new Vector2(0, 200), 1.0f);
-            _text.Saturation = 1;
-            _textRenderer.AddToScene(_text.Text);
 
             _fullScreenQuad = new FullScreenQuad(_worldRenderer.Texture);
             _ndcRenderer.AddToScene(_fullScreenQuad);
@@ -130,13 +116,11 @@ namespace ProceduralCity
         {
             CountFps(e);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
             var viewMatrix = _camera.Use();
 
             _worldRenderer.Clear();
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)), Matrix4.Identity);
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix, _modelMatrix);
-            _worldRenderer.RenderToTexture(_textRenderer, _textRendererMatrix, Matrix4.Identity, Matrix4.Identity);
 
             _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity, Matrix4.Identity);
             _context.SwapBuffers();
@@ -156,8 +140,7 @@ namespace ProceduralCity
         {
             _logger.Information($"Window resized: {_context.Width}x{_context.Height}");
             GL.Viewport(_context.ClientRectangle);
-            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(90), (float)_context.Width / _context.Height, 0.1f, 5000.0f);
-            _textRendererMatrix = Matrix4.CreateOrthographicOffCenter(0, _context.Width, _context.Height, 0, -1, 1);
+            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.Width / _context.Height, 0.1f, 5000.0f);
             _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
             _worldRenderer.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height);
         }
@@ -214,15 +197,6 @@ namespace ProceduralCity
             {
                 _context.ToggleVSync();
             }
-
-            if (e.Key == Key.KeypadPlus)
-            {
-                _text.Hue += 0.01f;
-            }
-            else if (e.Key == Key.KeypadMinus)
-            {
-                _text.Hue -= 0.01f;
-            }
         }
 
         public void Dispose()
@@ -232,11 +206,11 @@ namespace ProceduralCity
             _skybox?.Dispose();
             _world.Dispose();
             _context.Dispose();
-            _text.Dispose();
             _worldRenderer.Dispose();
             _ndcRenderer.Dispose();
             _skyboxRenderer.Dispose();
             _fullScreenQuad.Dispose();
+            _backbufferTexture.Dispose();
         }
     }
 }
