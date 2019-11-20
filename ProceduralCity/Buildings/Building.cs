@@ -7,51 +7,33 @@ namespace ProceduralCity.Buildings
 {
     class Building : IBuilding
     {
-        private readonly List<Vector3> _vertices = new List<Vector3>();
-        private readonly List<Vector2> _UVs = new List<Vector2>();
+        private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly ITexture _texture;
+        private readonly Shader _shader;
 
-        public ITexture Texture
-        {
-            get; private set;
-        }
-
-        public Shader Shader
-        {
-            get; private set;
-        }
-
-        public IEnumerable<Vector3> Vertices
+        public IEnumerable<Mesh> Meshes
         {
             get
             {
-                return _vertices;
+                return _meshes;
             }
         }
-
-        public IEnumerable<Vector2> UVs
-        {
-            get
-            {
-                return _UVs;
-            }
-        }
-
-        public bool HasBillboard { get; private set; } = false;
-
-        public Billboard Billboard => throw new System.NotImplementedException();
 
         public Building(Vector3 position, Vector2 area, Texture texture, Shader shader, float height)
         {
-            Texture = texture;
-            Shader = shader;
+            _texture = texture;
+            _shader = shader;
 
-            CreateTexturedCube(position, area, height);
+            _meshes.Add(CreateTexturedCube(position, area, height));
         }
 
-        private void CreateTexturedCube(Vector3 position, Vector2 area, float height)
+        private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height)
         {
-            _UVs.AddRange(PrimitiveUtils.CreateCubeUVs());
-            _vertices.AddRange(PrimitiveUtils.CreateCubeVertices(position, area, height));
+            return new Mesh(
+                PrimitiveUtils.CreateCubeVertices(position, area, height),
+                PrimitiveUtils.CreateCubeUVs(),
+                _texture,
+                _shader);
         }
     }
 }
