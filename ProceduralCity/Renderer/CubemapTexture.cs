@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenTK.Graphics.OpenGL;
 using System.Drawing;
+using OpenTK.Graphics.OpenGL;
 using Serilog;
 
 namespace ProceduralCity.Renderer
@@ -29,6 +29,12 @@ namespace ProceduralCity.Renderer
         {
             GL.ActiveTexture(textureUnit);
             GL.BindTexture(TextureTarget.TextureCubeMap, Id);
+        }
+
+        public void CreateMipmaps()
+        {
+            GL.BindTexture(TextureTarget.TextureCubeMap, Id);
+            GL.GenerateMipmap(GenerateMipmapTarget.TextureCubeMap);
         }
 
         private void LoadCubeMap(List<string> fileNames, string defaultFolder)
@@ -84,6 +90,11 @@ namespace ProceduralCity.Renderer
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public void Resize(int width, int height)
+        {
+            throw new NotImplementedException();
         }
     }
 }

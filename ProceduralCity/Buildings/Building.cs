@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using OpenTK;
 using ProceduralCity.Renderer;
+using ProceduralCity.Utils;
 
 namespace ProceduralCity.Buildings
 {
@@ -35,6 +36,10 @@ namespace ProceduralCity.Buildings
             }
         }
 
+        public bool HasBillboard { get; private set; } = false;
+
+        public Billboard Billboard => throw new System.NotImplementedException();
+
         public Building(Vector3 position, Vector2 area, Texture texture, Shader shader, float height)
         {
             Texture = texture;
@@ -45,75 +50,8 @@ namespace ProceduralCity.Buildings
 
         private void CreateTexturedCube(Vector3 position, Vector2 area, float height)
         {
-            //hátsó oldal
-            _UVs.Add(new Vector2(1, 0));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y, position.Z));
-            _UVs.Add(new Vector2(1, 1));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y + height, position.Z));
-            _UVs.Add(new Vector2(0, 1));
-            _vertices.Add(new Vector3(position.X, position.Y + height, position.Z));
-            _UVs.Add(new Vector2(1, 0));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y, position.Z));
-            _UVs.Add(new Vector2(0, 1));
-            _vertices.Add(new Vector3(position.X, position.Y + height, position.Z));
-            _UVs.Add(new Vector2(0, 0));
-            _vertices.Add(new Vector3(position.X, position.Y, position.Z));
-
-            //első oldal
-            _UVs.Add(new Vector2(0, 0));
-            _vertices.Add(new Vector3(position.X, position.Y, position.Z + area.Y));
-            _UVs.Add(new Vector2(0, 1));
-            _vertices.Add(new Vector3(position.X, position.Y + height, position.Z + area.Y));
-            _UVs.Add(new Vector2(1, 0));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y, position.Z + area.Y));
-            _UVs.Add(new Vector2(0, 1));
-            _vertices.Add(new Vector3(position.X, position.Y + height, position.Z + area.Y));
-            _UVs.Add(new Vector2(1, 1));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y + height, position.Z + area.Y));
-            _UVs.Add(new Vector2(1, 0));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y, position.Z + area.Y));
-
-            //jobb oldal
-            _UVs.Add(new Vector2(0, 0));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y, position.Z + area.Y));
-            _UVs.Add(new Vector2(0, 1));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y + height, position.Z + area.Y));
-            _UVs.Add(new Vector2(1, 0));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y, position.Z));
-            _UVs.Add(new Vector2(0, 1));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y + height, position.Z + area.Y));
-            _UVs.Add(new Vector2(1, 1));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y + height, position.Z));
-            _UVs.Add(new Vector2(1, 0));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y, position.Z));
-
-            //bal oldal
-            _UVs.Add(new Vector2(1, 0));
-            _vertices.Add(new Vector3(position.X, position.Y, position.Z));
-            _UVs.Add(new Vector2(1, 1));
-            _vertices.Add(new Vector3(position.X, position.Y + height, position.Z));
-            _UVs.Add(new Vector2(0, 1));
-            _vertices.Add(new Vector3(position.X, position.Y + height, position.Z + area.Y));
-            _UVs.Add(new Vector2(1, 0));
-            _vertices.Add(new Vector3(position.X, position.Y, position.Z));
-            _UVs.Add(new Vector2(0, 1));
-            _vertices.Add(new Vector3(position.X, position.Y + height, position.Z + area.Y));
-            _UVs.Add(new Vector2(0, 0));
-            _vertices.Add(new Vector3(position.X, position.Y, position.Z + area.Y));
-
-            //felső oldal
-            _UVs.Add(new Vector2(0, 0));
-            _vertices.Add(new Vector3(position.X, position.Y + height, position.Z + area.Y));
-            _UVs.Add(new Vector2(0, 0));
-            _vertices.Add(new Vector3(position.X, position.Y + height, position.Z));
-            _UVs.Add(new Vector2(0, 0));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y + height, position.Z + area.Y));
-            _UVs.Add(new Vector2(0, 0));
-            _vertices.Add(new Vector3(position.X, position.Y + height, position.Z));
-            _UVs.Add(new Vector2(0, 0));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y + height, position.Z));
-            _UVs.Add(new Vector2(0, 0));
-            _vertices.Add(new Vector3(position.X + area.X, position.Y + height, position.Z + area.Y));
+            _UVs.AddRange(PrimitiveUtils.CreateCubeUVs());
+            _vertices.AddRange(PrimitiveUtils.CreateCubeVertices(position, area, height));
         }
     }
 }

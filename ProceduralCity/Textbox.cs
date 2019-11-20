@@ -36,14 +36,10 @@ namespace ProceduralCity
             }
             set
             {
-                _hue = value.Clamp();
-
-                _shader.SetUniformValue("hue", new FloatUniform
-                {
-                    Value = _hue
-                });
+                WithHue(value);
             }
         }
+
         public float Saturation
         {
             get
@@ -52,12 +48,7 @@ namespace ProceduralCity
             }
             set
             {
-                _saturation = value.Clamp();
-
-                _shader.SetUniformValue("saturation", new FloatUniform
-                {
-                    Value = _saturation
-                });
+                WithSaturation(value);
             }
         }
 
@@ -69,16 +60,19 @@ namespace ProceduralCity
             }
             set
             {
-                _value = value.Clamp();
-                _shader.SetUniformValue("value", new FloatUniform
-                {
-                    Value = _value
-                });
+                WithValue(value);
             }
+        }
+
+        public float CursorAdvance
+        {
+            get;
+            private set;
         }
 
         public Textbox(string fontName)
         {
+            CursorAdvance = 0;
             _fontmap = new Texture($"{fontName}/font.png", "Fonts");
             _fontConfig = new FontConfig(fontName);
             _shader = new Shader("vs.vert", "font.frag");
@@ -105,6 +99,43 @@ namespace ProceduralCity
                 _text.Add(renderableChar);
                 cursorX += renderableChar.Advance;
             }
+            CursorAdvance = cursorX;
+
+            return this;
+        }
+
+        public Textbox WithHue(float hue)
+        {
+            _hue = hue.Clamp();
+
+            _shader.SetUniformValue("hue", new FloatUniform
+            {
+                Value = _hue
+            });
+
+            return this;
+        }
+
+        public Textbox WithSaturation(float saturation)
+        {
+            _saturation = saturation.Clamp();
+
+            _shader.SetUniformValue("saturation", new FloatUniform
+            {
+                Value = _saturation
+            });
+
+            return this;
+        }
+
+        public Textbox WithValue(float value)
+        {
+            _value = value.Clamp();
+
+            _shader.SetUniformValue("value", new FloatUniform
+            {
+                Value = _value
+            });
 
             return this;
         }

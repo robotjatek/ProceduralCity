@@ -32,7 +32,7 @@ namespace ProceduralCity.Renderer
 
             Id = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Id);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, width, height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, IntPtr.Zero);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
         }
@@ -84,6 +84,20 @@ namespace ProceduralCity.Renderer
         {
             GL.ActiveTexture(textureUnit);
             GL.BindTexture(TextureTarget.Texture2D, Id);
+        }
+
+        public void Resize(int width, int height)
+        {
+            Width = width;
+            Height = height;
+            GL.BindTexture(TextureTarget.Texture2D, Id);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+        }
+
+        public void CreateMipmaps()
+        {
+            GL.BindTexture(TextureTarget.Texture2D, Id);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
         }
 
         private bool disposedValue = false; // To detect redundant calls

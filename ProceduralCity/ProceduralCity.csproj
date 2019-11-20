@@ -67,16 +67,23 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\TextureCoordinateExtensions.cs" />
+    <Compile Include="Generators\BillboardBuilder.cs" />
+    <Compile Include="Generators\BillboardTextureGenerator.cs" />
+    <Compile Include="Generators\IBillboardBuilder.cs" />
+    <Compile Include="Generators\IBillboardTextureGenerator.cs" />
     <Compile Include="Renderer\BackBufferRenderer.cs" />
     <Compile Include="Billboard.cs" />
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Renderer\CubemapTexture.cs" />
+    <Compile Include="Renderer\IBackBufferRenderer.cs" />
     <Compile Include="Renderer\ITexture.cs" />
     <Compile Include="Renderer\Uniform\FloatUniform.cs" />
     <Compile Include="Renderer\Uniform\IntUniform.cs" />
     <Compile Include="Renderer\Uniform\IUniformValue.cs" />
     <Compile Include="Renderer\Uniform\Matrix4Uniform.cs" />
     <Compile Include="Renderer\Uniform\UniformHandler.cs" />
+    <Compile Include="Utils\CoinFlip.cs" />
     <Compile Include="Renderer\Utils\FullScreenQuad.cs" />
     <Compile Include="Textbox.cs" />
     <Compile Include="Buildings\IBuilding.cs" />
@@ -98,7 +105,7 @@
     <Compile Include="IGame.cs" />
     <Compile Include="IWorld.cs" />
     <Compile Include="OpenGlContext.cs" />
-    <Compile Include="PrimitiveUtils.cs" />
+    <Compile Include="Utils\PrimitiveUtils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Renderer\IRenderable.cs" />
     <Compile Include="Renderer\IRenderer.cs" />

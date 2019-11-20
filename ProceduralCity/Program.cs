@@ -43,6 +43,8 @@ namespace ProceduralCity
             builder.RegisterType<World>().As<IWorld>().SingleInstance();
             builder.RegisterType<Renderer.Renderer>().As<IRenderer>().InstancePerDependency();
             builder.RegisterType<Skybox>().As<ISkybox>().SingleInstance();
+            builder.RegisterType<BillboardTextureGenerator>().As<IBillboardTextureGenerator>().SingleInstance();
+            builder.RegisterType<BillboardBuilder>().As<IBillboardBuilder>().SingleInstance();
 
             return builder.Build();
         }

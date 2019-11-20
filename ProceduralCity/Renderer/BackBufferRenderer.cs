@@ -1,11 +1,12 @@
 ﻿using System;
 using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using Serilog;
 
 namespace ProceduralCity.Renderer
 {
-    class BackBufferRenderer : IDisposable
+    class BackBufferRenderer : IDisposable, IBackBufferRenderer
     {
         private int _frameBufferId;
         private int _rboId;
@@ -35,9 +36,10 @@ namespace ProceduralCity.Renderer
             private set;
         }
 
-        public BackBufferRenderer(ILogger logger, int width, int height, bool useDepthBuffer)
+        public BackBufferRenderer(ILogger logger, Texture texture, int width, int height, bool useDepthBuffer)
         {
             _logger = logger;
+            Texture = texture;
             Width = width;
             Height = height;
             IsDepthBuffered = useDepthBuffer;
@@ -48,7 +50,7 @@ namespace ProceduralCity.Renderer
         private void CreateFramebuffer()
         {
             _logger.Information("Creating framebuffer");
-            Texture = new Texture(Width, Height);
+            Texture.Resize(Width, Height);
 
             _frameBufferId = GL.GenFramebuffer();
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, _frameBufferId);
@@ -78,6 +80,7 @@ namespace ProceduralCity.Renderer
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, _frameBufferId);
             GL.Viewport(0, 0, Width, Height);
             renderer.RenderScene(projection, view, model);
+            Texture.CreateMipmaps();
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
@@ -88,6 +91,12 @@ namespace ProceduralCity.Renderer
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         }
 
+        public void Clear(Color4 color)
+        {
+            GL.ClearColor(color);
+            this.Clear();
+        }
+
         public void Resize(int width, int height)
         {
             Width = width;
@@ -95,7 +104,6 @@ namespace ProceduralCity.Renderer
 
             GL.DeleteFramebuffer(_frameBufferId);
             GL.DeleteRenderbuffer(_rboId);
-            Texture.Dispose();
             CreateFramebuffer();
         }
 
@@ -108,7 +116,6 @@ namespace ProceduralCity.Renderer
             {
                 if (disposing)
                 {
-                    Texture.Dispose();
                 }
 
                 GL.DeleteFramebuffer(_frameBufferId);

@@ -25,10 +25,12 @@ namespace ProceduralCity.Generators
         private readonly Texture[] _buildingTextures;
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
+        private readonly IBillboardBuilder _billboardBuilder;
 
-        public BuildingGenerator(ILogger logger, IAppConfig config)
+        public BuildingGenerator(ILogger logger, IAppConfig config, IBillboardBuilder billboardBuilder)
         {
             _config = config;
+
             _buildingShader = new Shader("vs.vert", "fs.frag");
             _buildingShader.SetUniformValue("tex", new IntUniform
             {
@@ -37,12 +39,12 @@ namespace ProceduralCity.Generators
             _buildingTextures = _config.BuildingTextures.Select(c => new Texture(c)).ToArray();
             _areaBorder = new Vector2(_config.AreaBorderSize);
             _logger = logger;
+            _billboardBuilder = billboardBuilder;
         }
 
         public IEnumerable<IBuilding> GenerateBuildings(IEnumerable<GroundNode> sites)
         {
             _logger.Information("Generating buildings");
-
             var buildings = new List<IBuilding>();
             foreach (var site in sites)
             {
@@ -68,7 +70,7 @@ namespace ProceduralCity.Generators
                 case BuildingType.Simple:
                     return new Building(position, area, texture, _buildingShader, height);
                 case BuildingType.Tower:
-                    return new TowerBuilding(position, area, texture, _buildingShader, height);
+                    return new TowerBuilding(position, area, texture, _buildingShader, height, _billboardBuilder);
                 /*  case BuildingType.Blocky:
                       return new BlockyBuilding(position, area, texture, _buildingShader, height); */
                 default:
@@ -85,6 +87,7 @@ namespace ProceduralCity.Generators
                 if (disposing)
                 {
                     _buildingShader.Dispose();
+                    _billboardBuilder.Dispose();
                     Array.ForEach(_buildingTextures, t => t.Dispose());
                 }
 

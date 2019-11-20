@@ -1,5 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL;
-using System;
+﻿using System;
+using OpenTK.Graphics.OpenGL;
 
 namespace ProceduralCity.Renderer
 {
@@ -12,5 +12,9 @@ namespace ProceduralCity.Renderer
         int Height { get; }
 
         void Bind(TextureUnit textureUnit);
+
+        void Resize(int width, int height);
+
+        void CreateMipmaps();
     }
 }
