@@ -8,38 +8,19 @@ namespace ProceduralCity.Buildings
 {
     class TowerBuilding : IBuilding
     {
-        private readonly List<Vector3> _vertices = new List<Vector3>();
+        private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly Shader _shader;
+        private readonly ITexture _texture;
 
-        private readonly List<Vector2> _UVs = new List<Vector2>();
-
-        public IEnumerable<Vector3> Vertices
+        public IEnumerable<Mesh> Meshes
         {
-            get
-            {
-                return _vertices;
-            }
+            get { return _meshes; }
         }
-
-        public IEnumerable<Vector2> UVs
-        {
-            get
-            {
-                return _UVs;
-            }
-        }
-
-        public ITexture Texture { get; private set; }
-
-        public Shader Shader { get; private set; }
-
-        public bool HasBillboard { get; private set; } = true;
-
-        public Billboard Billboard { get; private set; }
 
         public TowerBuilding(Vector3 position, Vector2 area, Texture texture, Shader shader, float height, IBillboardBuilder billboardBuilder)
         {
-            Texture = texture;
-            Shader = shader;
+            _texture = texture;
+            _shader = shader;
 
             var blockToppingArea = new Vector2(area.X + 3, area.Y + 3);
             var lastPosition = new Vector3(position);
@@ -51,56 +32,60 @@ namespace ProceduralCity.Buildings
                 blockToppingPosition.Y += 5;
                 billboardPosition = blockToppingPosition;
 
-                CreateTexturedCube(lastPosition, area, 5);
-                CreateUntexturedCube(blockToppingPosition, blockToppingArea, 3);
+                _meshes.Add(CreateTexturedCube(lastPosition, area, 5));
+                _meshes.Add(CreateUntexturedCube(blockToppingPosition, blockToppingArea, 3));
 
                 lastPosition.Y += 8;
                 height -= 8;
             }
 
-            Billboard = GenerateBillboard(billboardBuilder, billboardPosition, blockToppingArea);
+            CreateBillboardIfEliglible(billboardBuilder, billboardPosition, blockToppingArea);
         }
 
-        private Billboard GenerateBillboard(IBillboardBuilder builder, Vector3 position, Vector2 area)
+        private void CreateBillboardIfEliglible(IBillboardBuilder builder, Vector3 position, Vector2 area)
         {
             var northSouthSideLength = area.X;
             var eastWestSideLength = area.Y;
             if (northSouthSideLength > eastWestSideLength)
             {
-                if (northSouthSideLength < builder.CalculateBillboardWidth(3))
+                if (northSouthSideLength >= builder.CalculateBillboardWidth(3))
                 {
-                    HasBillboard = false;
-                    return null;
-                }
+                    var billboard = CoinFlip.Flip() ?
+                        builder.CreateNorthFacingBillboard(position, area, 3) :
+                        builder.CreateSouthFacingBillboard(position, area, 3);
 
-                return CoinFlip.Flip() ?
-                    builder.CreateNorthFacingBillboard(position, area, 3) :
-                    builder.CreateSouthFacingBillboard(position, area, 3);
+                    _meshes.AddRange(billboard.Meshes);
+                }
             }
             else
             {
-                if (eastWestSideLength < builder.CalculateBillboardWidth(3))
+                if (eastWestSideLength >= builder.CalculateBillboardWidth(3))
                 {
-                    HasBillboard = false;
-                    return null;
-                }
+                    var billboard = CoinFlip.Flip() ?
+                        builder.CreateWestFacingBillboard(position, area, 3) :
+                        builder.CreateEastFacingBillboard(position, area, 3);
 
-                return CoinFlip.Flip() ?
-                    builder.CreateWestFacingBillboard(position, area, 3) :
-                    builder.CreateEastFacingBillboard(position, area, 3);
+                    _meshes.AddRange(billboard.Meshes);
+                }
             }
         }
 
-        private void CreateTexturedCube(Vector3 position, Vector2 area, float height)
+        private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height)
         {
-            _UVs.AddRange(PrimitiveUtils.CreateCubeUVs());
-            _vertices.AddRange(PrimitiveUtils.CreateCubeVertices(position, area, height));
+            return new Mesh(
+                PrimitiveUtils.CreateCubeVertices(position, area, height),
+                PrimitiveUtils.CreateCubeUVs(),
+                _texture,
+                _shader);
         }
 
-        private void CreateUntexturedCube(Vector3 position, Vector2 area, float height)
+        private Mesh CreateUntexturedCube(Vector3 position, Vector2 area, float height)
         {
-            _UVs.AddRange(PrimitiveUtils.CreateZeroCubeUVs());
-            _vertices.AddRange(PrimitiveUtils.CreateCubeVertices(position, area, height));
+            return new Mesh(
+                PrimitiveUtils.CreateCubeVertices(position, area, height),
+                PrimitiveUtils.CreateZeroCubeUVs(),
+                _texture,
+                _shader);
         }
     }
 }

@@ -78,6 +78,7 @@
     <Compile Include="Renderer\CubemapTexture.cs" />
     <Compile Include="Renderer\IBackBufferRenderer.cs" />
     <Compile Include="Renderer\ITexture.cs" />
+    <Compile Include="Renderer\Mesh.cs" />
     <Compile Include="Renderer\Uniform\FloatUniform.cs" />
     <Compile Include="Renderer\Uniform\IntUniform.cs" />
     <Compile Include="Renderer\Uniform\IUniformValue.cs" />

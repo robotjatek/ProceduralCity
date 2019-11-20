@@ -8,28 +8,16 @@ namespace ProceduralCity.Renderer
 {
     class Skybox : ISkybox, IRenderable, IDisposable
     {
-        public IEnumerable<Vector3> Vertices
-        {
-            get;
-            private set;
-        }
+        private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly ITexture _texture;
+        private readonly Shader _shader;
 
-        public IEnumerable<Vector2> UVs
+        public IEnumerable<Mesh> Meshes
         {
-            get;
-            private set;
-        }
-
-        public ITexture Texture
-        {
-            get;
-            private set;
-        }
-
-        public Shader Shader
-        {
-            get;
-            private set;
+            get
+            {
+                return _meshes;
+            }
         }
 
         public Skybox()
@@ -44,15 +32,17 @@ namespace ProceduralCity.Renderer
                 "skybox/hq/front.jpg",
             };
 
-            Texture = new CubemapTexture(filenames.ToList());
-            Shader = new Shader("skybox.vert", "skybox.fs");
-            Shader.SetUniformValue("skybox", new IntUniform
+            _texture = new CubemapTexture(filenames.ToList());
+            _shader = new Shader("skybox.vert", "skybox.fs");
+            _shader.SetUniformValue("skybox", new IntUniform
             {
                 Value = 0
             });
 
-            Vertices = CreateVertices();
-            UVs = Enumerable.Empty<Vector2>();
+            var vertices = CreateVertices();
+            var uvs = Enumerable.Empty<Vector2>(); //TODO: seems like a hack
+
+            _meshes.Add(new Mesh(vertices, uvs, _texture, _shader));
         }
 
         private IEnumerable<Vector3> CreateVertices()
@@ -111,8 +101,8 @@ namespace ProceduralCity.Renderer
             {
                 if (disposing)
                 {
-                    Shader.Dispose();
-                    Texture.Dispose();
+                    _shader.Dispose();
+                    _texture.Dispose();
                 }
 
                 disposedValue = true;

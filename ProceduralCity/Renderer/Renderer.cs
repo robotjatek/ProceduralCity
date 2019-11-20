@@ -32,19 +32,22 @@ namespace ProceduralCity.Renderer
 
         public void AddToScene(IRenderable r)
         {
-            var textureId = r.Texture != null ? r.Texture.Id : 0;
-            var shaderId = r.Shader.ProgramId;
-            var key = (textureId, shaderId);
+            foreach (var mesh in r.Meshes)
+            {
+                var textureId = mesh.Texture != null ? mesh.Texture.Id : 0; //TODO: add different mesh types for textured and untextured
+                var shaderId = mesh.Shader.ProgramId;
+                var key = (textureId, shaderId);
 
-            if (_batches.TryGetValue(key, out ObjectBatch batch))
-            {
-                batch.AddRenderable(r);
-            }
-            else
-            {
-                var toAdd = new ObjectBatch(r.Shader, r.Texture);
-                toAdd.AddRenderable(r);
-                _batches.Add(key, toAdd);
+                if (_batches.TryGetValue(key, out ObjectBatch batch))
+                {
+                    batch.AddMesh(mesh);
+                }
+                else
+                {
+                    var toAdd = new ObjectBatch(mesh.Shader, mesh.Texture);
+                    toAdd.AddMesh(mesh);
+                    _batches.Add(key, toAdd);
+                }
             }
         }
 

@@ -29,10 +29,10 @@ namespace ProceduralCity.Renderer
             _texture = texture;
         }
 
-        public void AddRenderable(IRenderable r)
+        public void AddMesh(Mesh m)
         {
-            _vertices.AddRange(r.Vertices);
-            _UVs.AddRange(r.UVs);
+            _vertices.AddRange(m.Vertices);
+            _UVs.AddRange(m.UVs);
         }
 
         public void Draw(Matrix4 projection, Matrix4 view, Matrix4 model)

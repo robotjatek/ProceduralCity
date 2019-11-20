@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenTK;
 using ProceduralCity.Renderer.Uniform;
 using ProceduralCity.Utils;
 
@@ -8,45 +7,37 @@ namespace ProceduralCity.Renderer.Utils
 {
     class FullScreenQuad : IRenderable, IDisposable
     {
-        public IEnumerable<Vector3> Vertices
-        {
-            get;
-            private set;
-        }
+        private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly Shader _shader;
+        private readonly ITexture _texture;
 
-        public IEnumerable<Vector2> UVs
+        public IEnumerable<Mesh> Meshes
         {
-            get;
-            private set;
-        }
-
-        public ITexture Texture
-        {
-            get;
-            private set;
-        }
-
-        public Shader Shader
-        {
-            get;
-            private set;
+            get
+            {
+                return _meshes;
+            }
         }
 
         public FullScreenQuad(Texture texture)
         {
-            Texture = texture;
-            Shader = new Shader("vs.vert", "fs.frag");
-            Shader.SetUniformValue("tex", new IntUniform
+            _texture = texture;
+            _shader = new Shader("vs.vert", "fs.frag");
+            _shader.SetUniformValue("tex", new IntUniform
             {
                 Value = 0
             });
-            UVs = PrimitiveUtils.CreateNDCFullscreenUVs();
-            Vertices = PrimitiveUtils.CreateNDCFullscreenGuiVertices();
+
+            _meshes.Add(new Mesh(
+                PrimitiveUtils.CreateNDCFullscreenGuiVertices(),
+                PrimitiveUtils.CreateNDCFullscreenUVs(),
+                _texture,
+                _shader));
         }
 
         public void Dispose()
         {
-            Shader.Dispose();
+            _shader.Dispose();
         }
     }
 }
