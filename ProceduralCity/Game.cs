@@ -10,6 +10,14 @@ using Serilog;
 
 namespace ProceduralCity
 {
+    //TODO: generate skybox texture procedurally
+    //TODO: generate building textures procedurally
+    //TODO: more building types
+    //TODO: add more variety to the existing building types
+    //TODO: Each IRenderable should have a list of meshes
+    //TODO: add traffic lights
+    //TODO: add streetlights
+    //TODO: add some kind of bloom effect
     class Game : IGame, IDisposable
     {
         private readonly string _title;
@@ -40,7 +48,6 @@ namespace ProceduralCity
             IWorld world,
             OpenGlContext context,
             IRenderer renderer,
-            IRenderer textRenderer,
             IRenderer ndcRenderer,
             IRenderer skyboxRenderer,
             ISkybox skybox)
@@ -96,7 +103,7 @@ namespace ProceduralCity
         {
             _context.RenderFrame += (sender, e) => this.OnRenderFrame(e);
             _context.UpdateFrame += (sender, e) => this.OnUpdateFrame(e);
-            _context.Resize += (sender, e) => this.OnResize(e);
+            _context.Resize += (sender, e) => this.OnResize();
             _context.KeyDown += (sender, e) => this.OnKeyDown(e);
             _context.Width = _config.ResolutionWidth;
             _context.Height = _config.ResolutionHeight;
@@ -136,11 +143,11 @@ namespace ProceduralCity
             }
         }
 
-        private void OnResize(EventArgs e)
+        private void OnResize()
         {
             _logger.Information($"Window resized: {_context.Width}x{_context.Height}");
             GL.Viewport(_context.ClientRectangle);
-            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.Width / _context.Height, 0.1f, 5000.0f);
+            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.Width / _context.Height, 1.0f, 5000.0f);
             _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
             _worldRenderer.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height);
         }
