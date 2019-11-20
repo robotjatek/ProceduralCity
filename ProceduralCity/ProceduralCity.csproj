@@ -50,7 +50,7 @@
     <None Include="Shaders\fs.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Shaders\skybox.fs">
+    <None Include="Shaders\skybox.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\skybox.vert">

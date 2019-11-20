@@ -17,6 +17,7 @@ namespace ProceduralCity
     //TODO: add traffic lights
     //TODO: add streetlights
     //TODO: add some kind of bloom effect
+    //TODO: textures on building seam to be upside down
     class Game : IGame, IDisposable
     {
         private readonly string _title;
