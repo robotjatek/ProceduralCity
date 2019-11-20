@@ -14,7 +14,6 @@ namespace ProceduralCity
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
-    //TODO: Each IRenderable should have a list of meshes
     //TODO: add traffic lights
     //TODO: add streetlights
     //TODO: add some kind of bloom effect
