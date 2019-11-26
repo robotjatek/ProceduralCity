@@ -5,6 +5,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using ProceduralCity.Config;
 using ProceduralCity.Renderer;
+using ProceduralCity.Renderer.Uniform;
 using ProceduralCity.Renderer.Utils;
 using Serilog;
 
@@ -17,7 +18,10 @@ namespace ProceduralCity
     //TODO: add traffic lights
     //TODO: add streetlights
     //TODO: add some kind of bloom effect
-    //TODO: textures on building seam to be upside down
+    //TODO: textures on buildings seem to be upside down
+    //TODO: dynamic text rendering
+    //TODO: ground plane
+    //TODO: Mipmaping modes for generated textures (created with new Texture(w,h))
     class Game : IGame, IDisposable
     {
         private readonly string _title;
@@ -38,6 +42,7 @@ namespace ProceduralCity
         private readonly BackBufferRenderer _worldRenderer;
         private readonly Texture _backbufferTexture;
         private readonly FullScreenQuad _fullScreenQuad;
+        private readonly Shader _fullscreenShader;
 
         private double _elapsedFrameTime = 0;
 
@@ -95,7 +100,12 @@ namespace ProceduralCity
                 _config.ResolutionHeight,
                 useDepthBuffer: true);
 
-            _fullScreenQuad = new FullScreenQuad(_worldRenderer.Texture);
+            _fullscreenShader = new Shader("vs.vert", "fs.frag");
+            _fullscreenShader.SetUniformValue("tex", new IntUniform
+            {
+                Value = 0
+            });
+            _fullScreenQuad = new FullScreenQuad(_worldRenderer.Texture, _fullscreenShader);
             _ndcRenderer.AddToScene(_fullScreenQuad);
         }
 
@@ -216,7 +226,7 @@ namespace ProceduralCity
             _worldRenderer.Dispose();
             _ndcRenderer.Dispose();
             _skyboxRenderer.Dispose();
-            _fullScreenQuad.Dispose();
+            _fullscreenShader.Dispose();
             _backbufferTexture.Dispose();
         }
     }

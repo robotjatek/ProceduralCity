@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
-using ProceduralCity.Renderer.Uniform;
 
 namespace ProceduralCity.Renderer
 {
-    class Skybox : ISkybox, IRenderable, IDisposable
+    class ProceduralSkybox : ISkybox
     {
         private readonly List<Mesh> _meshes = new List<Mesh>();
-        private readonly ITexture _texture;
         private readonly Shader _shader;
 
         public IEnumerable<Mesh> Meshes
@@ -20,29 +18,14 @@ namespace ProceduralCity.Renderer
             }
         }
 
-        public Skybox()
+        public ProceduralSkybox()
         {
-            var filenames = new[]
-            {
-                "skybox/hq/right.jpg",
-                "skybox/hq/left.jpg",
-                "skybox/hq/top.jpg",
-                "skybox/hq/bottom.jpg",
-                "skybox/hq/back.jpg",
-                "skybox/hq/front.jpg",
-            };
-
-            _texture = new CubemapTexture(filenames.ToList());
-            _shader = new Shader("skybox/skybox.vert", "skybox/skybox.frag");
-            _shader.SetUniformValue("skybox", new IntUniform
-            {
-                Value = 0
-            });
+            _shader = new Shader("skybox/skybox.vert", "skybox/proceduralSkybox.frag");
 
             var vertices = CreateVertices();
-            var uvs = Enumerable.Empty<Vector2>(); //TODO: seems like a hack (edit: yes its kinda a hack. ObjectBatch expects an uv list, null will crash the program. In the skybox shader itself no UVs are used.)
+            var uvs = Enumerable.Empty<Vector2>();
 
-            _meshes.Add(new Mesh(vertices, uvs, _texture, _shader));
+            _meshes.Add(new Mesh(vertices, uvs, null, _shader));
         }
 
         private IEnumerable<Vector3> CreateVertices()
@@ -102,14 +85,13 @@ namespace ProceduralCity.Renderer
                 if (disposing)
                 {
                     _shader.Dispose();
-                    _texture.Dispose();
                 }
 
                 disposedValue = true;
             }
         }
 
-        ~Skybox()
+        ~ProceduralSkybox()
         {
             Dispose(false);
         }

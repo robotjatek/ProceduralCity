@@ -6,7 +6,7 @@ using Serilog;
 
 namespace ProceduralCity.Renderer
 {
-    class BackBufferRenderer : IDisposable, IBackBufferRenderer
+    class BackBufferRenderer : IBackBufferRenderer
     {
         private int _frameBufferId;
         private int _rboId;

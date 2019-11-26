@@ -33,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -50,10 +51,16 @@
     <None Include="Shaders\fs.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Shaders\skybox.frag">
+    <None Include="Shaders\Noise\Noise.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Shaders\skybox.vert">
+    <None Include="Shaders\Skybox\proceduralSkybox.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\Skybox\skybox.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\Skybox\skybox.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\street_light.frag">
@@ -79,11 +86,13 @@
     <Compile Include="Renderer\IBackBufferRenderer.cs" />
     <Compile Include="Renderer\ITexture.cs" />
     <Compile Include="Renderer\Mesh.cs" />
+    <Compile Include="Renderer\ProceduralSkybox.cs" />
     <Compile Include="Renderer\Uniform\FloatUniform.cs" />
     <Compile Include="Renderer\Uniform\IntUniform.cs" />
     <Compile Include="Renderer\Uniform\IUniformValue.cs" />
     <Compile Include="Renderer\Uniform\Matrix4Uniform.cs" />
     <Compile Include="Renderer\Uniform\UniformHandler.cs" />
+    <Compile Include="Renderer\Utils\NoiseRenderer.cs" />
     <Compile Include="Utils\CoinFlip.cs" />
     <Compile Include="Renderer\Utils\FullScreenQuad.cs" />
     <Compile Include="Textbox.cs" />
