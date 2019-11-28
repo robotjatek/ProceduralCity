@@ -4,5 +4,6 @@ namespace ProceduralCity.Renderer
 {
     interface ISkybox : IRenderable, IDisposable
     {
+        void Update();
     }
 }

@@ -2,17 +2,24 @@
 in vec3 TexCoords;
 out vec4 fragmentColor;
 
-const vec3 topColor = vec3(0,0,0);
-const vec3 bottomColor = vec3(0.1,0.2,0.3);
-const float topTransientCoord = 0.5;
+uniform float u_seed_x = 542.0f;
+uniform float u_seed_y = 736.0f;
+uniform float u_seed_z = 247.147f;
+uniform float u_seed_scale = 1112.0f;
+
+uniform vec3 u_cloud_color_1 = vec3(0,0,1);
+uniform vec3 u_cloud_color_2 = vec3(0,1,0);
+uniform float u_cloud_cutoff = 0.65f;
+uniform vec3 u_sky_top_color = vec3(0,0,0);
+uniform vec3 u_sky_bottom_color = vec3(0.1,0.2,0.3);
+const float topTransientCoord = 1f;
 const float bottomTransientCoord = 0.005;
 const int starCutoffLow = 4095;
 const int starCutoffHigh = 4096;
 
 float rand(vec3 uv)
 {    
-	float ret = fract(abs(cos(uv.x * 542.0f + uv.y * 736.0f + uv.z * 247.148f) * 1112.0));
-	return ret;
+	return fract(abs(cos(uv.x * u_seed_x + uv.y * u_seed_y + uv.z * u_seed_z) * u_seed_scale));
 }
 
 float Noise(vec3 uv)
@@ -64,13 +71,11 @@ float layeredNoise(vec3 uv)
 vec3 clouds(vec3 uv)
 {
 	vec3 col = vec3(0);
-	const float cutOff = 0.6;
-	
 	float val = layeredNoise(uv);
-	float scaledVal = (val - cutOff) / cutOff;
+	float scaledVal = (val - u_cloud_cutoff) / u_cloud_cutoff;
 
-	col = mix(vec3(0, 0, 1) * scaledVal, vec3(0, 1, 0) * scaledVal * 2, scaledVal);
-	if(val < cutOff)
+	col = mix(u_cloud_color_1 * scaledVal, u_cloud_color_2 * scaledVal * 2, scaledVal);
+	if(val < u_cloud_cutoff)
 	{
 		col = vec3(0);
 	};
@@ -80,11 +85,11 @@ vec3 clouds(vec3 uv)
 
 vec3 stars(vec3 uv)
 {
-	uv = floor(uv * 100000.0f) / 100000.0f;
+	uv = floor(uv * 1000.0f) / 1000.0f;
 
 	int starIntensity = int(rand(uv) * 4096);
 	vec3 col = vec3(starIntensity);
-	if(starIntensity < starCutoffLow || starIntensity > starCutoffHigh || uv.y < bottomTransientCoord)
+	if(starIntensity < starCutoffLow || starIntensity > starCutoffHigh)
 	{
 		col = vec3(0);
 	}
@@ -98,24 +103,27 @@ void main()
 	const float sphereDistance = 5.0f;
 	vec3 sphereUv = normalize(uv) * sphereDistance;  //"project" cube uv-s to a sphere
 
+	float intensityScale = 1f;
 	vec3 col = vec3(0);
 	if(sphereUv.y < bottomTransientCoord)
 	{
-		col = bottomColor;
+		col = u_sky_bottom_color;
+		intensityScale = 0f;
 	}
 	else if(sphereUv.y >= bottomTransientCoord && sphereUv.y < topTransientCoord)
 	{
 		const float transientLength = topTransientCoord - bottomTransientCoord;
 		float scaledTransientCoordinate = (sphereUv.y - bottomTransientCoord) / transientLength;
-		col = mix(bottomColor, topColor, smoothstep(0, 1, scaledTransientCoordinate));
+		col = mix(u_sky_bottom_color, u_sky_top_color, smoothstep(0, 1, scaledTransientCoordinate));
+		intensityScale = mix(0, 1, smoothstep(0, 1, scaledTransientCoordinate));
 	}
 	else
 	{
-		col = topColor;
+		col = u_sky_top_color;
 	}
 
-	col += stars(sphereUv) * 0.0001f;
-	col += clouds(sphereUv * 0.25f);
+	col += stars(sphereUv) * 0.00015f * intensityScale;
+	col += clouds(sphereUv * 0.25f) * intensityScale;
 
 	fragmentColor = vec4(clamp(col, vec3(0), vec3(1)),1.0);
 }

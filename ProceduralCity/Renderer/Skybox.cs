@@ -119,5 +119,11 @@ namespace ProceduralCity.Renderer
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        public void Update()
+        {
+            //TODO: review interface
+            throw new NotImplementedException();
+        }
     }
 }

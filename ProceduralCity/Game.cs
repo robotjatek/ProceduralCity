@@ -22,6 +22,7 @@ namespace ProceduralCity
     //TODO: dynamic text rendering
     //TODO: ground plane
     //TODO: Mipmaping modes for generated textures (created with new Texture(w,h))
+    //TODO: generic uniform class
     class Game : IGame, IDisposable
     {
         private readonly string _title;
@@ -214,13 +215,18 @@ namespace ProceduralCity
             {
                 _context.ToggleVSync();
             }
+
+            if (e.Key == Key.G)
+            {
+                _skybox.Update();
+            }
         }
 
         public void Dispose()
         {
             _logger.Information("Disposing objects");
-            _renderer?.Dispose();
-            _skybox?.Dispose();
+            _renderer.Dispose();
+            _skybox.Dispose();
             _world.Dispose();
             _context.Dispose();
             _worldRenderer.Dispose();
