@@ -33,14 +33,14 @@ namespace ProceduralCity.Renderer
             };
 
             _texture = new CubemapTexture(filenames.ToList());
-            _shader = new Shader("skybox.vert", "skybox.frag");
+            _shader = new Shader("skybox/skybox.vert", "skybox/skybox.frag");
             _shader.SetUniformValue("skybox", new IntUniform
             {
                 Value = 0
             });
 
             var vertices = CreateVertices();
-            var uvs = Enumerable.Empty<Vector2>(); //TODO: seems like a hack (edit: yes its kinda a hack. ObjectBatch expects an uv list, null, will crash the program. In the skybox shader itself no UVs are used.)
+            var uvs = Enumerable.Empty<Vector2>(); //TODO: seems like a hack (edit: yes its kinda a hack. ObjectBatch expects an uv list, null will crash the program. In the skybox shader itself no UVs are used.)
 
             _meshes.Add(new Mesh(vertices, uvs, _texture, _shader));
         }
@@ -118,6 +118,12 @@ namespace ProceduralCity.Renderer
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public void Update()
+        {
+            //TODO: review interface
+            throw new NotImplementedException();
         }
     }
 }

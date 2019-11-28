@@ -1,9 +1,10 @@
-﻿using OpenTK;
+﻿using System;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace ProceduralCity.Renderer
 {
-    interface IBackBufferRenderer
+    interface IBackBufferRenderer : IDisposable
     {
         int Height { get; }
         bool IsDepthBuffered { get; }
