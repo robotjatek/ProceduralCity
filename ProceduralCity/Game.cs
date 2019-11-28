@@ -11,7 +11,6 @@ using Serilog;
 
 namespace ProceduralCity
 {
-    //TODO: generate skybox texture procedurally
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
@@ -22,7 +21,6 @@ namespace ProceduralCity
     //TODO: dynamic text rendering
     //TODO: ground plane
     //TODO: Mipmaping modes for generated textures (created with new Texture(w,h))
-    //TODO: generic uniform class
     class Game : IGame, IDisposable
     {
         private readonly string _title;
