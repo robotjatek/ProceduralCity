@@ -17,7 +17,6 @@ namespace ProceduralCity
     //TODO: add more variety to the existing building types
     //TODO: add traffic lights
     //TODO: add streetlights
-    //TODO: add some kind of bloom effect
     //TODO: textures on buildings seem to be upside down
     //TODO: dynamic text rendering
     //TODO: ground plane
