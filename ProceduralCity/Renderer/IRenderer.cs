@@ -10,7 +10,7 @@ namespace ProceduralCity.Renderer
 
         Action AfterRender { get; set; }
 
-        void RenderScene(Matrix4 projection, Matrix4 view, Matrix4 model);
+        void RenderScene(Matrix4 projection, Matrix4 view);
 
         void AddToScene(IEnumerable<IRenderable> renderables);
 

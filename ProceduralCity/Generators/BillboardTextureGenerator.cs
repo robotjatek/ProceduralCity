@@ -102,7 +102,7 @@ namespace ProceduralCity.Generators
                     renderer.BeforeRender = () => { GL.Enable(EnableCap.Blend); };
                     renderer.AfterRender = () => { GL.Disable(EnableCap.Blend); };
                     renderer.AddToScene(text.Text);
-                    backbufferRenderer.RenderToTexture(renderer, _projectionMatrix, Matrix4.Identity, Matrix4.Identity);
+                    backbufferRenderer.RenderToTexture(renderer, _projectionMatrix, Matrix4.Identity);
 
                     if (text.CursorAdvance > tex.Width)
                     {

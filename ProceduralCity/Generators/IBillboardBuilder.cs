@@ -10,5 +10,6 @@ namespace ProceduralCity.Generators
         Billboard CreateSouthFacingBillboard(Vector3 position, Vector2 area, float height);
         Billboard CreateWestFacingBillboard(Vector3 position, Vector2 area, float height);
         Billboard CreateEastFacingBillboard(Vector3 position, Vector2 area, float height);
+        bool HasBillboards();
     }
 }

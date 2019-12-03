@@ -75,11 +75,11 @@ namespace ProceduralCity.Renderer
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
-        public void RenderToTexture(IRenderer renderer, Matrix4 projection, Matrix4 view, Matrix4 model)
+        public void RenderToTexture(IRenderer renderer, Matrix4 projection, Matrix4 view)
         {
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, _frameBufferId);
             GL.Viewport(0, 0, Width, Height);
-            renderer.RenderScene(projection, view, model);
+            renderer.RenderScene(projection, view);
             Texture.CreateMipmaps();
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }

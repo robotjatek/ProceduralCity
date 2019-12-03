@@ -44,28 +44,31 @@ namespace ProceduralCity.Buildings
 
         private void CreateBillboardIfEliglible(IBillboardBuilder builder, Vector3 position, Vector2 area)
         {
-            var northSouthSideLength = area.X;
-            var eastWestSideLength = area.Y;
-            if (northSouthSideLength > eastWestSideLength)
+            if (builder.HasBillboards())
             {
-                if (northSouthSideLength >= builder.CalculateBillboardWidth(3))
+                var northSouthSideLength = area.X;
+                var eastWestSideLength = area.Y;
+                if (northSouthSideLength > eastWestSideLength)
                 {
-                    var billboard = CoinFlip.Flip() ?
-                        builder.CreateNorthFacingBillboard(position, area, 3) :
-                        builder.CreateSouthFacingBillboard(position, area, 3);
+                    if (northSouthSideLength >= builder.CalculateBillboardWidth(3))
+                    {
+                        var billboard = CoinFlip.Flip() ?
+                            builder.CreateNorthFacingBillboard(position, area, 3) :
+                            builder.CreateSouthFacingBillboard(position, area, 3);
 
-                    _meshes.AddRange(billboard.Meshes);
+                        _meshes.AddRange(billboard.Meshes);
+                    }
                 }
-            }
-            else
-            {
-                if (eastWestSideLength >= builder.CalculateBillboardWidth(3))
+                else
                 {
-                    var billboard = CoinFlip.Flip() ?
-                        builder.CreateWestFacingBillboard(position, area, 3) :
-                        builder.CreateEastFacingBillboard(position, area, 3);
+                    if (eastWestSideLength >= builder.CalculateBillboardWidth(3))
+                    {
+                        var billboard = CoinFlip.Flip() ?
+                            builder.CreateWestFacingBillboard(position, area, 3) :
+                            builder.CreateEastFacingBillboard(position, area, 3);
 
-                    _meshes.AddRange(billboard.Meshes);
+                        _meshes.AddRange(billboard.Meshes);
+                    }
                 }
             }
         }

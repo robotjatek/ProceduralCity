@@ -14,12 +14,12 @@ namespace ProceduralCity.Renderer
 
         public Action AfterRender { get; set; }
 
-        public void RenderScene(Matrix4 projection, Matrix4 view, Matrix4 model)
+        public void RenderScene(Matrix4 projection, Matrix4 view)
         {
             BeforeRender?.Invoke();
             foreach (var batch in _batches.Values)
             {
-                batch.Draw(projection, view, model);
+                batch.Draw(projection, view);
             }
             AfterRender?.Invoke();
         }

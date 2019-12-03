@@ -24,7 +24,7 @@ namespace ProceduralCity.Renderer.Utils
         {
             var proj = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
             _backbufferRenderer.Clear();
-            _backbufferRenderer.RenderToTexture(_renderer, proj, Matrix4.Identity, Matrix4.Identity);
+            _backbufferRenderer.RenderToTexture(_renderer, proj, Matrix4.Identity);
         }
 
         private bool disposedValue = false;

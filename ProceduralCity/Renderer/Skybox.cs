@@ -122,7 +122,7 @@ namespace ProceduralCity.Renderer
 
         public void Update()
         {
-            //TODO: review interface
+            //XXX: Could be used to implement day-night cycles, etc.
             throw new NotImplementedException();
         }
     }
