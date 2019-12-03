@@ -18,6 +18,6 @@ void main()
 	}
 	else
 	{
-		fragmentColor = texture(tex, fTexCoord);
+		fragmentColor = texture(tex, fTexCoord) * mix(0, 1, 1f/u_LuminanceTreshold);
 	}
 }
