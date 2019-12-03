@@ -114,8 +114,8 @@ namespace ProceduralCity
             });
 
             _ndcTexture = _postprocessTexture;
-            var _fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
-            _ndcRenderer.AddToScene(_fullScreenQuad);
+            var fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
+            _ndcRenderer.AddToScene(fullScreenQuad);
         }
 
         private void ConfigureContext()
@@ -245,8 +245,8 @@ namespace ProceduralCity
                 }
 
                 _ndcRenderer.Clear();
-                var _fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
-                _ndcRenderer.AddToScene(_fullScreenQuad);
+                var fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
+                _ndcRenderer.AddToScene(fullScreenQuad);
 
                 _isBloomEnabled = !_isBloomEnabled;
             }
