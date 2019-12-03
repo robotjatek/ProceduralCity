@@ -22,15 +22,13 @@ namespace ProceduralCity.Renderer.PostProcess
             _effect = effect;
             _renderer = new Renderer();
             _backbufferRenderer = new BackBufferRenderer(_logger, outputTexture, outputTexture.Width, outputTexture.Height, false);
+            var quad = new FullScreenQuad(_inputTextures, _effect);
+            _renderer.AddToScene(quad);
         }
 
         public void DoPostProcess()
         {
-            //TODO: consider to move everything to the constructor except the _backbufferRenderer.RenderToTexture
-            var quad = new FullScreenQuad(_inputTextures, _effect);
-            _renderer.AddToScene(quad);
             _backbufferRenderer.RenderToTexture(_renderer, _proj, Matrix4.Identity);
-            _renderer.Clear();
         }
 
         public void Resize(int width, int height, float scale)
