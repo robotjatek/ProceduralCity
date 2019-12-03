@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
+using ProceduralCity.Extensions;
 
 namespace ProceduralCity.Renderer
 {
@@ -34,9 +36,9 @@ namespace ProceduralCity.Renderer
         {
             foreach (var mesh in r.Meshes)
             {
-                var textureId = mesh.Texture != null ? mesh.Texture.Id : 0; //TODO: add different mesh types for textured and untextured
+                var textureHash = mesh.Textures.Select(t => t.Id).CalculateHash();
                 var shaderId = mesh.Shader.ProgramId;
-                var key = (textureId, shaderId);
+                var key = (textureHash, shaderId);
 
                 if (_batches.TryGetValue(key, out ObjectBatch batch))
                 {
@@ -44,7 +46,7 @@ namespace ProceduralCity.Renderer
                 }
                 else
                 {
-                    var toAdd = new ObjectBatch(mesh.Shader, mesh.Texture);
+                    var toAdd = new ObjectBatch(mesh.Shader, mesh.Textures);
                     toAdd.AddMesh(mesh);
                     _batches.Add(key, toAdd);
                 }

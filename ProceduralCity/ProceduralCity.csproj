@@ -77,6 +77,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\TextureCoordinateExtensions.cs" />
     <Compile Include="Generators\BillboardBuilder.cs" />
     <Compile Include="Generators\BillboardTextureGenerator.cs" />

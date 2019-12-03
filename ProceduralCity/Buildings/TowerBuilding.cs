@@ -75,7 +75,7 @@ namespace ProceduralCity.Buildings
             return new Mesh(
                 PrimitiveUtils.CreateCubeVertices(position, area, height),
                 PrimitiveUtils.CreateCubeUVs(),
-                _texture,
+                new[] { _texture },
                 _shader);
         }
 
@@ -84,7 +84,7 @@ namespace ProceduralCity.Buildings
             return new Mesh(
                 PrimitiveUtils.CreateCubeVertices(position, area, height),
                 PrimitiveUtils.CreateZeroCubeUVs(),
-                _texture,
+                new[] { _texture },
                 _shader);
         }
     }

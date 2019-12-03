@@ -42,7 +42,7 @@ namespace ProceduralCity.Renderer
             var vertices = CreateVertices();
             var uvs = Enumerable.Empty<Vector2>(); //TODO: seems like a hack (edit: yes its kinda a hack. ObjectBatch expects an uv list, null will crash the program. In the skybox shader itself no UVs are used.)
 
-            _meshes.Add(new Mesh(vertices, uvs, _texture, _shader));
+            _meshes.Add(new Mesh(vertices, uvs, new[] { _texture }, _shader));
         }
 
         private IEnumerable<Vector3> CreateVertices()

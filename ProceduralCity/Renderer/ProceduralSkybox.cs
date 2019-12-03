@@ -42,7 +42,7 @@ namespace ProceduralCity.Renderer
             var vertices = CreateVertices();
             var uvs = Enumerable.Empty<Vector2>();
 
-            _meshes.Add(new Mesh(vertices, uvs, null, _shader));
+            _meshes.Add(new Mesh(vertices, uvs, _shader));
         }
 
         public void Update()

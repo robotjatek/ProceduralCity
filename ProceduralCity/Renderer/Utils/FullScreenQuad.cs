@@ -25,7 +25,7 @@ namespace ProceduralCity.Renderer.Utils
             _meshes.Add(new Mesh(
                 PrimitiveUtils.CreateNDCFullscreenGuiVertices(),
                 PrimitiveUtils.CreateNDCFullscreenUVs(),
-                _texture,
+                new[] { _texture },
                 _shader));
         }
     }
