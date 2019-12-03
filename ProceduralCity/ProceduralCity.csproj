@@ -54,6 +54,9 @@
     <None Include="Shaders\Noise\Noise.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Shaders\PostProcess\luminance.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Shaders\Skybox\proceduralSkybox.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -86,6 +89,8 @@
     <Compile Include="Renderer\IBackBufferRenderer.cs" />
     <Compile Include="Renderer\ITexture.cs" />
     <Compile Include="Renderer\Mesh.cs" />
+    <Compile Include="Renderer\PostProcess\PostProcess.cs" />
+    <Compile Include="Renderer\PostProcess\PostprocessPipeline.cs" />
     <Compile Include="Renderer\ProceduralSkybox.cs" />
     <Compile Include="Renderer\Uniform\FloatUniform.cs" />
     <Compile Include="Renderer\Uniform\IntUniform.cs" />

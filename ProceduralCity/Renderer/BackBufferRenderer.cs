@@ -9,7 +9,7 @@ namespace ProceduralCity.Renderer
     class BackBufferRenderer : IBackBufferRenderer
     {
         private int _frameBufferId;
-        private int _rboId;
+        private int _depthRboId;
         private readonly ILogger _logger;
 
         public Texture Texture
@@ -58,10 +58,10 @@ namespace ProceduralCity.Renderer
 
             if (IsDepthBuffered)
             {
-                _rboId = GL.GenRenderbuffer();
-                GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _rboId);
+                _depthRboId = GL.GenRenderbuffer();
+                GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _depthRboId);
                 GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent, Width, Height);
-                GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, _rboId);
+                GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, _depthRboId);
                 GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
             }
 
@@ -97,13 +97,13 @@ namespace ProceduralCity.Renderer
             this.Clear();
         }
 
-        public void Resize(int width, int height)
+        public void Resize(int width, int height, float scale)
         {
-            Width = width;
-            Height = height;
+            Width = (int)(width * scale);
+            Height = (int)(height * scale);
 
+            GL.DeleteRenderbuffer(_depthRboId);
             GL.DeleteFramebuffer(_frameBufferId);
-            GL.DeleteRenderbuffer(_rboId);
             CreateFramebuffer();
         }
 
@@ -119,7 +119,7 @@ namespace ProceduralCity.Renderer
                 }
 
                 GL.DeleteFramebuffer(_frameBufferId);
-                GL.DeleteRenderbuffer(_rboId);
+                GL.DeleteRenderbuffer(_depthRboId);
 
                 disposedValue = true;
             }

@@ -5,6 +5,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using ProceduralCity.Config;
 using ProceduralCity.Renderer;
+using ProceduralCity.Renderer.PostProcess;
 using ProceduralCity.Renderer.Uniform;
 using ProceduralCity.Renderer.Utils;
 using Serilog;
@@ -42,6 +43,9 @@ namespace ProceduralCity
         private readonly Texture _backbufferTexture;
         private readonly FullScreenQuad _fullScreenQuad;
         private readonly Shader _fullscreenShader;
+
+        private readonly PostprocessPipeline _postprocessPipeline;
+        private readonly Texture _postprocessTexture;
 
         private double _elapsedFrameTime = 0;
 
@@ -99,12 +103,15 @@ namespace ProceduralCity
                 _config.ResolutionHeight,
                 useDepthBuffer: true);
 
+            _postprocessTexture = new Texture(_config.ResolutionWidth / 2, _config.ResolutionHeight / 2);
+            _postprocessPipeline = new PostprocessPipeline(_logger, _config, _worldRenderer.Texture, _postprocessTexture);
+
             _fullscreenShader = new Shader("vs.vert", "fs.frag");
             _fullscreenShader.SetUniformValue("tex", new IntUniform
             {
                 Value = 0
             });
-            _fullScreenQuad = new FullScreenQuad(_worldRenderer.Texture, _fullscreenShader);
+            _fullScreenQuad = new FullScreenQuad(_postprocessTexture, _fullscreenShader);
             _ndcRenderer.AddToScene(_fullScreenQuad);
         }
 
@@ -138,6 +145,9 @@ namespace ProceduralCity
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)), Matrix4.Identity);
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix, _modelMatrix);
 
+            _postprocessPipeline.RunPipeline();
+
+            GL.Viewport(0, 0, _context.ClientRectangle.Width, _context.ClientRectangle.Height);
             _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity, Matrix4.Identity);
             _context.SwapBuffers();
         }
@@ -145,7 +155,7 @@ namespace ProceduralCity
         private void CountFps(FrameEventArgs e)
         {
             _elapsedFrameTime += e.Time;
-            if (_elapsedFrameTime >= 0.5)
+            if (_elapsedFrameTime >= 0.4)
             {
                 _context.Title = $"{_title} - FPS: {Math.Round(1f / e.Time, 0)}";
                 _elapsedFrameTime = 0;
@@ -158,7 +168,8 @@ namespace ProceduralCity
             GL.Viewport(_context.ClientRectangle);
             _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.Width / _context.Height, 1.0f, 5000.0f);
             _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
-            _worldRenderer.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height);
+            _worldRenderer.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height, 1.0f);
+            _postprocessPipeline.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height, .5f);
         }
 
         private void OnKeyDown(KeyboardKeyEventArgs e)
@@ -232,6 +243,9 @@ namespace ProceduralCity
             _skyboxRenderer.Dispose();
             _fullscreenShader.Dispose();
             _backbufferTexture.Dispose();
+
+            _postprocessTexture.Dispose();
+            _postprocessPipeline.Dispose();
         }
     }
 }

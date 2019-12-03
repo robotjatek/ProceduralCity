@@ -41,10 +41,16 @@ namespace ProceduralCity.Renderer
                 _uniformLocations.Add(uniformName, location);
             }
 
-            if(location != -1)
+            if (location != -1)
             {
                 value.Visit(location, _uniformHandler);
             }
+            else
+            {
+                //    Log.Logger.Warning($"Could not find uniform {uniformName}");
+                //TODO: enable unknown uniform warning!
+            }
+
             this.Unbind();
         }
 

@@ -51,6 +51,15 @@ namespace ProceduralCity.Renderer
             }
         }
 
+        public void Clear()
+        {
+            foreach (var batch in _batches.Values)
+            {
+                batch.Dispose();
+            }
+            _batches.Clear();
+        }
+
         public void Dispose()
         {
             foreach (var batch in _batches.Values)
