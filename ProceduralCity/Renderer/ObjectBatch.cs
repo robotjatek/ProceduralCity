@@ -35,7 +35,7 @@ namespace ProceduralCity.Renderer
             _UVs.AddRange(m.UVs);
         }
 
-        public void Draw(Matrix4 projection, Matrix4 view, Matrix4 model)
+        public void Draw(Matrix4 projection, Matrix4 view)
         {
             if (!_ready)
             {
@@ -59,10 +59,7 @@ namespace ProceduralCity.Renderer
             {
                 Value = view
             });
-            _shader.SetUniformValue("_model", new Matrix4Uniform
-            {
-                Value = model //TODO: set model matrix from outside of the renderer
-            });
+
             _shader.Use();
 
             GL.DrawArrays(PrimitiveType.Triangles, 0, Vertices.Length);

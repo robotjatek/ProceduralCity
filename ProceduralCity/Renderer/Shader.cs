@@ -47,8 +47,7 @@ namespace ProceduralCity.Renderer
             }
             else
             {
-                //    Log.Logger.Warning($"Could not find uniform {uniformName}");
-                //TODO: enable unknown uniform warning!
+                Log.Logger.Warning($"Could not find uniform {uniformName}");
             }
 
             this.Unbind();

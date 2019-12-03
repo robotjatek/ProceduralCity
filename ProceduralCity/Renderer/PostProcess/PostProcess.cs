@@ -29,7 +29,7 @@ namespace ProceduralCity.Renderer.PostProcess
             //TODO: consider to move everything to the constructor except the _backbufferRenderer.RenderToTexture
             var quad = new FullScreenQuad(_inputTextures, _effect);
             _renderer.AddToScene(quad);
-            _backbufferRenderer.RenderToTexture(_renderer, _proj, Matrix4.Identity, Matrix4.Identity);
+            _backbufferRenderer.RenderToTexture(_renderer, _proj, Matrix4.Identity);
             _renderer.Clear();
         }
 

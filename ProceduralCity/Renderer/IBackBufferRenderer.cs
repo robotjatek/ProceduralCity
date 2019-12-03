@@ -13,7 +13,7 @@ namespace ProceduralCity.Renderer
 
         void Clear();
         void Clear(Color4 color);
-        void RenderToTexture(IRenderer renderer, Matrix4 projection, Matrix4 view, Matrix4 model);
+        void RenderToTexture(IRenderer renderer, Matrix4 projection, Matrix4 view);
         void Resize(int width, int height, float scale);
     }
 }

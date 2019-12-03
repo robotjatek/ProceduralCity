@@ -25,7 +25,6 @@ namespace ProceduralCity
     {
         private readonly string _title;
         private Matrix4 _projectionMatrix = Matrix4.Identity;
-        private Matrix4 _modelMatrix = Matrix4.Identity;
         private Matrix4 _ndcRendererMatrix;
 
         private readonly IAppConfig _config;
@@ -144,13 +143,13 @@ namespace ProceduralCity
             var viewMatrix = _camera.Use();
 
             _worldRenderer.Clear();
-            _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)), Matrix4.Identity);
-            _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix, _modelMatrix);
+            _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
+            _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix);
 
             _postprocessPipeline.RunPipeline();
 
             GL.Viewport(0, 0, _context.ClientRectangle.Width, _context.ClientRectangle.Height);
-            _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity, Matrix4.Identity);
+            _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity);
             _context.SwapBuffers();
         }
 
