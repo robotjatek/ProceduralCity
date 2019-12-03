@@ -172,7 +172,7 @@ namespace ProceduralCity
             _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.Width / _context.Height, 1.0f, 5000.0f);
             _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
             _worldRenderer.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height, 1.0f);
-            _postprocessPipeline.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height, .5f);
+            _postprocessPipeline.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height, 1.0f);
         }
 
         private void OnKeyDown(KeyboardKeyEventArgs e)

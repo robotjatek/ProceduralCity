@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OpenTK;
 using ProceduralCity.Config;
 using ProceduralCity.Renderer.Uniform;
 using Serilog;
@@ -15,6 +16,8 @@ namespace ProceduralCity.Renderer.PostProcess
         private readonly List<PostProcess> _postprocess;
         private readonly Shader _lumaEffect = new Shader("vs.vert", "PostProcess/luminance.frag");
         private readonly Shader _blendEffect = new Shader("vs.vert", "PostProcess/blend.frag");
+        private readonly Shader _horizontalBlurEffect = new Shader("vs.vert", "PostProcess/blur.frag");
+        private readonly Shader _verticalBlurEffect = new Shader("vs.vert", "PostProcess/blur.frag");
 
         public PostprocessPipeline(ILogger logger, IAppConfig config, Texture inputTexture, Texture outputTexture)
         {
@@ -25,7 +28,10 @@ namespace ProceduralCity.Renderer.PostProcess
             _postprocess = new List<PostProcess>()
             {
                 new PostProcess(logger, new[] { _inputTexture }, _outputTexture, _lumaEffect),
-                new PostProcess(logger, new[] { _inputTexture, _outputTexture }, _outputTexture, _blendEffect)
+                new PostProcess(logger, new[] { _outputTexture }, _outputTexture, _horizontalBlurEffect),
+                new PostProcess(logger, new[] { _outputTexture }, _outputTexture, _verticalBlurEffect),
+
+                new PostProcess(logger, new[] { _inputTexture, _outputTexture }, _outputTexture, _blendEffect),
             };
 
             _lumaEffect.SetUniformValue("u_LuminanceTreshold", new FloatUniform
@@ -45,6 +51,26 @@ namespace ProceduralCity.Renderer.PostProcess
             {
                 Value = 1
             });
+
+            _horizontalBlurEffect.SetUniformValue("u_texture", new IntUniform
+            {
+                Value = 0
+            });
+            _horizontalBlurEffect.SetUniformValue("u_Offset", new Vector2Uniform
+            {
+                Value = new Vector2(1f / _inputTexture.Width, 0)
+            });
+
+            _verticalBlurEffect.SetUniformValue("u_texture", new IntUniform
+            {
+                Value = 0
+            });
+            _verticalBlurEffect.SetUniformValue("u_Offset", new Vector2Uniform
+            {
+                Value = new Vector2(0, 1f / _inputTexture.Height)
+            });
+
+            _logger.Information($"Post-process pipeline has been set up with {_postprocess.Count} effects");
         }
 
         public void RunPipeline()
@@ -73,6 +99,8 @@ namespace ProceduralCity.Renderer.PostProcess
                 {
                     _lumaEffect.Dispose();
                     _blendEffect.Dispose();
+                    _horizontalBlurEffect.Dispose();
+                    _verticalBlurEffect.Dispose();
                     foreach (var p in _postprocess)
                     {
                         p.Dispose();

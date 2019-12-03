@@ -57,6 +57,9 @@
     <None Include="Shaders\PostProcess\blend.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Shaders\PostProcess\blur.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Shaders\PostProcess\luminance.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -101,6 +104,7 @@
     <Compile Include="Renderer\Uniform\IUniformValue.cs" />
     <Compile Include="Renderer\Uniform\Matrix4Uniform.cs" />
     <Compile Include="Renderer\Uniform\UniformHandler.cs" />
+    <Compile Include="Renderer\Uniform\Vector2Uniform.cs" />
     <Compile Include="Renderer\Uniform\Vector3Uniform.cs" />
     <Compile Include="Renderer\Utils\NoiseRenderer.cs" />
     <Compile Include="Utils\CoinFlip.cs" />
