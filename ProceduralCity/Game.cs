@@ -41,11 +41,12 @@ namespace ProceduralCity
         private readonly OpenGlContext _context;
         private readonly BackBufferRenderer _worldRenderer;
         private readonly Texture _backbufferTexture;
-        private readonly FullScreenQuad _fullScreenQuad;
         private readonly Shader _fullscreenShader;
 
+        private bool _isBloomEnabled = true;
         private readonly PostprocessPipeline _postprocessPipeline;
         private readonly Texture _postprocessTexture;
+        private Texture _ndcTexture;
 
         private double _elapsedFrameTime = 0;
 
@@ -111,7 +112,9 @@ namespace ProceduralCity
             {
                 Value = 0
             });
-            _fullScreenQuad = new FullScreenQuad(new[] { _postprocessTexture }, _fullscreenShader);
+
+            _ndcTexture = _postprocessTexture;
+            var _fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
             _ndcRenderer.AddToScene(_fullScreenQuad);
         }
 
@@ -228,6 +231,24 @@ namespace ProceduralCity
             if (e.Key == Key.G)
             {
                 _skybox.Update();
+            }
+
+            if (e.Key == Key.B)
+            {
+                if (_isBloomEnabled)
+                {
+                    _ndcTexture = _postprocessTexture;
+                }
+                else
+                {
+                    _ndcTexture = _worldRenderer.Texture;
+                }
+
+                _ndcRenderer.Clear();
+                var _fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
+                _ndcRenderer.AddToScene(_fullScreenQuad);
+
+                _isBloomEnabled = !_isBloomEnabled;
             }
         }
 
