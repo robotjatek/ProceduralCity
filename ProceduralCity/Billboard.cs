@@ -18,7 +18,7 @@ namespace ProceduralCity
 
         public Billboard(Texture texture, Shader shader, IEnumerable<Vector3> vertices, IEnumerable<Vector2> uvs)
         {
-            _meshes.Add(new Mesh(vertices, uvs, texture, shader));
+            _meshes.Add(new Mesh(vertices, uvs, new[] { texture }, shader));
         }
     }
 }

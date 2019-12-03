@@ -42,5 +42,7 @@ namespace ProceduralCity.Config
         public int BillboardTextureHeight { get; set; }
 
         public int BillboardLineHeight { get; set; }
+
+        public float BloomTreshold { get; set; }
     }
 }

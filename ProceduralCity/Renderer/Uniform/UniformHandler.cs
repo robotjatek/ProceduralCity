@@ -20,6 +20,11 @@ namespace ProceduralCity.Renderer.Uniform
             GL.UniformMatrix4(location, false, ref matrix);
         }
 
+        public void Dispatch(int location, Vector2Uniform value)
+        {
+            GL.Uniform2(location, value.Value);
+        }
+
         public void Dispatch(int location, Vector3Uniform value)
         {
             GL.Uniform3(location, value.Value);

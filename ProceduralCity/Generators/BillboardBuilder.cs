@@ -10,6 +10,7 @@ namespace ProceduralCity.Generators
     class BillboardBuilder : IBillboardBuilder, IDisposable
     {
         //TODO: generate billboard coordinates in model space, then transform them with a model matrix
+        //TODO: do not crash if billboard number is 0
         private readonly Random _random = new Random();
         private readonly Texture[] _billboardTextures;
         private readonly IAppConfig _config;

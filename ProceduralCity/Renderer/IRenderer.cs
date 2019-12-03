@@ -15,5 +15,7 @@ namespace ProceduralCity.Renderer
         void AddToScene(IEnumerable<IRenderable> renderables);
 
         void AddToScene(IRenderable renderable);
+
+        void Clear();
     }
 }

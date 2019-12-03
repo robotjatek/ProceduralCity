@@ -48,7 +48,7 @@ namespace ProceduralCity
             var t = (float)charConfig.Y / texture.Height;
             var uvs = PrimitiveUtils.CreateSpriteUVs(new Vector2(s, t), (float)charConfig.Width / texture.Width, (float)charConfig.Height / texture.Height);
 
-            _meshes.Add(new Mesh(vertices, uvs, _texture, _shader));
+            _meshes.Add(new Mesh(vertices, uvs, new[] { _texture }, _shader));
         }
     }
 }

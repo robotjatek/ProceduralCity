@@ -1,0 +1,18 @@
+﻿using OpenTK;
+
+namespace ProceduralCity.Renderer.Uniform
+{
+    class Vector2Uniform : IUniformValue
+    {
+        public Vector2 Value
+        {
+            get;
+            set;
+        }
+
+        public void Visit(int location, UniformHandler uniformHandler)
+        {
+            uniformHandler.Dispatch(location, this);
+        }
+    }
+}

@@ -7,7 +7,7 @@ namespace ProceduralCity.Renderer.Utils
     {
         private readonly List<Mesh> _meshes = new List<Mesh>();
         private readonly Shader _shader;
-        private readonly ITexture _texture;
+        private readonly IEnumerable<ITexture> _textures;
 
         public IEnumerable<Mesh> Meshes
         {
@@ -17,15 +17,15 @@ namespace ProceduralCity.Renderer.Utils
             }
         }
 
-        public FullScreenQuad(Texture texture, Shader shader)
+        public FullScreenQuad(IEnumerable<Texture> textures, Shader shader)
         {
-            _texture = texture;
+            _textures = textures;
             _shader = shader;
 
             _meshes.Add(new Mesh(
                 PrimitiveUtils.CreateNDCFullscreenGuiVertices(),
                 PrimitiveUtils.CreateNDCFullscreenUVs(),
-                _texture,
+                _textures,
                 _shader));
         }
     }

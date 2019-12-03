@@ -54,6 +54,15 @@
     <None Include="Shaders\Noise\Noise.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Shaders\PostProcess\blend.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\PostProcess\blur.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\PostProcess\luminance.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Shaders\Skybox\proceduralSkybox.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -74,6 +83,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\TextureCoordinateExtensions.cs" />
     <Compile Include="Generators\BillboardBuilder.cs" />
     <Compile Include="Generators\BillboardTextureGenerator.cs" />
@@ -86,12 +96,15 @@
     <Compile Include="Renderer\IBackBufferRenderer.cs" />
     <Compile Include="Renderer\ITexture.cs" />
     <Compile Include="Renderer\Mesh.cs" />
+    <Compile Include="Renderer\PostProcess\PostProcess.cs" />
+    <Compile Include="Renderer\PostProcess\PostprocessPipeline.cs" />
     <Compile Include="Renderer\ProceduralSkybox.cs" />
     <Compile Include="Renderer\Uniform\FloatUniform.cs" />
     <Compile Include="Renderer\Uniform\IntUniform.cs" />
     <Compile Include="Renderer\Uniform\IUniformValue.cs" />
     <Compile Include="Renderer\Uniform\Matrix4Uniform.cs" />
     <Compile Include="Renderer\Uniform\UniformHandler.cs" />
+    <Compile Include="Renderer\Uniform\Vector2Uniform.cs" />
     <Compile Include="Renderer\Uniform\Vector3Uniform.cs" />
     <Compile Include="Renderer\Utils\NoiseRenderer.cs" />
     <Compile Include="Utils\CoinFlip.cs" />
