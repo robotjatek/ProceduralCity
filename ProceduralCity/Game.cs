@@ -111,7 +111,7 @@ namespace ProceduralCity
             {
                 Value = 0
             });
-            _fullScreenQuad = new FullScreenQuad(_postprocessTexture, _fullscreenShader);
+            _fullScreenQuad = new FullScreenQuad(new[] { _postprocessTexture }, _fullscreenShader);
             _ndcRenderer.AddToScene(_fullScreenQuad);
         }
 

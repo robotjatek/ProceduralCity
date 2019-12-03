@@ -54,6 +54,9 @@
     <None Include="Shaders\Noise\Noise.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Shaders\PostProcess\blend.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Shaders\PostProcess\luminance.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
