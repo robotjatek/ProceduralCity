@@ -234,21 +234,26 @@ namespace ProceduralCity
 
             if (e.Key == Key.B)
             {
-                if (_isBloomEnabled)
-                {
-                    _ndcTexture = _worldRenderer.Texture;
-                }
-                else
-                {
-                    _ndcTexture = _postprocessTexture;
-                }
-
-                _ndcRenderer.Clear();
-                var fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
-                _ndcRenderer.AddToScene(fullScreenQuad);
-
-                _isBloomEnabled = !_isBloomEnabled;
+                ToggleBloom();
             }
+        }
+
+        private void ToggleBloom()
+        {
+            if (_isBloomEnabled)
+            {
+                _ndcTexture = _worldRenderer.Texture;
+            }
+            else
+            {
+                _ndcTexture = _postprocessTexture;
+            }
+
+            _ndcRenderer.Clear();
+            var fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
+            _ndcRenderer.AddToScene(fullScreenQuad);
+
+            _isBloomEnabled = !_isBloomEnabled;
         }
 
         public void Dispose()
