@@ -102,7 +102,7 @@ namespace ProceduralCity
                 _config.ResolutionHeight,
                 useDepthBuffer: true);
 
-            _postprocessTexture = new Texture(_config.ResolutionWidth / 2, _config.ResolutionHeight / 2);
+            _postprocessTexture = new Texture(_config.ResolutionWidth, _config.ResolutionHeight);
             _postprocessPipeline = new PostprocessPipeline(_logger, _config, _worldRenderer.Texture, _postprocessTexture);
 
             _fullscreenShader = new Shader("vs.vert", "fs.frag");
