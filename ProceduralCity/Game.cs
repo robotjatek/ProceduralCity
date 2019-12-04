@@ -146,7 +146,8 @@ namespace ProceduralCity
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix);
 
-            _postprocessPipeline.RunPipeline();
+            if (_isBloomEnabled)
+                _postprocessPipeline.RunPipeline();
 
             GL.Viewport(0, 0, _context.ClientRectangle.Width, _context.ClientRectangle.Height);
             _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity);
@@ -235,11 +236,11 @@ namespace ProceduralCity
             {
                 if (_isBloomEnabled)
                 {
-                    _ndcTexture = _postprocessTexture;
+                    _ndcTexture = _worldRenderer.Texture;
                 }
                 else
                 {
-                    _ndcTexture = _worldRenderer.Texture;
+                    _ndcTexture = _postprocessTexture;
                 }
 
                 _ndcRenderer.Clear();
