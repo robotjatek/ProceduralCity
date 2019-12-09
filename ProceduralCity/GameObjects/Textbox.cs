@@ -8,7 +8,7 @@ using ProceduralCity.Extensions;
 using ProceduralCity.Renderer;
 using ProceduralCity.Renderer.Uniform;
 
-namespace ProceduralCity
+namespace ProceduralCity.GameObjects
 {
     class Textbox : IDisposable
     {
