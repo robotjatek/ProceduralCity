@@ -23,7 +23,7 @@ namespace ProceduralCity
     //TODO: dynamic text rendering
     //TODO: fog
     //TODO: Mipmaping modes for generated textures (created with new Texture(w,h))
-    //TODO: add decal rendering (stencil buffer?)
+    //TODO: add decal rendering (stencil buffer?) [streetlights, billboards]
     class Game : IGame, IDisposable
     {
         private readonly string _title;

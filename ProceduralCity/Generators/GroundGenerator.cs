@@ -20,7 +20,7 @@ namespace ProceduralCity.Generators
         private readonly Shader _lightShader = new Shader("vs.vert", "street_light.frag");
         private readonly List<Vector3> _lightColors = new List<Vector3>()
         {
-            new Vector3(0.025f, 0.025f, 0.025f), //Sodium vapor
+            new Vector3(1f, 0.82f, 0.698f), //Sodium vapor
             new Vector3(0.847f, 0.969f, 1f), //Mercury Vapor
             new Vector3(0.949f, 0.988f, 1f), //Metal Halide
             new Vector3(1f, 0.718f, 0.298f), //High Pressure Sodium
