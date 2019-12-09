@@ -2,7 +2,7 @@
 using OpenTK;
 using ProceduralCity.Renderer;
 
-namespace ProceduralCity
+namespace ProceduralCity.GameObjects
 {
     class Billboard : IRenderable
     {

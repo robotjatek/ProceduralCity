@@ -12,15 +12,19 @@ using Serilog;
 
 namespace ProceduralCity
 {
+    //TODO: Add the ability to render post process effects in a lower resolution
+    //TODO: Generators should not own any texture or shader references, these should be asked from a resource manager class
+    //TODO: dispose all generators after the generation has been completed
+    //TODO: generate only high-luma billboards
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
     //TODO: add traffic lights
-    //TODO: add streetlights
     //TODO: textures on buildings seem to be upside down
     //TODO: dynamic text rendering
-    //TODO: ground plane
+    //TODO: fog
     //TODO: Mipmaping modes for generated textures (created with new Texture(w,h))
+    //TODO: add decal rendering (stencil buffer?)
     class Game : IGame, IDisposable
     {
         private readonly string _title;

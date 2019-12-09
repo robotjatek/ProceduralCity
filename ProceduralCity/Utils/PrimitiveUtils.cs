@@ -85,9 +85,9 @@ namespace ProceduralCity.Utils
             yield return new Vector3(position.X, position.Y + height, position.Z + area.Y);
             yield return new Vector3(position.X, position.Y + height, position.Z);
             yield return new Vector3(position.X + area.X, position.Y + height, position.Z + area.Y);
+            yield return new Vector3(position.X + area.X, position.Y + height, position.Z + area.Y);
             yield return new Vector3(position.X, position.Y + height, position.Z);
             yield return new Vector3(position.X + area.X, position.Y + height, position.Z);
-            yield return new Vector3(position.X + area.X, position.Y + height, position.Z + area.Y);
         }
 
         public static IEnumerable<Vector3> CreateLeftVertices(Vector3 position, Vector2 area, float height)
@@ -140,7 +140,7 @@ namespace ProceduralCity.Utils
             yield return new Vector2(0, 0);
         }
 
-        public static IEnumerable<Vector2> CreateTopUVs()
+        public static IEnumerable<Vector2> CreateZeroTopUVs()
         {
             yield return new Vector2(0, 0);
             yield return new Vector2(0, 0);
@@ -148,6 +148,16 @@ namespace ProceduralCity.Utils
             yield return new Vector2(0, 0);
             yield return new Vector2(0, 0);
             yield return new Vector2(0, 0);
+        }
+
+        public static IEnumerable<Vector2> CreateTopUVs(float height, float width)
+        {
+            yield return new Vector2(0, 0);
+            yield return new Vector2(0, height);
+            yield return new Vector2(width, 0);
+            yield return new Vector2(width, 0);
+            yield return new Vector2(0, height);
+            yield return new Vector2(height, width);
         }
 
         public static IEnumerable<Vector2> CreateLeftUVs()
@@ -209,7 +219,7 @@ namespace ProceduralCity.Utils
             UVs.AddRange(CreateFrontUvs());
             UVs.AddRange(CreateRightUVs());
             UVs.AddRange(CreateLeftUVs());
-            UVs.AddRange(CreateTopUVs());
+            UVs.AddRange(CreateZeroTopUVs());
             UVs.AddRange(CreateBottomUVs());
             return UVs;
         }

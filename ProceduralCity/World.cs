@@ -20,8 +20,12 @@ namespace ProceduralCity
             _groundGenerator = groundGenerator;
             _buildingGenerator = buildingGenerator;
 
-            var sites = _groundGenerator.Generate();
+            var sites = _groundGenerator.GenerateSites();
             _logger.Information($"Number of sites: {sites.Count()}");
+            var groundPlane = _groundGenerator.CreateGroundPlane();
+            _renderables.Add(groundPlane);
+            var streetLights = _groundGenerator.CreateStreetLights(sites);
+            _renderables.AddRange(streetLights);
 
             var buildings = _buildingGenerator.GenerateBuildings(sites);
             _renderables.AddRange(buildings);
@@ -44,6 +48,7 @@ namespace ProceduralCity
                 if (disposing)
                 {
                     _buildingGenerator.Dispose();
+                    _groundGenerator.Dispose();
                 }
 
                 disposedValue = true;

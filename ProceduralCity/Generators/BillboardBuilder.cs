@@ -2,6 +2,7 @@
 using System.Linq;
 using OpenTK;
 using ProceduralCity.Config;
+using ProceduralCity.GameObjects;
 using ProceduralCity.Renderer;
 using ProceduralCity.Utils;
 

@@ -45,6 +45,9 @@
     </None>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+    <None Include="Shaders\FlatColored.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Shaders\font.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -75,9 +78,6 @@
     <None Include="Shaders\street_light.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Shaders\street_light.vert">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Shaders\vs.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -85,12 +85,14 @@
   <ItemGroup>
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\TextureCoordinateExtensions.cs" />
+    <Compile Include="GameObjects\StreetLightStrip.cs" />
     <Compile Include="Generators\BillboardBuilder.cs" />
     <Compile Include="Generators\BillboardTextureGenerator.cs" />
     <Compile Include="Generators\IBillboardBuilder.cs" />
     <Compile Include="Generators\IBillboardTextureGenerator.cs" />
+    <Compile Include="GameObjects\GroundPlane.cs" />
     <Compile Include="Renderer\BackBufferRenderer.cs" />
-    <Compile Include="Billboard.cs" />
+    <Compile Include="GameObjects\Billboard.cs" />
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Renderer\CubemapTexture.cs" />
     <Compile Include="Renderer\IBackBufferRenderer.cs" />
@@ -109,12 +111,12 @@
     <Compile Include="Renderer\Utils\NoiseRenderer.cs" />
     <Compile Include="Utils\CoinFlip.cs" />
     <Compile Include="Renderer\Utils\FullScreenQuad.cs" />
-    <Compile Include="Textbox.cs" />
-    <Compile Include="Buildings\IBuilding.cs" />
-    <Compile Include="Buildings\TowerBuilding.cs" />
-    <Compile Include="Character.cs" />
+    <Compile Include="GameObjects\Textbox.cs" />
+    <Compile Include="GameObjects\Buildings\IBuilding.cs" />
+    <Compile Include="GameObjects\Buildings\TowerBuilding.cs" />
+    <Compile Include="GameObjects\Character.cs" />
     <Compile Include="Config\AppConfig.cs" />
-    <Compile Include="Buildings\Building.cs" />
+    <Compile Include="GameObjects\Buildings\Building.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Config\FontConfig.cs" />
     <Compile Include="Config\IAppConfig.cs" />

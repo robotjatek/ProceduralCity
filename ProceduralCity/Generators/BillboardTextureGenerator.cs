@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using ProceduralCity.Config;
+using ProceduralCity.GameObjects;
 using ProceduralCity.Renderer;
 using Serilog;
 
