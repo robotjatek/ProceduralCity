@@ -15,6 +15,15 @@ namespace ProceduralCity.Generators
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
         private readonly Matrix4 _projectionMatrix;
+        private readonly List<Vector3> _billboardColors = new List<Vector3>()
+        {
+            new Vector3(0.839f, 0.325f, 1f),
+            new Vector3(0.506f, 0.969f, 0.996f),
+            new Vector3(0.472f, 0.964f, 0.984f),
+            new Vector3(0.144f, 1f, 0.961f),
+            new Vector3(0.531f, 0.373f, 1f),
+            new Vector3(0.183f, 0.528f, 0.973f),
+        };
 
         private static readonly string[] _prefixes = new[]
         {
@@ -92,11 +101,13 @@ namespace ProceduralCity.Generators
             foreach (var tex in textures)
             {
                 var word = GenerateBillboardText();
+                var color = _billboardColors[_random.Next(_billboardColors.Count)];
 
                 using (var text = new Textbox("Consolas")
                     .WithText(word, new Vector2(), 1.5f)
-                    .WithHue((float)_random.NextDouble())
-                    .WithSaturation((float)_random.NextDouble()))
+                    .WithHue(color.X)
+                    .WithSaturation(color.Y)
+                    .WithValue(color.Z))
                 using (var renderer = new Renderer.Renderer())
                 using (var backbufferRenderer = new BackBufferRenderer(_logger, tex, tex.Width, tex.Height, false))
                 {

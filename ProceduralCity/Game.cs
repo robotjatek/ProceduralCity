@@ -15,7 +15,6 @@ namespace ProceduralCity
     //TODO: Add the ability to render post process effects in a lower resolution
     //TODO: Generators should not own any texture or shader references, these should be asked from a resource manager class
     //TODO: dispose all generators after the generation has been completed
-    //TODO: generate only high-luma billboards
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
