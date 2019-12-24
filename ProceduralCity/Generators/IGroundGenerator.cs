@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ProceduralCity.GameObjects;
 using ProceduralCity.Renderer;
 
 namespace ProceduralCity.Generators
@@ -9,5 +10,6 @@ namespace ProceduralCity.Generators
         IEnumerable<GroundNode> GenerateSites();
         IRenderable CreateGroundPlane();
         IEnumerable<IRenderable> CreateStreetLights(IEnumerable<GroundNode> sites);
+        IEnumerable<TrafficLight> CreateTrafficLights(IEnumerable<GroundNode> sites);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using ProceduralCity.Config;
 using ProceduralCity.GameObjects;
@@ -43,6 +44,40 @@ namespace ProceduralCity.Generators
             return new GroundPlane(new Vector3(0, 0, 0), new Vector2(_config.WorldSize), _planeShader);
         }
 
+        private readonly Shader _headLightShader = new Shader("instanced.vert", "street_light.frag"); //TODO: maybe one shader only, and set uniforms before render?
+        private readonly Shader _rearLightShader = new Shader("instanced.vert", "street_light.frag");
+
+        public IEnumerable<TrafficLight> CreateTrafficLights(IEnumerable<GroundNode> sites)
+        {
+            _headLightShader.SetUniformValue("u_color", new Vector3Uniform
+            {
+                Value = new Vector3(1f, 0.945f, 0.878f)
+            });
+            _rearLightShader.SetUniformValue("u_color", new Vector3Uniform
+            {
+                Value = new Vector3(1, 0, 0)
+            });
+
+            var areaBorder = new Vector2(_config.AreaBorderSize - 10);
+            foreach (var site in sites)
+            {
+                var corners = new[]
+                {
+                    new Vector3(site.StartPosition.X + areaBorder.X, 0, site.StartPosition.Y + areaBorder.Y),
+                    new Vector3(site.EndPosition.X - areaBorder.X, 0, site.StartPosition.Y + areaBorder.Y),
+                    new Vector3(site.EndPosition.X - areaBorder.X, 0, site.EndPosition.Y - areaBorder.Y),
+                    new Vector3(site.StartPosition.X + areaBorder.X, 0, site.EndPosition.Y - areaBorder.Y)
+                };
+
+                var maxSpeed = 10.00f;
+                var minSpeed = 5.00f;
+                var speed = (float)_random.NextDouble() * (maxSpeed - minSpeed) + minSpeed;
+
+                var firstWaypoint = Waypoint.CreateCircle(corners);
+                yield return new TrafficLight(corners.First(), firstWaypoint, _headLightShader, _rearLightShader, speed);
+            }
+        }
+
         public IEnumerable<IRenderable> CreateStreetLights(IEnumerable<GroundNode> sites)
         {
             var lightColor = _lightColors[_random.Next(_lightColors.Count)];
@@ -57,7 +92,7 @@ namespace ProceduralCity.Generators
             foreach (var site in sites)
             {
                 var position = new Vector3(site.StartPosition.X + areaBorder.X, 0, site.StartPosition.Y + areaBorder.Y);
-                var area = site.EndPosition - site.StartPosition - areaBorder;
+                var area = site.EndPosition - site.StartPosition - (areaBorder * 2);
 
                 for (int i = (int)position.X + 2 + 1; i <= position.X + area.X; i += 12)
                 {
@@ -128,6 +163,8 @@ namespace ProceduralCity.Generators
                 {
                     _planeShader.Dispose();
                     _lightShader.Dispose();
+                    _headLightShader.Dispose();
+                    _rearLightShader.Dispose();
                 }
 
                 disposedValue = true;

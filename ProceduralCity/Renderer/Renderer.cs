@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using ProceduralCity.Extensions;
+using Serilog;
 
 namespace ProceduralCity.Renderer
 {
@@ -36,6 +37,12 @@ namespace ProceduralCity.Renderer
         {
             foreach (var mesh in r.Meshes)
             {
+                if (mesh.Shader == null)
+                {
+                    Log.Logger.Error($"Shader is null");
+                    throw new ArgumentException();
+                }
+
                 var textureHash = mesh.Textures.Select(t => t.Id).CalculateHash();
                 var shaderId = mesh.Shader.ProgramId;
                 var key = (textureHash, shaderId);

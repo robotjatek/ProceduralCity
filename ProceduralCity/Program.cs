@@ -37,7 +37,7 @@ namespace ProceduralCity
             builder.Register(c => logger).As<ILogger>().SingleInstance();
             builder.RegisterType<Game>().As<IGame>().OnRelease(game => game.Dispose()).InstancePerLifetimeScope();
             builder.RegisterType<AppConfig>().As<IAppConfig>().SingleInstance();
-            builder.Register(c => new Camera(new Vector3(-1, -1, -1), 90, 0)).As<ICamera>().SingleInstance();
+            builder.Register(c => new Camera(new Vector3(-1, 10, -1), 90, 0)).As<ICamera>().SingleInstance();
             builder.RegisterType<GroundGenerator>().As<IGroundGenerator>().SingleInstance();
             builder.RegisterType<BuildingGenerator>().As<IBuildingGenerator>().SingleInstance();
             builder.RegisterType<World>().As<IWorld>().SingleInstance();

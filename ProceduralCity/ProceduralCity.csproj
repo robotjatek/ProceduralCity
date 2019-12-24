@@ -54,6 +54,9 @@
     <None Include="Shaders\fs.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Shaders\instanced.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Shaders\Noise\Noise.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -86,6 +89,8 @@
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\TextureCoordinateExtensions.cs" />
     <Compile Include="GameObjects\StreetLightStrip.cs" />
+    <Compile Include="GameObjects\TrafficLight.cs" />
+    <Compile Include="GameObjects\Waypoint.cs" />
     <Compile Include="Generators\BillboardBuilder.cs" />
     <Compile Include="Generators\BillboardTextureGenerator.cs" />
     <Compile Include="Generators\IBillboardBuilder.cs" />
@@ -141,6 +146,7 @@
     <Compile Include="Renderer\Shader.cs" />
     <Compile Include="Renderer\Skybox.cs" />
     <Compile Include="Renderer\Texture.cs" />
+    <Compile Include="Utils\Ref.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>
