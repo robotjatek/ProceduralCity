@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
 using ProceduralCity.Config;
 using ProceduralCity.GameObjects;
@@ -49,13 +48,14 @@ namespace ProceduralCity.Generators
 
         public IEnumerable<TrafficLight> CreateTrafficLights(IEnumerable<GroundNode> sites)
         {
+            var traffic = new List<TrafficLight>();
             _headLightShader.SetUniformValue("u_color", new Vector3Uniform
             {
                 Value = new Vector3(1f, 0.945f, 0.878f)
             });
             _rearLightShader.SetUniformValue("u_color", new Vector3Uniform
             {
-                Value = new Vector3(1, 0, 0)
+                Value = new Vector3(0.9f, 0.2f, 0.1f)
             });
 
             var areaBorder = new Vector2(_config.AreaBorderSize - 10);
@@ -69,12 +69,44 @@ namespace ProceduralCity.Generators
                     new Vector3(site.StartPosition.X + areaBorder.X, 0, site.EndPosition.Y - areaBorder.Y)
                 };
 
+                var firstWaypoint = Waypoint.CreateCircle(corners);
+                var t = CreateTrafficOnCircuit(5, firstWaypoint);
+                traffic.AddRange(t);
+            }
+
+            return traffic;
+        }
+
+        private IEnumerable<TrafficLight> CreateTrafficOnCircuit(int maxPerSegment, Waypoint firstWaypoint)
+        {
+            var traffic = new List<TrafficLight>();
+            var current = firstWaypoint;
+
+            do
+            {
+                var target = current.Next;
+                traffic.AddRange(CreateTrafficOnSegment(current, target, maxPerSegment));
+
+                current = current.Next;
+            } while (current != firstWaypoint);
+
+            return traffic;
+        }
+
+        private IEnumerable<TrafficLight> CreateTrafficOnSegment(Waypoint start, Waypoint finish, int maxPerSegment)
+        {
+            for (int i = 0; i < maxPerSegment; i++)
+            {
                 var maxSpeed = 10.00f;
                 var minSpeed = 5.00f;
                 var speed = (float)_random.NextDouble() * (maxSpeed - minSpeed) + minSpeed;
 
-                var firstWaypoint = Waypoint.CreateCircle(corners);
-                yield return new TrafficLight(corners.First(), firstWaypoint, _headLightShader, _rearLightShader, speed);
+                var x = (float)_random.NextDouble() * (finish.Position.X - start.Position.X) + start.Position.X;
+                var y = (float)_random.NextDouble() * (finish.Position.Y - start.Position.Y) + start.Position.Y;
+                var z = (float)_random.NextDouble() * (finish.Position.Z - start.Position.Z) + start.Position.Z;
+
+                var position = new Vector3(x, y, z);
+                yield return new TrafficLight(position, finish, _headLightShader, _rearLightShader, speed);
             }
         }
 
