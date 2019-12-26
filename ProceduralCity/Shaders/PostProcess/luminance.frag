@@ -7,7 +7,7 @@ uniform float u_LuminanceTreshold;
 
 void main()
 {
-	const vec3 luminanceConstants = vec3(0.2126, 0.7152, 0.0722);
+	const vec3 luminanceConstants = vec3(0.2126f, 0.7152f, 0.0722f);
 	vec4 color = texture(tex, fTexCoord);
 	vec3 rgb = color.rgb;
 	float luminance = dot(rgb, luminanceConstants);
@@ -18,6 +18,6 @@ void main()
 	}
 	else
 	{
-		fragmentColor = texture(tex, fTexCoord) * mix(0, 1, 1f/u_LuminanceTreshold);
+		fragmentColor = texture(tex, fTexCoord) * mix(0, 1, 1.0f/u_LuminanceTreshold);
 	}
 }
