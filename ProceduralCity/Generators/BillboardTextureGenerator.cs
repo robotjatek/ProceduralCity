@@ -46,7 +46,7 @@ namespace ProceduralCity.Generators
             "Dream",
             "Karma",
             "Wizard",
-            "Apple",
+            "Pear",
             "Micro",
             "Raven",
             "World",

@@ -12,8 +12,8 @@ uniform vec3 u_cloud_color_2 = vec3(0,1,0);
 uniform float u_cloud_cutoff = 0.65f;
 uniform vec3 u_sky_top_color = vec3(0,0,0);
 uniform vec3 u_sky_bottom_color = vec3(0.1,0.2,0.3);
-const float topTransientCoord = 0.1f;
-const float bottomTransientCoord = 0.005;
+const float topTransientCoord = 0.01f;
+const float bottomTransientCoord = -0.5;
 const int starCutoffLow = 4095;
 const int starCutoffHigh = 4096;
 
@@ -103,12 +103,12 @@ void main()
 	const float sphereDistance = 5.0f;
 	vec3 sphereUv = normalize(uv) * sphereDistance;  //"project" cube uv-s to a sphere
 
-	float intensityScale = 1f;
+	float intensityScale = 1.0f;
 	vec3 col = vec3(0);
 	if(sphereUv.y < bottomTransientCoord)
 	{
 		col = u_sky_bottom_color;
-		intensityScale = 0f;
+		intensityScale = 0.0f;
 	}
 	else if(sphereUv.y >= bottomTransientCoord && sphereUv.y < topTransientCoord)
 	{

@@ -1,31 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
 using ProceduralCity.Renderer.Uniform;
+using ProceduralCity.Utils;
 
 namespace ProceduralCity.Renderer
 {
-    class ObjectBatch : IBatch, IDisposable
+    class InstancedBatch : IBatch, IDisposable
     {
-        private bool disposedValue = false;
-
         private readonly Shader _shader;
         private readonly IEnumerable<ITexture> _textures;
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Vector2> _UVs = new List<Vector2>();
 
-        private Vector3[] Vertices { get; set; }
-        private Vector2[] UVs { get; set; }
-
+        private readonly List<Ref<Matrix4>> _instanceModels = new List<Ref<Matrix4>>();
+        private Matrix4[] _instanceModelMatrixValues;
+        private bool disposedValue;
         private bool _ready = false;
         private int _vaoId;
         private int _vertexVboId;
         private int _uvVboId;
+        private int _instancedModelVbo;
 
-        public ObjectBatch(Shader shader, IEnumerable<ITexture> textures)
+        private Vector3[] Vertices { get; set; }
+
+        private Vector2[] UVs { get; set; }
+
+        public InstancedBatch(Shader shader, IEnumerable<ITexture> textures)
         {
             _shader = shader;
             _textures = textures;
@@ -33,8 +39,13 @@ namespace ProceduralCity.Renderer
 
         public void AddMesh(Mesh m)
         {
-            _vertices.AddRange(m.Vertices);
-            _UVs.AddRange(m.UVs);
+            //TODO: throw exception if ready == true 
+            if (!_vertices.Any())
+            {
+                _vertices.AddRange(m.Vertices);
+                _UVs.AddRange(m.UVs);
+            }
+            _instanceModels.Add(m.Model);
         }
 
         public void Draw(Matrix4 projection, Matrix4 view)
@@ -44,8 +55,9 @@ namespace ProceduralCity.Renderer
                 Setup();
             }
 
-            GL.BindVertexArray(_vaoId);
+            SetupInstancedArray();
 
+            GL.BindVertexArray(_vaoId);
             var textureOffset = 0;
             foreach (var texture in _textures)
             {
@@ -63,7 +75,7 @@ namespace ProceduralCity.Renderer
             });
 
             _shader.Use();
-            GL.DrawArrays(PrimitiveType.Triangles, 0, Vertices.Length);
+            GL.DrawArraysInstanced(PrimitiveType.Triangles, 0, Vertices.Length, _instanceModels.Count);
             GL.BindVertexArray(0);
         }
 
@@ -76,6 +88,7 @@ namespace ProceduralCity.Renderer
             _vertices.Clear();
             UVs = _UVs.ToArray();
             _UVs.Clear();
+            _instanceModelMatrixValues = new Matrix4[_instanceModels.Count];
 
             _vaoId = GL.GenVertexArray();
             GL.BindVertexArray(_vaoId);
@@ -92,9 +105,40 @@ namespace ProceduralCity.Renderer
             GL.EnableVertexAttribArray(uvLayoutId);
             GL.VertexAttribPointer(uvLayoutId, 2, VertexAttribPointerType.Float, false, 0, 0);
 
+            _instancedModelVbo = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
+            GL.BufferData(BufferTarget.ArrayBuffer, _instanceModels.Count * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
+            GL.EnableVertexAttribArray(3);
+            GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 0);
+            GL.VertexAttribDivisor(3, 1);
+
+            GL.EnableVertexAttribArray(4);
+            GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 16);
+            GL.VertexAttribDivisor(4, 1);
+
+            GL.EnableVertexAttribArray(5);
+            GL.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 32);
+            GL.VertexAttribDivisor(5, 1);
+
+            GL.EnableVertexAttribArray(6);
+            GL.VertexAttribPointer(6, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 48);
+            GL.VertexAttribDivisor(6, 1);
+
             GL.BindVertexArray(0);
             _ready = true;
             _shader.Use();
+        }
+
+        private void SetupInstancedArray()
+        {
+            Parallel.For(0, _instanceModels.Count, (i) =>
+            {
+                _instanceModelMatrixValues[i] = _instanceModels[i].Value;
+            });
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
+            GL.BufferData(BufferTarget.ArrayBuffer, _instanceModels.Count * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
+            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, _instanceModelMatrixValues.Length * Vector4.SizeInBytes * 4, _instanceModelMatrixValues);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -103,7 +147,7 @@ namespace ProceduralCity.Renderer
             {
                 if (disposing)
                 {
-                    // No managed objects to dispose at the moment
+                    // no managed objects to dispose
                 }
 
                 GL.DeleteVertexArray(_vaoId);
@@ -114,15 +158,16 @@ namespace ProceduralCity.Renderer
             }
         }
 
-        ~ObjectBatch()
+        ~InstancedBatch()
         {
-            Dispose(false);
+            Dispose(disposing: false);
         }
 
         public void Dispose()
         {
-            Dispose(true);
+            Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
     }
 }
+

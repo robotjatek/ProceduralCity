@@ -1,13 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
+
 using ProceduralCity.Config;
+using ProceduralCity.GameObjects;
 using ProceduralCity.Renderer;
 using ProceduralCity.Renderer.PostProcess;
 using ProceduralCity.Renderer.Uniform;
 using ProceduralCity.Renderer.Utils;
+
 using Serilog;
 
 namespace ProceduralCity
@@ -18,12 +24,13 @@ namespace ProceduralCity
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
-    //TODO: add traffic lights
+    //TODO: Incorporate shared logic betwwen InstancedBatch and ObjectBatch into a shared class
     //TODO: textures on buildings seem to be upside down
     //TODO: dynamic text rendering
     //TODO: fog
     //TODO: Mipmaping modes for generated textures (created with new Texture(w,h))
     //TODO: add decal rendering (stencil buffer?) [streetlights, billboards]
+    //TODO: add state change capability to the renderer
     class Game : IGame, IDisposable
     {
         private readonly string _title;
@@ -50,6 +57,8 @@ namespace ProceduralCity
         private Texture _ndcTexture;
 
         private double _elapsedFrameTime = 0;
+
+        private readonly IEnumerable<TrafficLight> _traffic;
 
         public Game(
             IAppConfig config,
@@ -95,6 +104,8 @@ namespace ProceduralCity
             };
             _skyboxRenderer.AddToScene(skybox);
 
+            _traffic = _world.Traffic;
+            _renderer.AddToScene(_traffic);
             _renderer.AddToScene(_world.Renderables);
 
             _backbufferTexture = new Texture(_config.ResolutionWidth, config.ResolutionHeight);
@@ -137,6 +148,7 @@ namespace ProceduralCity
 
         private void OnUpdateFrame(FrameEventArgs e)
         {
+            Parallel.ForEach(_traffic, t => t.Move((float)e.Time));
         }
 
         private void OnRenderFrame(FrameEventArgs e)

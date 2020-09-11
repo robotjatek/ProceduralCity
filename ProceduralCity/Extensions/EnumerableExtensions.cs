@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ProceduralCity.Extensions
 {
@@ -13,6 +14,14 @@ namespace ProceduralCity.Extensions
             }
 
             return hash;
+        }
+
+        public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> a)
+        {
+            foreach (T item in enumerable)
+            {
+                a(item);
+            }
         }
     }
 }

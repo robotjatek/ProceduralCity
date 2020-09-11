@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
+using ProceduralCity.Utils;
 
 namespace ProceduralCity.Renderer
 {
@@ -11,6 +12,9 @@ namespace ProceduralCity.Renderer
         public IEnumerable<Vector2> UVs { get; private set; }
         public IEnumerable<ITexture> Textures { get; private set; } = Enumerable.Empty<ITexture>();
         public Shader Shader { get; private set; }
+        public bool IsInstanced { get; set; } = false;
+
+        public Ref<Matrix4> Model { get; set; } = new Ref<Matrix4>();
 
         public Mesh(IEnumerable<Vector3> vertices, IEnumerable<Vector2> uvs, Shader shader)
         {
