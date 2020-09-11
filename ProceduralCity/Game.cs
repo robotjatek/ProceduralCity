@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
+
 using ProceduralCity.Config;
-using ProceduralCity.Extensions;
 using ProceduralCity.GameObjects;
 using ProceduralCity.Renderer;
 using ProceduralCity.Renderer.PostProcess;
 using ProceduralCity.Renderer.Uniform;
 using ProceduralCity.Renderer.Utils;
+
 using Serilog;
 
 namespace ProceduralCity
@@ -145,7 +148,7 @@ namespace ProceduralCity
 
         private void OnUpdateFrame(FrameEventArgs e)
         {
-            _traffic.ForEach(t => t.Move((float)e.Time));
+            Parallel.ForEach(_traffic, t => t.Move((float)e.Time));
         }
 
         private void OnRenderFrame(FrameEventArgs e)

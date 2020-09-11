@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+
 using ProceduralCity.Renderer.Uniform;
-using ProceduralCity.Utils;
 
 namespace ProceduralCity.Renderer
 {
-    class ObjectBatch : IDisposable
+    class ObjectBatch : IBatch, IDisposable
     {
         private bool disposedValue = false;
 
@@ -16,8 +16,6 @@ namespace ProceduralCity.Renderer
         private readonly IEnumerable<ITexture> _textures;
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Vector2> _UVs = new List<Vector2>();
-
-        private readonly List<Ref<Matrix4>> _instanceModels = new List<Ref<Matrix4>>();
 
         private Vector3[] Vertices { get; set; }
         private Vector2[] UVs { get; set; }
@@ -27,8 +25,6 @@ namespace ProceduralCity.Renderer
         private int _vertexVboId;
         private int _uvVboId;
 
-        private int _instancedModelVbo;
-
         public ObjectBatch(Shader shader, IEnumerable<ITexture> textures)
         {
             _shader = shader;
@@ -37,16 +33,8 @@ namespace ProceduralCity.Renderer
 
         public void AddMesh(Mesh m)
         {
-            if ((m.IsInstanced && _vertices.Count == 0) || !m.IsInstanced)
-            {
-                _vertices.AddRange(m.Vertices);
-                _UVs.AddRange(m.UVs);
-            }
-
-            if (m.IsInstanced)
-            {
-                _instanceModels.Add(m.Model);
-            }
+            _vertices.AddRange(m.Vertices);
+            _UVs.AddRange(m.UVs);
         }
 
         public void Draw(Matrix4 projection, Matrix4 view)
@@ -55,7 +43,7 @@ namespace ProceduralCity.Renderer
             {
                 Setup();
             }
-            SetupInstancedArray();
+
             GL.BindVertexArray(_vaoId);
 
             var textureOffset = 0;
@@ -75,23 +63,8 @@ namespace ProceduralCity.Renderer
             });
 
             _shader.Use();
-
-            if (_instanceModels.Count > 0)
-            {
-                GL.DrawArraysInstanced(PrimitiveType.Triangles, 0, Vertices.Length, _instanceModels.Count);
-            }
-            else
-            {
-                GL.DrawArrays(PrimitiveType.Triangles, 0, Vertices.Length);
-            }
+            GL.DrawArrays(PrimitiveType.Triangles, 0, Vertices.Length);
             GL.BindVertexArray(0);
-        }
-
-        private void SetupInstancedArray()
-        {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, _instanceModels.Count * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, _instanceModels.Count * Vector4.SizeInBytes * 4, _instanceModels.Select(m => m.Value).ToArray());
         }
 
         private void Setup()
@@ -116,28 +89,6 @@ namespace ProceduralCity.Renderer
             GL.BufferData(BufferTarget.ArrayBuffer, _UVs.Count * Vector2.SizeInBytes, UVs, BufferUsageHint.StaticDraw);
             GL.EnableVertexAttribArray(uvLayoutId);
             GL.VertexAttribPointer(uvLayoutId, 2, VertexAttribPointerType.Float, false, 0, 0);
-
-            if (_instanceModels.Count > 0)
-            {
-                _instancedModelVbo = GL.GenBuffer();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
-                GL.BufferData(BufferTarget.ArrayBuffer, _instanceModels.Count * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
-                GL.EnableVertexAttribArray(3);
-                GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 0);
-                GL.VertexAttribDivisor(3, 1);
-
-                GL.EnableVertexAttribArray(4);
-                GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 16);
-                GL.VertexAttribDivisor(4, 1);
-
-                GL.EnableVertexAttribArray(5);
-                GL.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 32);
-                GL.VertexAttribDivisor(5, 1);
-
-                GL.EnableVertexAttribArray(6);
-                GL.VertexAttribPointer(6, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 48);
-                GL.VertexAttribDivisor(6, 1);
-            }
 
             GL.BindVertexArray(0);
             _ready = true;

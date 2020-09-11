@@ -101,6 +101,8 @@
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Renderer\CubemapTexture.cs" />
     <Compile Include="Renderer\IBackBufferRenderer.cs" />
+    <Compile Include="Renderer\IBatch.cs" />
+    <Compile Include="Renderer\InstancedBatch.cs" />
     <Compile Include="Renderer\ITexture.cs" />
     <Compile Include="Renderer\Mesh.cs" />
     <Compile Include="Renderer\PostProcess\PostProcess.cs" />

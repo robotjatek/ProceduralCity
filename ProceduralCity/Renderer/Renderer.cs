@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using OpenTK;
+
 using ProceduralCity.Extensions;
+
 using Serilog;
 
 namespace ProceduralCity.Renderer
 {
     class Renderer : IRenderer, IDisposable
     {
-        private readonly Dictionary<(int textureId, int shaderId), ObjectBatch> _batches = new Dictionary<(int, int), ObjectBatch>();
+        private readonly Dictionary<(int textureId, int shaderId), IBatch> _batches = new Dictionary<(int, int), IBatch>();
 
         public Action BeforeRender { get; set; }
 
@@ -47,13 +50,13 @@ namespace ProceduralCity.Renderer
                 var shaderId = mesh.Shader.ProgramId;
                 var key = (textureHash, shaderId);
 
-                if (_batches.TryGetValue(key, out ObjectBatch batch))
+                if (_batches.TryGetValue(key, out IBatch batch))
                 {
                     batch.AddMesh(mesh);
                 }
                 else
                 {
-                    var toAdd = new ObjectBatch(mesh.Shader, mesh.Textures);
+                    var toAdd = CreateBatch(mesh.IsInstanced, mesh.Shader, mesh.Textures);
                     toAdd.AddMesh(mesh);
                     _batches.Add(key, toAdd);
                 }
@@ -75,6 +78,16 @@ namespace ProceduralCity.Renderer
             {
                 batch.Dispose();
             }
+        }
+
+        private IBatch CreateBatch(bool instanced, Shader shader, IEnumerable<ITexture> textures)
+        {
+            if (instanced)
+            {
+                return new InstancedBatch(shader, textures);
+            }
+
+            return new ObjectBatch(shader, textures);
         }
     }
 }
