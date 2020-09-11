@@ -2,7 +2,7 @@
 
 namespace ProceduralCity.Renderer.Uniform
 {
-    class Vector3Uniform : IUniformValue
+    struct Vector3Uniform : IUniformValue
     {
         public Vector3 Value
         {

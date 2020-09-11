@@ -2,7 +2,7 @@
 
 namespace ProceduralCity.Renderer.Uniform
 {
-    class Matrix4Uniform : IUniformValue
+    struct Matrix4Uniform : IUniformValue
     {
         public Matrix4 Value
         {

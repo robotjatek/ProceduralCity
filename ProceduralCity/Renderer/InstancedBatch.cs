@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -18,7 +19,7 @@ namespace ProceduralCity.Renderer
         private readonly List<Vector2> _UVs = new List<Vector2>();
 
         private readonly List<Ref<Matrix4>> _instanceModels = new List<Ref<Matrix4>>();
-        private Ref<Matrix4>[] _im;
+        private Matrix4[] _instanceModelMatrixValues;
         private bool disposedValue;
         private bool _ready = false;
         private int _vaoId;
@@ -64,7 +65,6 @@ namespace ProceduralCity.Renderer
                 textureOffset++;
             }
 
-            //TODO: check if pooling is possible with these classes -- reduce GC pressure in renderer (also in normal ObjectBatch class)
             _shader.SetUniformValue("_projection", new Matrix4Uniform
             {
                 Value = projection
@@ -85,8 +85,10 @@ namespace ProceduralCity.Renderer
             var uvLayoutId = 2;
 
             Vertices = _vertices.ToArray();
-            UVs = _UVs.ToArray(); // TODO: check if this can be removed. Potentionally halves the memory need
-            _im = _instanceModels.ToArray();
+            _vertices.Clear();
+            UVs = _UVs.ToArray();
+            _UVs.Clear();
+            _instanceModelMatrixValues = new Matrix4[_instanceModels.Count];
 
             _vaoId = GL.GenVertexArray();
             GL.BindVertexArray(_vaoId);
@@ -129,10 +131,14 @@ namespace ProceduralCity.Renderer
 
         private void SetupInstancedArray()
         {
+            Parallel.For(0, _instanceModels.Count, (i) =>
+            {
+                _instanceModelMatrixValues[i] = _instanceModels[i].Value;
+            });
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
             GL.BufferData(BufferTarget.ArrayBuffer, _instanceModels.Count * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, _instanceModels.Count * Vector4.SizeInBytes * 4, _im.Select(m => m.Value).ToArray());
-            // TODO: check if toarray can be eleminated
+            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, _instanceModelMatrixValues.Length * Vector4.SizeInBytes * 4, _instanceModelMatrixValues);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -141,7 +147,7 @@ namespace ProceduralCity.Renderer
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects)
+                    // no managed objects to dispose
                 }
 
                 GL.DeleteVertexArray(_vaoId);

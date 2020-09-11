@@ -73,7 +73,9 @@ namespace ProceduralCity.Renderer
             var uvLayoutId = 2;
 
             Vertices = _vertices.ToArray();
+            _vertices.Clear();
             UVs = _UVs.ToArray();
+            _UVs.Clear();
 
             _vaoId = GL.GenVertexArray();
             GL.BindVertexArray(_vaoId);
@@ -86,7 +88,7 @@ namespace ProceduralCity.Renderer
 
             _uvVboId = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _uvVboId);
-            GL.BufferData(BufferTarget.ArrayBuffer, _UVs.Count * Vector2.SizeInBytes, UVs, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, UVs.Length * Vector2.SizeInBytes, UVs, BufferUsageHint.StaticDraw);
             GL.EnableVertexAttribArray(uvLayoutId);
             GL.VertexAttribPointer(uvLayoutId, 2, VertexAttribPointerType.Float, false, 0, 0);
 

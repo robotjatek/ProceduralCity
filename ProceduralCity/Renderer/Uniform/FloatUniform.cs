@@ -1,6 +1,6 @@
 ﻿namespace ProceduralCity.Renderer.Uniform
 {
-    class FloatUniform : IUniformValue
+    struct FloatUniform : IUniformValue
     {
         public float Value
         {
