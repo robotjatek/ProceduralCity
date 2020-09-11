@@ -24,7 +24,7 @@ namespace ProceduralCity
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
-    //TODO: add traffic lights
+    //TODO: Incorporate shared logic betwwen InstancedBatch and ObjectBatch into a shared class
     //TODO: textures on buildings seem to be upside down
     //TODO: dynamic text rendering
     //TODO: fog
