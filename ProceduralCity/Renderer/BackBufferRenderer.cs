@@ -68,7 +68,7 @@ namespace ProceduralCity.Renderer
             var frameBufferStatus = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
             if (frameBufferStatus != FramebufferErrorCode.FramebufferComplete)
             {
-                _logger.Error($"Error while creating framebuffer: {frameBufferStatus.ToString()}");
+                _logger.Error($"Error while creating framebuffer: {frameBufferStatus}");
             }
 
             Clear();
