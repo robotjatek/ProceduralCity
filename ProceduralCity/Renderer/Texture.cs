@@ -1,7 +1,10 @@
 ﻿using System;
-using System.Drawing;
 using OpenTK.Graphics.OpenGL;
 using Serilog;
+
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace ProceduralCity.Renderer
 {
@@ -48,38 +51,50 @@ namespace ProceduralCity.Renderer
         {
             Id = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Id);
-            using (var image = new Bitmap($"{defaultFolder}/{fileName}"))
+            Rgba32 transparent = Color.Transparent;
+
+            using (var image = Image.Load<Rgba32>($"{defaultFolder}/{fileName}"))
             {
-                Width = image.Width;
-                Height = image.Height;
-                image.MakeTransparent();
-                var bitmapData = image.LockBits(
-                    new Rectangle(0, 0, image.Width, image.Height),
-                    System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                    image.PixelFormat);
+                image.Mutate(i => i.Flip(FlipMode.Vertical));
+                image.ProcessPixelRows(a =>
+                {
+                    for (int i = 0; i < image.Height; i++)
+                    {
+                        var row = a.GetRowSpan(i);
+                        foreach(ref var pixel in row)
+                        {
+                            if(pixel.A == 0)
+                            {
+                                pixel = Color.Transparent;
+                            }
+                        }
+                    }
+                });
+
+                var rawData = new byte[image.Width * image.Height * 4];
+                image.CopyPixelDataTo(rawData); 
 
                 GL.TexImage2D(
-                    TextureTarget.Texture2D,
-                    0,
-                    PixelInternalFormat.Rgba,
-                    image.Width,
-                    image.Height,
-                    0,
-                    PixelFormat.Bgra,
-                    PixelType.UnsignedByte,
-                    bitmapData.Scan0);
-                image.UnlockBits(bitmapData);
-
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
-
-                GL.GetFloat((GetPName)ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out float maxAniso);
-                GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, maxAniso);
-
-                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+                        TextureTarget.Texture2D,
+                        0,
+                        PixelInternalFormat.Rgba,
+                        image.Width,
+                        image.Height,
+                        0,
+                        PixelFormat.Rgba,
+                        PixelType.UnsignedByte,
+                        rawData);
             }
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+
+            GL.GetFloat((GetPName)ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out float maxAniso);
+            GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, maxAniso);
+
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
         }
 
         public void Bind(TextureUnit textureUnit)

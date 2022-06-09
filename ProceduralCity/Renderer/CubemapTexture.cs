@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using OpenTK.Graphics.OpenGL;
 using Serilog;
+
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace ProceduralCity.Renderer
 {
@@ -51,16 +53,12 @@ namespace ProceduralCity.Renderer
             
             for (var i = 0; i < fileNames.Count; i++)
             {
-                using (var image = new Bitmap($"{defaultFolder}/{fileNames[i]}"))
+                using (var image = Image.Load<Rgb24>($"{defaultFolder}/{fileNames[i]}"))
                 {
-                    var bitmapData = image.LockBits(
-                    new Rectangle(0, 0, image.Width, image.Height),
-                    System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                    image.PixelFormat);
+                    var rawData = new byte[4*image.Width*image.Height];
+                    image.CopyPixelDataTo(rawData);
 
-                    GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0, PixelInternalFormat.Rgb, image.Width, image.Height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, bitmapData.Scan0);
-
-                    image.UnlockBits(bitmapData);
+                    GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0, PixelInternalFormat.Rgb, image.Width, image.Height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, rawData);
                 }
             }
         }

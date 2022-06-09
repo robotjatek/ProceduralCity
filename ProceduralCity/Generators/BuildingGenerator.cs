@@ -47,6 +47,8 @@ namespace ProceduralCity.Generators
         {
             _logger.Information("Generating buildings");
             var buildings = new List<IBuilding>();
+            //TODO: Multiple buildings per sites
+            //TODO: paralellize building generation
             foreach (var site in sites)
             {
                 var position = new Vector3(site.StartPosition.X + _areaBorder.X, 0, site.StartPosition.Y + _areaBorder.Y);
