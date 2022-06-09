@@ -1,6 +1,7 @@
-﻿using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Desktop;
+
 using Serilog;
 
 namespace ProceduralCity
@@ -9,9 +10,7 @@ namespace ProceduralCity
     {
         private readonly ILogger _logger;
 
-        public bool IsFullscreen { get; private set; }
-
-        public OpenGlContext(int width, int height, GraphicsMode mode, string title, ILogger logger) : base(width, height, mode, title)
+        public OpenGlContext(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings, ILogger logger) : base(gameWindowSettings, nativeWindowSettings)
         {
             _logger = logger;
             var glVendor = GL.GetString(StringName.Vendor);
@@ -25,15 +24,13 @@ namespace ProceduralCity
             if (IsFullscreen == true)
             {
                 this.WindowState = WindowState.Normal;
-                this.CursorVisible = true;
+                this.CursorState = CursorState.Normal;
             }
             else
             {
                 this.WindowState = WindowState.Fullscreen;
-                this.CursorVisible = false;
+                this.CursorState = CursorState.Hidden;
             }
-
-            IsFullscreen = !IsFullscreen;
         }
 
         public void ToggleVSync()

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using OpenTK;
+using OpenTK.Mathematics;
+
 using ProceduralCity.Generators;
 using ProceduralCity.Renderer;
 using ProceduralCity.Utils;

@@ -48,7 +48,7 @@ namespace ProceduralCity.Renderer
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureBaseLevel, 0);
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMaxLevel, 0);
-
+            
             for (var i = 0; i < fileNames.Count; i++)
             {
                 using (var image = new Bitmap($"{defaultFolder}/{fileNames[i]}"))

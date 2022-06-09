@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 
 using ProceduralCity.Config;
 using ProceduralCity.GameObjects;
@@ -15,6 +14,7 @@ using ProceduralCity.Renderer.Uniform;
 using ProceduralCity.Renderer.Utils;
 
 using Serilog;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ProceduralCity
 {
@@ -132,18 +132,17 @@ namespace ProceduralCity
 
         private void ConfigureContext()
         {
-            _context.RenderFrame += (sender, e) => this.OnRenderFrame(e);
-            _context.UpdateFrame += (sender, e) => this.OnUpdateFrame(e);
-            _context.Resize += (sender, e) => this.OnResize();
-            _context.KeyDown += (sender, e) => this.OnKeyDown(e);
-            _context.Width = _config.ResolutionWidth;
-            _context.Height = _config.ResolutionHeight;
+            _context.RenderFrame += (e) => this.OnRenderFrame(e);
+            _context.UpdateFrame += (e) => this.OnUpdateFrame(e);
+            _context.Size = new Vector2i(_config.ResolutionWidth, _config.ResolutionHeight);
+            _context.Resize += (e) => this.OnResize();
+            _context.KeyDown += (e) => this.OnKeyDown(e);
             _context.Title = _config.WindowTitle;
         }
 
         public void RunGame()
         {
-            _context.Run(_config.FrameRate);
+            _context.Run();
         }
 
         private void OnUpdateFrame(FrameEventArgs e)
@@ -164,7 +163,7 @@ namespace ProceduralCity
             if (_isBloomEnabled)
                 _postprocessPipeline.RunPipeline();
 
-            GL.Viewport(0, 0, _context.ClientRectangle.Width, _context.ClientRectangle.Height);
+            GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
             _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity);
             _context.SwapBuffers();
         }
@@ -181,73 +180,73 @@ namespace ProceduralCity
 
         private void OnResize()
         {
-            _logger.Information($"Window resized: {_context.Width}x{_context.Height}");
-            GL.Viewport(_context.ClientRectangle);
-            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.Width / _context.Height, 1.0f, 5000.0f);
+            _logger.Information($"Window resized: {_context.Size.X}x{_context.Size.Y}");
+            GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
+            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.ClientRectangle.Size.X / _context.ClientRectangle.Size.Y, 1.0f, 5000.0f);
             _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
-            _worldRenderer.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height, 1.0f);
-            _postprocessPipeline.Resize(_context.ClientRectangle.Width, _context.ClientRectangle.Height, 1.0f);
+            _worldRenderer.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
+            _postprocessPipeline.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
         }
 
         private void OnKeyDown(KeyboardKeyEventArgs e)
         {
-            if (e.Key == Key.Escape)
+            if (e.Key == Keys.Escape)
             {
                 _context.Close();
             }
 
-            if (e.Key == Key.A)
+            if (e.Key == Keys.A)
             {
                 _camera.StrafeLeft();
             }
-            else if (e.Key == Key.D)
+            else if (e.Key == Keys.D)
             {
                 _camera.StrafeRight();
             }
 
-            if (e.Key == Key.W)
+            if (e.Key == Keys.W)
             {
                 _camera.MoveForward();
             }
-            else if (e.Key == Key.S)
+            else if (e.Key == Keys.S)
             {
                 _camera.MoveBackward();
             }
 
-            if (e.Key == Key.Up)
+            if (e.Key == Keys.Up)
             {
                 _camera.SetVertical(-1.0f);
             }
-            else if (e.Key == Key.Down)
+            else if (e.Key == Keys.Down)
             {
                 _camera.SetVertical(1.0f);
             }
 
-            if (e.Key == Key.Left)
+            if (e.Key == Keys.Left)
             {
                 _camera.SetHorizontal(-1.0f);
             }
-            else if (e.Key == Key.Right)
+            else if (e.Key == Keys.Right)
             {
                 _camera.SetHorizontal(1.0f);
             }
 
-            if (e.Alt && e.Key == Key.Enter)
+            if (e.Alt && e.Key == Keys.Enter)
             {
                 _context.ToggleFullscreen();
             }
 
-            if (e.Key == Key.F1)
+            if (e.Key == Keys.F1)
             {
                 _context.ToggleVSync();
             }
 
-            if (e.Key == Key.G)
+            if (e.Key == Keys.G)
             {
                 _skybox.Update();
             }
 
-            if (e.Key == Key.B)
+            if (e.Key == Keys.B)
             {
                 ToggleBloom();
             }

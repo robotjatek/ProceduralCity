@@ -1,7 +1,7 @@
 ﻿using System;
-using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
+
 using Serilog;
 
 namespace ProceduralCity.Renderer

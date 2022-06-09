@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using OpenTK;
+using OpenTK.Mathematics;
+
 using ProceduralCity.Config;
 using ProceduralCity.Extensions;
 using ProceduralCity.Renderer;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenTK;
+using OpenTK.Mathematics;
+
 using ProceduralCity.Config;
 using ProceduralCity.GameObjects;
 using ProceduralCity.Renderer;
