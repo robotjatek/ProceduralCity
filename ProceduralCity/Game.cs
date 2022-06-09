@@ -33,7 +33,6 @@ namespace ProceduralCity
     //TODO: add state change capability to the renderer
     class Game : IGame, IDisposable
     {
-        private readonly string _title;
         private Matrix4 _projectionMatrix = Matrix4.Identity;
         private Matrix4 _ndcRendererMatrix;
 
@@ -74,7 +73,6 @@ namespace ProceduralCity
             _camera = camera;
             _logger = logger;
             _config = config;
-            _title = config.WindowTitle;
 
             _context = context;
             ConfigureContext();
@@ -137,7 +135,6 @@ namespace ProceduralCity
             _context.Size = new Vector2i(_config.ResolutionWidth, _config.ResolutionHeight);
             _context.Resize += (e) => this.OnResize();
             _context.KeyDown += (e) => this.OnKeyDown(e);
-            _context.Title = _config.WindowTitle;
         }
 
         public void RunGame()
@@ -173,7 +170,7 @@ namespace ProceduralCity
             _elapsedFrameTime += e.Time;
             if (_elapsedFrameTime >= 0.4)
             {
-                _context.Title = $"{_title} - FPS: {Math.Round(1f / e.Time, 0)}";
+                _context.Title = $"{_config.WindowTitle} - FPS: {Math.Round(1f / e.Time, 0)}";
                 _elapsedFrameTime = 0;
             }
         }

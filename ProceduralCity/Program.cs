@@ -22,32 +22,15 @@ namespace ProceduralCity
         private static IContainer RegisterDependencies()
         {
             var builder = new ContainerBuilder();
+
             var appConfig = new AppConfig();
+            var logger = CreateLogger();
+            var context = CreateContext(appConfig, logger);
 
-            var logger = new LoggerConfiguration()
-                .WriteTo.Console()
-                .MinimumLevel.Verbose()
-                .Enrich.FromLogContext()
-                .CreateLogger();
-            Log.Logger = logger;
-
-            var gs = new GameWindowSettings
-            {
-                RenderFrequency = appConfig.FrameRate
-            };
-
-            var ns = new NativeWindowSettings
-            {
-                Size = new Vector2i(640, 480),
-                Title = "DummyContext"
-            };
-
-            var context = new OpenGlContext(gs, ns, logger); //this is a hack to create a context before any opengl calls
-
-            builder.Register(c => context).As<OpenGlContext>().SingleInstance();
             builder.Register(c => logger).As<ILogger>().SingleInstance();
-            builder.RegisterType<Game>().As<IGame>().OnRelease(game => game.Dispose()).InstancePerLifetimeScope();
             builder.Register(c => appConfig).As<IAppConfig>().SingleInstance();
+            builder.Register(c => context).As<OpenGlContext>().SingleInstance();
+            builder.RegisterType<Game>().As<IGame>().OnRelease(game => game.Dispose()).InstancePerLifetimeScope();
             builder.Register(c => new Camera(new Vector3(-1, 10, -1), 90, 0)).As<ICamera>().SingleInstance();
             builder.RegisterType<GroundGenerator>().As<IGroundGenerator>().SingleInstance();
             builder.RegisterType<BuildingGenerator>().As<IBuildingGenerator>().SingleInstance();
@@ -58,6 +41,34 @@ namespace ProceduralCity
             builder.RegisterType<BillboardBuilder>().As<IBillboardBuilder>().SingleInstance();
 
             return builder.Build();
+        }
+
+        private static Serilog.Core.Logger CreateLogger()
+        {
+            var logger = new LoggerConfiguration()
+                            .WriteTo.Console()
+                            .MinimumLevel.Verbose()
+                            .Enrich.FromLogContext()
+                            .CreateLogger();
+            Log.Logger = logger;
+            return logger;
+        }
+
+        private static OpenGlContext CreateContext(AppConfig appConfig, Serilog.Core.Logger logger)
+        {
+            var gameWindowSettings = new GameWindowSettings
+            {
+                RenderFrequency = appConfig.FrameRate
+            };
+
+            var nativeWindowSettings = new NativeWindowSettings
+            {
+                Size = new Vector2i(appConfig.ResolutionWidth, appConfig.ResolutionHeight),
+                Title = appConfig.WindowTitle,
+            };
+
+            var context = new OpenGlContext(gameWindowSettings, nativeWindowSettings, logger);
+            return context;
         }
     }
 }
