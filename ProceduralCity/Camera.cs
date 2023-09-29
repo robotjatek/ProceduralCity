@@ -1,12 +1,11 @@
 ﻿using System;
-using OpenTK;
 using OpenTK.Mathematics;
 
 namespace ProceduralCity
 {
     class Camera : ICamera
     {
-        private const int SPEED_MAGIC = 3;
+        private const int SPEED_MAGIC = 2;
         private Vector3 _position;
         private float _horizontalAngle;
         private float _verticalAngle;
@@ -17,7 +16,7 @@ namespace ProceduralCity
             _position = position;
             _horizontalAngle = horizontalAngle;
             _verticalAngle = verticalAngle;
-            _velocity = 0.5f;
+            _velocity = 1.5f;
         }
 
         public void MoveForward()
