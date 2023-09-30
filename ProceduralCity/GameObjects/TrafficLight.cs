@@ -9,12 +9,12 @@ namespace ProceduralCity.GameObjects
     class TrafficLight : IRenderable
     {
         private readonly float _speed;
-        private static readonly Vector3 UP = new Vector3(0, 1, 0);
+        private static readonly Vector3 UP = new(0, 1, 0);
         private Vector3 _position;
         private Waypoint _target;
         private readonly Shader _headlightShader; //TODO: disable backface culling on this and use 1 mesh only with 1 shader
         private readonly Shader _rearLightShader;
-        private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly List<Mesh> _meshes = new();
 
         public Matrix4 Model { get; private set; } = Matrix4.Identity;
 

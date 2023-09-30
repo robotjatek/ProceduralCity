@@ -22,7 +22,7 @@ namespace ProceduralCity.Generators
 
         private readonly Shader _buildingShader;
         private readonly Vector2 _areaBorder;
-        private readonly Random _random = new Random();
+        private readonly Random _random = new();
         private readonly Texture[] _buildingTextures;
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
@@ -66,18 +66,12 @@ namespace ProceduralCity.Generators
             var type = (BuildingType)_random.Next(Enum.GetValues(typeof(BuildingType)).Length);
             var height = _random.Next(_config.MinBuildingHeight, _config.MaxBuildingHeight);
 
-            switch (type)
+            return type switch
             {
-                case BuildingType.Simple:
-                    return new Building(position, area, texture, _buildingShader, height);
-                case BuildingType.Tower:
-                    return new TowerBuilding(position, area, texture, _buildingShader, height, _billboardBuilder);
-                /*  case BuildingType.Blocky:
-                      return new BlockyBuilding(position, area, texture, _buildingShader, height); */
-                default:
-                    throw new NotImplementedException();
-            }
-
+                BuildingType.Simple => new Building(position, area, texture, _buildingShader, height),
+                BuildingType.Tower => new TowerBuilding(position, area, texture, _buildingShader, height, _billboardBuilder),
+                _ => throw new NotImplementedException(),
+            };
         }
 
         private bool disposedValue = false;

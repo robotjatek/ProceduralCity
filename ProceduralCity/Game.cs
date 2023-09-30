@@ -18,7 +18,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ProceduralCity
 {
-    //TODO: implement TexturePool
+    //TODO: automatic camera flyby
     //TODO: fix billboard texture coordinates
     //TODO: document how to show text on screen. This was working before look it up in the git history
     //TODO: show fps counter on screen instead of the titlebar

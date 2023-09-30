@@ -10,8 +10,8 @@ namespace ProceduralCity
 {
     class World : IDisposable, IWorld
     {
-        private readonly List<IRenderable> _renderables = new List<IRenderable>();
-        private readonly List<TrafficLight> _trafficLights = new List<TrafficLight>();
+        private readonly List<IRenderable> _renderables = new();
+        private readonly List<TrafficLight> _trafficLights = new();
         private readonly IGroundGenerator _groundGenerator;
         private readonly IBuildingGenerator _buildingGenerator;
         private readonly ILogger _logger;

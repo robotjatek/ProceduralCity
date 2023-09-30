@@ -9,7 +9,7 @@ namespace ProceduralCity.Buildings
 {
     class TowerBuilding : IBuilding
     {
-        private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly List<Mesh> _meshes = new();
         private readonly Shader _shader;
         private readonly ITexture _texture;
 

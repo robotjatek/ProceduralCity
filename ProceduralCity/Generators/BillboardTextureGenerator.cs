@@ -12,11 +12,11 @@ namespace ProceduralCity.Generators
 {
     class BillboardTextureGenerator : IBillboardTextureGenerator
     {
-        private readonly Random _random = new Random();
+        private readonly Random _random = new();
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
         private readonly Matrix4 _projectionMatrix;
-        private readonly List<Vector3> _billboardColors = new List<Vector3>()
+        private readonly List<Vector3> _billboardColors = new()
         {
             new Vector3(0.839f, 0.325f, 1f),
             new Vector3(0.506f, 0.969f, 0.996f),
@@ -104,23 +104,21 @@ namespace ProceduralCity.Generators
                 var word = GenerateBillboardText();
                 var color = _billboardColors[_random.Next(_billboardColors.Count)];
 
-                using (var text = new Textbox("Consolas")
+                using var text = new Textbox("Consolas")
                     .WithText(word, new Vector2(), 1.5f)
                     .WithHue(color.X)
                     .WithSaturation(color.Y)
-                    .WithValue(color.Z))
-                using (var renderer = new Renderer.Renderer())
-                using (var backbufferRenderer = new BackBufferRenderer(_logger, tex, tex.Width, tex.Height, false))
-                {
-                    renderer.BeforeRender = () => { GL.Enable(EnableCap.Blend); };
-                    renderer.AfterRender = () => { GL.Disable(EnableCap.Blend); };
-                    renderer.AddToScene(text.Text);
-                    backbufferRenderer.RenderToTexture(renderer, _projectionMatrix, Matrix4.Identity);
+                    .WithValue(color.Z);
+                using var renderer = new Renderer.Renderer();
+                using var backbufferRenderer = new BackBufferRenderer(_logger, tex, tex.Width, tex.Height, false);
+                renderer.BeforeRender = () => { GL.Enable(EnableCap.Blend); };
+                renderer.AfterRender = () => { GL.Disable(EnableCap.Blend); };
+                renderer.AddToScene(text.Text);
+                backbufferRenderer.RenderToTexture(renderer, _projectionMatrix, Matrix4.Identity);
 
-                    if (text.CursorAdvance > tex.Width)
-                    {
-                        _logger.Warning("The billboard text is wider than the texture width! ({word})", word);
-                    }
+                if (text.CursorAdvance > tex.Width)
+                {
+                    _logger.Warning("The billboard text is wider than the texture width! ({word})", word);
                 }
             }
         }

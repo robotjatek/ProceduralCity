@@ -12,10 +12,10 @@ namespace ProceduralCity.Generators
     class BillboardBuilder : IBillboardBuilder, IDisposable
     {
         //TODO: generate billboard coordinates in model space, then transform them with a model matrix
-        private readonly Random _random = new Random();
+        private readonly Random _random = new();
         private readonly Texture[] _billboardTextures;
         private readonly IAppConfig _config;
-        private readonly Shader _shader = new Shader("vs.vert", "fs.frag");
+        private readonly Shader _shader = new("vs.vert", "fs.frag");
 
         public BillboardBuilder(IAppConfig config, IBillboardTextureGenerator billboardTextureGenerator)
         {
