@@ -18,6 +18,10 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ProceduralCity
 {
+    //TODO: implement TexturePool
+    //TODO: fix billboard texture coordinates
+    //TODO: show fps counter on screen instead of the titlebar
+    //TODO: document how to show text on screen. This was working before look it up in the git history
     //TODO: Add the ability to render post process effects in a lower resolution
     //TODO: Generators should not own any texture or shader references, these should be asked from a resource manager class
     //TODO: dispose all generators after the generation has been completed
