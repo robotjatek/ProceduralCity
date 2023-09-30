@@ -9,8 +9,8 @@ namespace ProceduralCity.Renderer
 {
     class Shader : IDisposable
     {
-        private readonly Dictionary<string, int> _uniformLocations = new Dictionary<string, int>();
-        private readonly UniformHandler _uniformHandler = new UniformHandler();
+        private readonly Dictionary<string, int> _uniformLocations = new();
+        private readonly UniformHandler _uniformHandler = new();
 
         public int ProgramId
         {
@@ -50,7 +50,7 @@ namespace ProceduralCity.Renderer
                 Log.Logger.Warning("Could not find uniform {uniformName}", uniformName);
             }
 
-            this.Unbind();
+            Unbind();
         }
 
         public void Use()
@@ -58,12 +58,12 @@ namespace ProceduralCity.Renderer
             GL.UseProgram(ProgramId);
         }
 
-        public void Unbind()
+        public static void Unbind()
         {
             GL.UseProgram(0);
         }
 
-        private int LinkShaders(int vertexHandle, int fragmentHandle)
+        private static int LinkShaders(int vertexHandle, int fragmentHandle)
         {
             var programId = GL.CreateProgram();
             GL.AttachShader(programId, vertexHandle);
@@ -72,7 +72,7 @@ namespace ProceduralCity.Renderer
             return programId;
         }
 
-        private int CompileShader(string shaderFile, ShaderType type)
+        private static int CompileShader(string shaderFile, ShaderType type)
         {
             var shaderHandle = GL.CreateShader(type);
             GL.ShaderSource(shaderHandle, shaderFile);
@@ -81,7 +81,7 @@ namespace ProceduralCity.Renderer
             return shaderHandle;
         }
 
-        private void CheckForCompilationErrors(int shaderId)
+        private static void CheckForCompilationErrors(int shaderId)
         {
             GL.GetShader(shaderId, ShaderParameter.CompileStatus, out int result);
             if (result != 1)
@@ -95,7 +95,7 @@ namespace ProceduralCity.Renderer
             }
         }
 
-        private string LoadTextFile(string filename)
+        private static string LoadTextFile(string filename)
         {
             return File.ReadAllText($"Shaders/{filename}");
         }

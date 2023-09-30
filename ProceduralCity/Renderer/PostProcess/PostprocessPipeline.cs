@@ -15,10 +15,10 @@ namespace ProceduralCity.Renderer.PostProcess
         private readonly Texture _outputTexture;
 
         private readonly List<PostProcess> _postprocess;
-        private readonly Shader _lumaEffect = new Shader("vs.vert", "PostProcess/luminance.frag");
-        private readonly Shader _blendEffect = new Shader("vs.vert", "PostProcess/blend.frag");
-        private readonly Shader _horizontalBlurEffect = new Shader("vs.vert", "PostProcess/blur.frag");
-        private readonly Shader _verticalBlurEffect = new Shader("vs.vert", "PostProcess/blur.frag");
+        private readonly Shader _lumaEffect = new("vs.vert", "PostProcess/luminance.frag");
+        private readonly Shader _blendEffect = new("vs.vert", "PostProcess/blend.frag");
+        private readonly Shader _horizontalBlurEffect = new("vs.vert", "PostProcess/blur.frag");
+        private readonly Shader _verticalBlurEffect = new("vs.vert", "PostProcess/blur.frag");
 
         public PostprocessPipeline(ILogger logger, IAppConfig config, Texture inputTexture, Texture outputTexture)
         {

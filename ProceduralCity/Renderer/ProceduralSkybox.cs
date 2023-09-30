@@ -11,8 +11,8 @@ namespace ProceduralCity.Renderer
     class ProceduralSkybox : ISkybox
     {
         private readonly ILogger _logger;
-        private readonly Random _random = new Random();
-        private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly Random _random = new();
+        private readonly List<Mesh> _meshes = new();
         private readonly Shader _shader;
         private readonly Vector3[] _cloudColors = new[]
         {
@@ -89,7 +89,7 @@ namespace ProceduralCity.Renderer
             });
         }
 
-        private Vector3 MixCloudColors(Vector3 color1, Vector3 color2)
+        private static Vector3 MixCloudColors(Vector3 color1, Vector3 color2)
         {
             return (color1 + color2) * 0.3f;
         }
@@ -137,7 +137,7 @@ namespace ProceduralCity.Renderer
             return (cloudColor1, cloudColor2);
         }
 
-        private IEnumerable<Vector3> CreateVertices()
+        private static IEnumerable<Vector3> CreateVertices()
         {
             return new[]
             {

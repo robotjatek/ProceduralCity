@@ -13,7 +13,7 @@ namespace ProceduralCity.GameObjects
 {
     class Textbox : IDisposable
     {
-        private readonly List<IRenderable> _text = new List<IRenderable>();
+        private readonly List<IRenderable> _text = new();
         private readonly Texture _fontmap;
         private readonly Shader _shader;
         private readonly FontConfig _fontConfig;

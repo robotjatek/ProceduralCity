@@ -14,12 +14,12 @@ namespace ProceduralCity.Generators
     class GroundGenerator : IGroundGenerator, IDisposable
     {
         private Vector2 _worldSize;
-        private readonly Random _random = new Random();
+        private readonly Random _random = new();
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
-        private readonly Shader _planeShader = new Shader("vs.vert", "FlatColored.frag");
-        private readonly Shader _lightShader = new Shader("vs.vert", "street_light.frag");
-        private readonly List<Vector3> _lightColors = new List<Vector3>()
+        private readonly Shader _planeShader = new("vs.vert", "FlatColored.frag");
+        private readonly Shader _lightShader = new("vs.vert", "street_light.frag");
+        private readonly List<Vector3> _lightColors = new()
         {
             new Vector3(1f, 0.82f, 0.698f), //Sodium vapor
             new Vector3(0.847f, 0.969f, 1f), //Mercury Vapor
@@ -44,8 +44,8 @@ namespace ProceduralCity.Generators
             return new GroundPlane(new Vector3(0, 0, 0), new Vector2(_config.WorldSize), _planeShader);
         }
 
-        private readonly Shader _headLightShader = new Shader("instanced.vert", "street_light.frag"); //TODO: maybe one shader only, and set uniforms before render?
-        private readonly Shader _rearLightShader = new Shader("instanced.vert", "street_light.frag");
+        private readonly Shader _headLightShader = new("instanced.vert", "street_light.frag"); //TODO: maybe one shader only, and set uniforms before render?
+        private readonly Shader _rearLightShader = new("instanced.vert", "street_light.frag");
 
         public IEnumerable<TrafficLight> CreateTrafficLights(IEnumerable<GroundNode> sites)
         {
