@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.IO;
+
 using OpenTK.Graphics.OpenGL;
+
 using Serilog;
+
+using StbImageSharp;
 
 namespace ProceduralCity.Renderer
 {
@@ -48,20 +52,11 @@ namespace ProceduralCity.Renderer
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureBaseLevel, 0);
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMaxLevel, 0);
-            
+
             for (var i = 0; i < fileNames.Count; i++)
             {
-                using (var image = new Bitmap($"{defaultFolder}/{fileNames[i]}"))
-                {
-                    var bitmapData = image.LockBits(
-                    new Rectangle(0, 0, image.Width, image.Height),
-                    System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                    image.PixelFormat);
-
-                    GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0, PixelInternalFormat.Rgb, image.Width, image.Height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, bitmapData.Scan0);
-
-                    image.UnlockBits(bitmapData);
-                }
+                var image = ImageResult.FromStream(File.OpenRead($"{defaultFolder}/{fileNames[i]}"), ColorComponents.RedGreenBlueAlpha);
+                GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, image.Data);
             }
         }
 

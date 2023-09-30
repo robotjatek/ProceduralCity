@@ -58,7 +58,7 @@ namespace ProceduralCity
         {
             var gameWindowSettings = new GameWindowSettings
             {
-                RenderFrequency = appConfig.FrameRate
+                UpdateFrequency = appConfig.FrameRate
             };
 
             var nativeWindowSettings = new NativeWindowSettings
