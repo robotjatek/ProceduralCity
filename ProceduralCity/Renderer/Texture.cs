@@ -29,6 +29,8 @@ namespace ProceduralCity.Renderer
             private set;
         }
 
+        public string Path { get; private set; }
+
         public Texture(int width, int height)
         {
             Width = width;
@@ -45,6 +47,7 @@ namespace ProceduralCity.Renderer
 
         public Texture(string fileName, string defaultFolder = "Textures")
         {
+            Path = $"{defaultFolder}/{fileName}";
             LoadImage(fileName, defaultFolder);
         }
 
@@ -112,7 +115,7 @@ namespace ProceduralCity.Renderer
 
         protected virtual void Dispose(bool disposing)
         {
-            Log.Information($"Disposing Texture {Id}");
+            Log.Information("Disposing Texture {Id} {Path}", Id, Path);
             if (!disposedValue)
             {
                 //if (disposing)

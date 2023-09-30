@@ -15,7 +15,7 @@ namespace ProceduralCity
             _logger = logger;
             var glVendor = GL.GetString(StringName.Vendor);
             var glRenderer = GL.GetString(StringName.Renderer);
-            _logger.Information($"Vendor: {glVendor} | Renderer: {glRenderer}");
+            _logger.Information("Vendor: {glVendor} | Renderer: {glRenderer}", glVendor, glRenderer);
             VSync = VSyncMode.Off;
         }
 

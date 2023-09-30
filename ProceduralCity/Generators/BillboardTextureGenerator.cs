@@ -119,7 +119,7 @@ namespace ProceduralCity.Generators
 
                     if (text.CursorAdvance > tex.Width)
                     {
-                        _logger.Warning($"The billboard text is wider than the texture width! ({word})");
+                        _logger.Warning("The billboard text is wider than the texture width! ({word})", word);
                     }
                 }
             }
@@ -132,7 +132,7 @@ namespace ProceduralCity.Generators
             var second = _second[_random.Next(_second.Length)];
 
             var word = _random.Next() % 2 == 0 ? $"{prefix}{first}" : $"{first} {second}";
-            _logger.Debug($"Billboard text: {word}");
+            _logger.Debug("Billboard text: {word}", word);
             return word;
         }
     }

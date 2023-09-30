@@ -56,7 +56,7 @@ namespace ProceduralCity.Generators
                 buildings.Add(building);
             }
 
-            _logger.Information($"Number of buildings: {buildings.Count}");
+            _logger.Information("Number of buildings: {buildingCount}", buildings.Count);
 
             return buildings;
         }

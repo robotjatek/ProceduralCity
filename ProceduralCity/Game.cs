@@ -20,8 +20,8 @@ namespace ProceduralCity
 {
     //TODO: implement TexturePool
     //TODO: fix billboard texture coordinates
-    //TODO: show fps counter on screen instead of the titlebar
     //TODO: document how to show text on screen. This was working before look it up in the git history
+    //TODO: show fps counter on screen instead of the titlebar
     //TODO: Add the ability to render post process effects in a lower resolution
     //TODO: Generators should not own any texture or shader references, these should be asked from a resource manager class
     //TODO: dispose all generators after the generation has been completed
@@ -181,7 +181,7 @@ namespace ProceduralCity
 
         private void OnResize()
         {
-            _logger.Information($"Window resized: {_context.Size.X}x{_context.Size.Y}");
+            _logger.Information("Window resized: {x}x{y}", _context.Size.X, _context.Size.Y);
             GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
             _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.ClientRectangle.Size.X / _context.ClientRectangle.Size.Y, 1.0f, 5000.0f);
             _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);

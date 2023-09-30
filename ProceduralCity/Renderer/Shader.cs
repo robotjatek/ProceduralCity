@@ -47,7 +47,7 @@ namespace ProceduralCity.Renderer
             }
             else
             {
-                Log.Logger.Warning($"Could not find uniform {uniformName}");
+                Log.Logger.Warning("Could not find uniform {uniformName}", uniformName);
             }
 
             this.Unbind();
@@ -91,13 +91,13 @@ namespace ProceduralCity.Renderer
             }
             else
             {
-                Log.Information($"Compiled shader {shaderId} successfully");
+                Log.Information("Compiled shader {shaderId} successfully", shaderId);
             }
         }
 
-        private string LoadTextFile(string vertexShader)
+        private string LoadTextFile(string filename)
         {
-            return File.ReadAllText($"Shaders/{vertexShader}");
+            return File.ReadAllText($"Shaders/{filename}");
         }
 
         private bool disposedValue = false;

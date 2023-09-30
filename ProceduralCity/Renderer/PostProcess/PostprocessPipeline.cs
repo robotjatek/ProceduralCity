@@ -71,7 +71,7 @@ namespace ProceduralCity.Renderer.PostProcess
                 Value = new Vector2(0, 1f / _inputTexture.Height)
             });
 
-            _logger.Information($"Post-process pipeline has been set up with {_postprocess.Count} effects");
+            _logger.Information("Post-process pipeline has been set up with {postprocess_count} effects", _postprocess.Count);
         }
 
         public void RunPipeline()

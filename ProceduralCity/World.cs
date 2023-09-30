@@ -31,7 +31,7 @@ namespace ProceduralCity
             _buildingGenerator = buildingGenerator;
 
             var sites = _groundGenerator.GenerateSites();
-            _logger.Information($"Number of sites: {sites.Count()}");
+            _logger.Information("Number of sites: {siteCount}", sites.Count());
             var groundPlane = _groundGenerator.CreateGroundPlane();
             _renderables.Add(groundPlane);
             var streetLights = _groundGenerator.CreateStreetLights(sites);
@@ -39,7 +39,7 @@ namespace ProceduralCity
 
             var trafficLights = _groundGenerator.CreateTrafficLights(sites);
             _trafficLights.AddRange(trafficLights);
-            _logger.Information($"Number of traffic lights: {_trafficLights.Count}");
+            _logger.Information("Number of traffic lights: {trafficLightCount}", trafficLights.Count());
 
             var buildings = _buildingGenerator.GenerateBuildings(sites);
             _renderables.AddRange(buildings);

@@ -27,7 +27,7 @@ namespace ProceduralCity.Generators
 
         public IEnumerable<GroundNode> Split(Random random)
         {
-            Log.Debug($"Splitting node ({StartPosition}, {EndPosition})");
+            Log.Debug("Splitting node ({StartPosition}, {EndPosition})", StartPosition, EndPosition);
 
             var verticalLength = (int)VerticalLenght();
             var horizontalLength = (int)HorizontalLenght();

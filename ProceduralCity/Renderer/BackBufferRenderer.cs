@@ -68,7 +68,7 @@ namespace ProceduralCity.Renderer
             var frameBufferStatus = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
             if (frameBufferStatus != FramebufferErrorCode.FramebufferComplete)
             {
-                _logger.Error($"Error while creating framebuffer: {frameBufferStatus}");
+                _logger.Error("Error while creating framebuffer: {frameBufferStatus}", frameBufferStatus);
             }
 
             Clear();
@@ -111,7 +111,7 @@ namespace ProceduralCity.Renderer
 
         protected virtual void Dispose(bool disposing)
         {
-            _logger.Information($"Disposing framebuffer: {_frameBufferId}");
+            _logger.Information("Disposing framebuffer: {_frameBufferId}", _frameBufferId);
             if (!disposedValue)
             {
                 if (disposing)

@@ -117,8 +117,8 @@ namespace ProceduralCity.Generators
             _lightShader.SetUniformValue("u_color", new Vector3Uniform
             {
                 Value = lightColor
-            });
-            _logger.Information($"Set streetlight color to: {lightColor}");
+            });            
+            _logger.Information("Set streetlight color to: {lightColor}", lightColor);
 
             var areaBorder = new Vector2(_config.AreaBorderSize - 4);
             var lightSize = new Vector2(2, 2);

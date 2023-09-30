@@ -66,7 +66,7 @@ namespace ProceduralCity.Renderer
             var y = (float)(_random.NextDouble() * 1000f);
             var z = (float)(_random.NextDouble() * 1000f);
             var scale = (float)(_random.NextDouble() * 10000f);
-            _logger.Information($"Setting sky seed values: x:{x}, y:{y}, z:{z}, scale:{scale}");
+            _logger.Information("Setting sky seed values: x: {x}, y: {y}, z: {z}, scale: {scale}", x, y, z, scale);
 
             _shader.SetUniformValue("u_seed_x", new FloatUniform
             {
@@ -105,8 +105,8 @@ namespace ProceduralCity.Renderer
                 Value = topColor
             });
 
-            _logger.Information($"Sky top color set to: {topColor}");
-            _logger.Information($"Sky bottom color set to: {bottomColor}");
+            _logger.Information("Sky top color set to: {topColor}", topColor);
+            _logger.Information("Sky bottom color set to: {bottomColor}", bottomColor);
         }
 
         private void SetCloudCutoffValue()
@@ -116,7 +116,7 @@ namespace ProceduralCity.Renderer
             {
                 Value = cutoff
             });
-            _logger.Information($"Cloud cutoff value set to: {cutoff}");
+            _logger.Information("Cloud cutoff value set to: {cutoff}", cutoff);
         }
 
         private (Vector3 color1, Vector3 color2) GenerateCloudColors()
@@ -133,7 +133,7 @@ namespace ProceduralCity.Renderer
                 Value = cloudColor2
             });
 
-            _logger.Information($"Generated cloud colors: {cloudColor1}, {cloudColor2}");
+            _logger.Information("Generated cloud colors: {cloudColor1}, {cloudColor2}", cloudColor1, cloudColor2);
             return (cloudColor1, cloudColor2);
         }
 
