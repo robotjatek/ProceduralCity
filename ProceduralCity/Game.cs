@@ -20,18 +20,21 @@ namespace ProceduralCity
 {
     //TODO: automatic camera flyby
     //TODO: fix billboard texture coordinates
+    //TODO: textures on buildings seem to be upside down
     //TODO: document how to show text on screen. This was working before look it up in the git history
     //TODO: show fps counter on screen instead of the titlebar
+    //TODO: dynamic text rendering
+    //TODO: fog
+    //TODO: Global HUE for the world affecting sky/building/window/fog colors
+    //TODO: generate building textures procedurally
+    //TODO: Do not animate hidden traffic lights
+    //TODO: Do not render hidden traffic lights
     //TODO: Add the ability to render post process effects in a lower resolution
     //TODO: Generators should not own any texture or shader references, these should be asked from a resource manager class
     //TODO: dispose all generators after the generation has been completed
-    //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
-    //TODO: Incorporate shared logic betwwen InstancedBatch and ObjectBatch into a shared class
-    //TODO: textures on buildings seem to be upside down
-    //TODO: dynamic text rendering
-    //TODO: fog
+    //TODO: Incorporate shared logic between InstancedBatch and ObjectBatch into a shared class
     //TODO: Mipmaping modes for generated textures (created with new Texture(w,h))
     //TODO: add decal rendering (stencil buffer?) [streetlights, billboards]
     //TODO: add state change capability to the renderer
