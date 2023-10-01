@@ -27,13 +27,14 @@ namespace ProceduralCity
     //TODO: fog
     //TODO: Global HUE for the world affecting sky/building/window/fog colors
     //TODO: generate building textures procedurally
+    //TODO: more building types
+    //TODO: add more variety to the existing building types
     //TODO: Do not animate hidden traffic lights
     //TODO: Do not render hidden traffic lights
+    //TODO: Render skybox into texture when generating the world, to reduce GPU usage
     //TODO: Add the ability to render post process effects in a lower resolution
     //TODO: Generators should not own any texture or shader references, these should be asked from a resource manager class
     //TODO: dispose all generators after the generation has been completed
-    //TODO: more building types
-    //TODO: add more variety to the existing building types
     //TODO: Incorporate shared logic between InstancedBatch and ObjectBatch into a shared class
     //TODO: Mipmaping modes for generated textures (created with new Texture(w,h))
     //TODO: add decal rendering (stencil buffer?) [streetlights, billboards]
@@ -140,8 +141,8 @@ namespace ProceduralCity
             _context.RenderFrame += (e) => this.OnRenderFrame(e);
             _context.UpdateFrame += (e) => this.OnUpdateFrame(e);
             _context.Size = new Vector2i(_config.ResolutionWidth, _config.ResolutionHeight);
-            _context.Resize += (e) => this.OnResize();
-            _context.KeyDown += (e) => this.OnKeyDown(e);
+            _context.Resize += (e) => OnResize();
+            _context.KeyDown += OnKeyDown;
         }
 
         public void RunGame()
@@ -151,7 +152,7 @@ namespace ProceduralCity
 
         private void OnUpdateFrame(FrameEventArgs e)
         {
-            Parallel.ForEach(_traffic, t => t.Move((float)e.Time));
+            Parallel.ForEach(_traffic, t => t.Move((float)e.Time)); // TODO: only animate visible traffic
         }
 
         private void OnRenderFrame(FrameEventArgs e)
@@ -254,6 +255,16 @@ namespace ProceduralCity
             {
                 ToggleBloom();
             }
+
+            if (e.Key == Keys.F2)
+            {
+                ToggleFrameLimit();
+            }
+        }
+
+        private void ToggleFrameLimit()
+        {
+            _context.UpdateFrequency = _context.UpdateFrequency == 0 ? _config.FrameRate : 0;
         }
 
         private void ToggleBloom()

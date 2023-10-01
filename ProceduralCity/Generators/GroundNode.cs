@@ -4,7 +4,6 @@ using System.Linq;
 using OpenTK.Mathematics;
 
 using ProceduralCity.Config;
-using Serilog;
 
 namespace ProceduralCity.Generators
 {
@@ -27,8 +26,6 @@ namespace ProceduralCity.Generators
 
         public IEnumerable<GroundNode> Split(Random random)
         {
-            Log.Debug("Splitting node ({StartPosition}, {EndPosition})", StartPosition, EndPosition);
-
             var verticalLength = (int)VerticalLenght();
             var horizontalLength = (int)HorizontalLenght();
 
