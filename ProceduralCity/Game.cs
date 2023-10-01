@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 using ProceduralCity.Config;
 using ProceduralCity.GameObjects;
@@ -14,7 +11,10 @@ using ProceduralCity.Renderer.Uniform;
 using ProceduralCity.Renderer.Utils;
 
 using Serilog;
-using OpenTK.Windowing.GraphicsLibraryFramework;
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ProceduralCity
 {
@@ -31,6 +31,7 @@ namespace ProceduralCity
     //TODO: add more variety to the existing building types
     //TODO: Do not animate hidden traffic lights
     //TODO: Do not render hidden traffic lights
+    //TODO: Building LOD levels
     //TODO: Render skybox into texture when generating the world, to reduce GPU usage
     //TODO: Add the ability to render post process effects in a lower resolution
     //TODO: Generators should not own any texture or shader references, these should be asked from a resource manager class
@@ -51,6 +52,7 @@ namespace ProceduralCity
         private readonly IRenderer _skyboxRenderer;
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
+        private readonly CameraController _cameraController;
         private readonly IWorld _world;
 
         private readonly OpenGlContext _context;
@@ -71,6 +73,7 @@ namespace ProceduralCity
             IAppConfig config,
             ILogger logger,
             ICamera camera,
+            CameraController cameraController,
             IWorld world,
             OpenGlContext context,
             IRenderer renderer,
@@ -79,6 +82,7 @@ namespace ProceduralCity
             ISkybox skybox)
         {
             _camera = camera;
+            _cameraController = cameraController;
             _logger = logger;
             _config = config;
 
@@ -138,8 +142,8 @@ namespace ProceduralCity
 
         private void ConfigureContext()
         {
-            _context.RenderFrame += (e) => this.OnRenderFrame(e);
-            _context.UpdateFrame += (e) => this.OnUpdateFrame(e);
+            _context.RenderFrame += this.OnRenderFrame;
+            _context.UpdateFrame += this.OnUpdateFrame;
             _context.Size = new Vector2i(_config.ResolutionWidth, _config.ResolutionHeight);
             _context.Resize += (e) => OnResize();
             _context.KeyDown += OnKeyDown;
@@ -152,6 +156,7 @@ namespace ProceduralCity
 
         private void OnUpdateFrame(FrameEventArgs e)
         {
+            _cameraController.Update((float)e.Time);
             Parallel.ForEach(_traffic, t => t.Move((float)e.Time)); // TODO: only animate visible traffic
         }
 
@@ -211,7 +216,7 @@ namespace ProceduralCity
 
             if (e.Key == Keys.W)
             {
-                _camera.MoveForward();
+                _camera.MoveForward((float)_elapsedFrameTime);
             }
             else if (e.Key == Keys.S)
             {
@@ -259,6 +264,11 @@ namespace ProceduralCity
             if (e.Key == Keys.F2)
             {
                 ToggleFrameLimit();
+            }
+
+            if (e.Key == Keys.T)
+            {
+                _cameraController.TeleportToNewPosition();
             }
         }
 

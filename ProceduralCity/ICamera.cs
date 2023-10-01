@@ -4,7 +4,7 @@ namespace ProceduralCity
 {
     public interface ICamera
     {
-        void MoveForward();
+        void MoveForward(float delta = 1.0f);
 
         void MoveBackward();
 
@@ -17,5 +17,9 @@ namespace ProceduralCity
         void SetVertical(float vertical);
 
         Matrix4 Use();
+
+        void SetPosition(Vector3 position);
+
+        void LookAt(Vector3 position);
     }
 }
