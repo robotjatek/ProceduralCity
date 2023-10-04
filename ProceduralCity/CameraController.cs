@@ -3,8 +3,8 @@ CameraController class
 
 Known inputs
 - size of the world
-- buildings max heigth
-- coordinates of the city center can be calcualted
+- buildings max height
+- coordinates of the city center can be calculated
 
 High level logic v1:
 
@@ -15,9 +15,10 @@ After some time teleport to a new position
 Move forward towards the city center
 If the city center is close move backwards, if far move forward
 Rotate around the city center
+Fade out-Fade-in effect when teleporting
 
 In progress:
-- Fade out-Fade-in effect when teleporting
+
 
 To Do:
 - Select a random movement and move the camera
@@ -48,6 +49,12 @@ namespace ProceduralCity
 
     internal class CameraController
     {
+        private const int MAX_ELAPSED_TIME_BEFORE_TELEPORT = 10;
+        private const float START_FADEOUTBEFORETELEPORT = 1.5f;
+        private const float END_FADEINAFTERTELEPORT = 1.5f;
+        private const float FADEOUT_LENGTH = MAX_ELAPSED_TIME_BEFORE_TELEPORT - START_FADEOUTBEFORETELEPORT;
+        private const float FADEIN_LENGTH = END_FADEINAFTERTELEPORT;
+
         private readonly ICamera _camera;
         private readonly IAppConfig _configuration;
         private readonly Vector3 _cityCenterPosition;
@@ -57,6 +64,10 @@ namespace ProceduralCity
         private readonly double _maxDistance;
         private MovementType _chosenMovement;
         private Direction _direction;
+
+        public delegate void SetFadeoutDelegate(float fadeoutFactor);
+        public SetFadeoutDelegate SetFadeout { get; set; }
+
 
         public CameraController(ICamera camera, IAppConfig configuration)
         {
@@ -69,17 +80,20 @@ namespace ProceduralCity
         public void Update(float deltaTime)
         {
             _elapsedTimeSinceLastTeleport += deltaTime;
-            if (_elapsedTimeSinceLastTeleport > 10)
+
+            FadeOut();
+            FadeIn();
+
+            if (_elapsedTimeSinceLastTeleport > MAX_ELAPSED_TIME_BEFORE_TELEPORT)
             {
                 TeleportToNewPosition();
-                _elapsedTimeSinceLastTeleport = 0;
             }
 
             // TODO: command pattern
             if (_chosenMovement == MovementType.STRAIGHT)
             {
 
-                if(_direction == Direction.A)
+                if (_direction == Direction.A)
                 {
                     _camera.MoveForward(deltaTime);
                 }
@@ -90,7 +104,7 @@ namespace ProceduralCity
             }
             else if (_chosenMovement == MovementType.ROTATE)
             {
-                if(_direction == Direction.A)
+                if (_direction == Direction.A)
                 {
                     _camera.StrafeLeft(deltaTime);
                 }
@@ -99,8 +113,28 @@ namespace ProceduralCity
                     _camera.StrafeRight(deltaTime);
                 }
                 LookAtCityCenter();
-            } 
+            }
 
+        }
+
+        private void FadeIn()
+        {
+            if (_elapsedTimeSinceLastTeleport < END_FADEINAFTERTELEPORT)
+            {
+                var fadeTime = _elapsedTimeSinceLastTeleport;
+                var fact = Math.Clamp(fadeTime / (FADEIN_LENGTH), 0, 1);
+                SetFadeout(fact);
+            }
+        }
+
+        private void FadeOut()
+        {
+            if (_elapsedTimeSinceLastTeleport > FADEOUT_LENGTH)
+            {
+                var fadeTime = _elapsedTimeSinceLastTeleport - FADEOUT_LENGTH;
+                var fact = Math.Clamp(1.0f - (fadeTime / (MAX_ELAPSED_TIME_BEFORE_TELEPORT - FADEOUT_LENGTH)), 0, 1);
+                SetFadeout(fact);
+            }
         }
 
         //TODO: make this private
@@ -116,6 +150,7 @@ namespace ProceduralCity
             _camera.SetPosition(pos);
             LookAtCityCenter();
             PickMovement();
+            _elapsedTimeSinceLastTeleport = 0;
 
         }
 

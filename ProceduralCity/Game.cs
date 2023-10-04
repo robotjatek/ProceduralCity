@@ -83,6 +83,7 @@ namespace ProceduralCity
         {
             _camera = camera;
             _cameraController = cameraController;
+            _cameraController.SetFadeout = this.SetFadeout;
             _logger = logger;
             _config = config;
 
@@ -293,6 +294,14 @@ namespace ProceduralCity
             _ndcRenderer.AddToScene(fullScreenQuad);
 
             _isBloomEnabled = !_isBloomEnabled;
+        }
+
+        private void SetFadeout(float fadeout)
+        {
+            _fullscreenShader.SetUniformValue("fadeFactor", new FloatUniform
+            {
+                Value = fadeout
+            });
         }
 
         public void Dispose()
