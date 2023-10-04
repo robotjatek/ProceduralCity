@@ -26,23 +26,23 @@ namespace ProceduralCity
             _position.Z -= (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
         }
 
-        public void MoveBackward()
+        public void MoveBackward(float delta = 1.0f)
         {
-            _position.X -= (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity;
-            _position.Y += (float)Math.Sin(_verticalAngle * Math.PI / 180.0f) * _velocity;
-            _position.Z += (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity;
+            _position.X -= (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
+            _position.Y += (float)Math.Sin(_verticalAngle * Math.PI / 180.0f) * _velocity * delta;
+            _position.Z += (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
         }
 
-        public void StrafeLeft()
+        public void StrafeLeft(float delta = 1.0f)
         {
-            _position.X -= (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity;
-            _position.Z -= (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity;
+            _position.X -= (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
+            _position.Z -= (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
         }
 
-        public void StrafeRight()
+        public void StrafeRight(float delta = 1.0f)
         {
-            _position.X += (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity;
-            _position.Z += (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity;
+            _position.X += (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
+            _position.Z += (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
         }
 
         public void SetHorizontal(float horizontal)
@@ -85,6 +85,11 @@ namespace ProceduralCity
             var direction = _position - position;
             _horizontalAngle = direction.Z < 0 ? 180 - MathHelper.RadiansToDegrees(rotation.Y) : MathHelper.RadiansToDegrees(rotation.Y);
             // TODO: implement vertical angle lookAt
+        }
+
+        public Vector3 GetPosition()
+        {
+            return _position;
         }
     }
 }

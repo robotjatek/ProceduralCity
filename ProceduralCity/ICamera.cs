@@ -6,11 +6,11 @@ namespace ProceduralCity
     {
         void MoveForward(float delta = 1.0f);
 
-        void MoveBackward();
+        void MoveBackward(float delta = 1.0f);
 
-        void StrafeLeft();
+        void StrafeLeft(float delta = 1.0f);
 
-        void StrafeRight();
+        void StrafeRight(float delta = 1.0f);
 
         void SetHorizontal(float horizontal);
 
@@ -19,6 +19,8 @@ namespace ProceduralCity
         Matrix4 Use();
 
         void SetPosition(Vector3 position);
+
+        Vector3 GetPosition();
 
         void LookAt(Vector3 position);
     }
