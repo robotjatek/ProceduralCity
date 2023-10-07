@@ -271,6 +271,11 @@ namespace ProceduralCity
             {
                 _cameraController.TeleportToNewPosition();
             }
+
+            if (e.Key == Keys.F)
+            {
+                _cameraController.ToggleFlyby();
+            }
         }
 
         private void ToggleFrameLimit()

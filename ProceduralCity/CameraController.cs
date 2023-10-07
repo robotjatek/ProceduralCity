@@ -16,6 +16,7 @@ Move forward towards the city center
 If the city center is close move backwards, if far move forward
 Rotate around the city center
 Fade out-Fade-in effect when teleporting
+Toggle between flyby and user camera
 
 In progress:
 
@@ -25,7 +26,6 @@ To Do:
     - Move while looking down
     - Rotate around an arbitrary position/object
     - Follow a random path (curves?)
-- Toggle between flyby and user camera
  */
 using OpenTK.Mathematics;
 
@@ -64,6 +64,7 @@ namespace ProceduralCity
         private readonly double _maxDistance;
         private MovementType _chosenMovement;
         private Direction _direction;
+        private bool _enabled = true;
 
         public delegate void SetFadeoutDelegate(float fadeoutFactor);
         public SetFadeoutDelegate SetFadeout { get; set; }
@@ -79,42 +80,55 @@ namespace ProceduralCity
 
         public void Update(float deltaTime)
         {
-            _elapsedTimeSinceLastTeleport += deltaTime;
+            if(_enabled)
+            {
+                _elapsedTimeSinceLastTeleport += deltaTime;
 
-            FadeOut();
-            FadeIn();
+                FadeOut();
+                FadeIn();
 
-            if (_elapsedTimeSinceLastTeleport > MAX_ELAPSED_TIME_BEFORE_TELEPORT)
+                if (_elapsedTimeSinceLastTeleport > MAX_ELAPSED_TIME_BEFORE_TELEPORT)
+                {
+                    TeleportToNewPosition();
+                }
+
+                // TODO: command pattern
+                if (_chosenMovement == MovementType.STRAIGHT)
+                {
+
+                    if (_direction == Direction.A)
+                    {
+                        _camera.MoveForward(deltaTime);
+                    }
+                    else if (_direction == Direction.B)
+                    {
+                        _camera.MoveBackward(deltaTime);
+                    }
+                }
+                else if (_chosenMovement == MovementType.ROTATE)
+                {
+                    if (_direction == Direction.A)
+                    {
+                        _camera.StrafeLeft(deltaTime);
+                    }
+                    else
+                    {
+                        _camera.StrafeRight(deltaTime);
+                    }
+                    LookAtCityCenter();
+                }
+            }
+        }
+
+        public void ToggleFlyby()
+        {
+            if (!_enabled) 
             {
                 TeleportToNewPosition();
             }
 
-            // TODO: command pattern
-            if (_chosenMovement == MovementType.STRAIGHT)
-            {
-
-                if (_direction == Direction.A)
-                {
-                    _camera.MoveForward(deltaTime);
-                }
-                else if (_direction == Direction.B)
-                {
-                    _camera.MoveBackward(deltaTime);
-                }
-            }
-            else if (_chosenMovement == MovementType.ROTATE)
-            {
-                if (_direction == Direction.A)
-                {
-                    _camera.StrafeLeft(deltaTime);
-                }
-                else
-                {
-                    _camera.StrafeRight(deltaTime);
-                }
-                LookAtCityCenter();
-            }
-
+            SetFadeout?.Invoke(1.0f);
+            _enabled = !_enabled;
         }
 
         private void FadeIn()
