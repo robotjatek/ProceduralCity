@@ -19,40 +19,40 @@ namespace ProceduralCity
             _velocity = 30f;
         }
 
-        public void MoveForward(float delta = 1.0f)
+        public void MoveForward(float delta)
         {
             _position.X += (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
             _position.Y -= (float)Math.Sin(_verticalAngle * Math.PI / 180.0f) * _velocity * delta;
             _position.Z -= (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
         }
 
-        public void MoveBackward(float delta = 1.0f)
+        public void MoveBackward(float delta)
         {
             _position.X -= (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
             _position.Y += (float)Math.Sin(_verticalAngle * Math.PI / 180.0f) * _velocity * delta;
             _position.Z += (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
         }
 
-        public void StrafeLeft(float delta = 1.0f)
+        public void StrafeLeft(float delta)
         {
             _position.X -= (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
             _position.Z -= (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
         }
 
-        public void StrafeRight(float delta = 1.0f)
+        public void StrafeRight(float delta)
         {
             _position.X += (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
             _position.Z += (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
         }
 
-        public void SetHorizontal(float horizontal)
+        public void SetHorizontal(float horizontal, float delta)
         {
-            _horizontalAngle += horizontal * _velocity * SPEED_MAGIC;
+            _horizontalAngle += horizontal * _velocity * SPEED_MAGIC * delta;
         }
 
-        public void SetVertical(float vertical)
+        public void SetVertical(float vertical, float delta)
         {
-            _verticalAngle += vertical * _velocity * SPEED_MAGIC;
+            _verticalAngle += vertical * _velocity * SPEED_MAGIC * delta;
         }
 
         public Matrix4 Use()

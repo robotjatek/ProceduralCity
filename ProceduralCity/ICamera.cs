@@ -4,17 +4,17 @@ namespace ProceduralCity
 {
     public interface ICamera
     {
-        void MoveForward(float delta = 1.0f);
+        void MoveForward(float delta);
 
-        void MoveBackward(float delta = 1.0f);
+        void MoveBackward(float delta);
 
-        void StrafeLeft(float delta = 1.0f);
+        void StrafeLeft(float delta);
 
-        void StrafeRight(float delta = 1.0f);
+        void StrafeRight(float delta);
 
-        void SetHorizontal(float horizontal);
+        void SetHorizontal(float horizontal, float delta);
 
-        void SetVertical(float vertical);
+        void SetVertical(float vertical, float delta);
 
         Matrix4 Use();
 

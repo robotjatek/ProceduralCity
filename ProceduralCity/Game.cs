@@ -157,8 +157,50 @@ namespace ProceduralCity
 
         private void OnUpdateFrame(FrameEventArgs e)
         {
+            var keyboardState = _context.KeyboardState;
+            HandleCameraInput(e, keyboardState);
+
             _cameraController.Update((float)e.Time);
             Parallel.ForEach(_traffic, t => t.Move((float)e.Time)); // TODO: only animate visible traffic
+        }
+
+        private void HandleCameraInput(FrameEventArgs e, KeyboardState keyboardState)
+        {
+            if (keyboardState[Keys.A])
+            {
+                _camera.StrafeLeft((float)e.Time);
+            }
+            else if (keyboardState[Keys.D])
+            {
+                _camera.StrafeRight((float)e.Time);
+            }
+
+            if (keyboardState[Keys.W])
+            {
+                _camera.MoveForward((float)e.Time);
+            }
+            else if (keyboardState[Keys.S])
+            {
+                _camera.MoveBackward((float)e.Time);
+            }
+
+            if (keyboardState[Keys.Up])
+            {
+                _camera.SetVertical(-1.0f, (float)e.Time);
+            }
+            else if (keyboardState[Keys.Down])
+            {
+                _camera.SetVertical(1.0f, (float)e.Time);
+            }
+
+            if (keyboardState[Keys.Left])
+            {
+                _camera.SetHorizontal(-1.0f, (float)e.Time);
+            }
+            else if (keyboardState[Keys.Right])
+            {
+                _camera.SetHorizontal(1.0f, (float)e.Time);
+            }
         }
 
         private void OnRenderFrame(FrameEventArgs e)
@@ -204,42 +246,6 @@ namespace ProceduralCity
             if (e.Key == Keys.Escape)
             {
                 _context.Close();
-            }
-
-            if (e.Key == Keys.A)
-            {
-                _camera.StrafeLeft();
-            }
-            else if (e.Key == Keys.D)
-            {
-                _camera.StrafeRight();
-            }
-
-            if (e.Key == Keys.W)
-            {
-                _camera.MoveForward((float)_elapsedFrameTime);
-            }
-            else if (e.Key == Keys.S)
-            {
-                _camera.MoveBackward();
-            }
-
-            if (e.Key == Keys.Up)
-            {
-                _camera.SetVertical(-1.0f);
-            }
-            else if (e.Key == Keys.Down)
-            {
-                _camera.SetVertical(1.0f);
-            }
-
-            if (e.Key == Keys.Left)
-            {
-                _camera.SetHorizontal(-1.0f);
-            }
-            else if (e.Key == Keys.Right)
-            {
-                _camera.SetHorizontal(1.0f);
             }
 
             if (e.Alt && e.Key == Keys.Enter)
