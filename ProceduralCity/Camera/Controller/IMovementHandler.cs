@@ -1,4 +1,6 @@
-﻿namespace ProceduralCity.Camera.Movements
+﻿using ProceduralCity.Camera.Controller.Movements;
+
+namespace ProceduralCity.Camera.Controller
 {
     interface IMovementHandler
     {

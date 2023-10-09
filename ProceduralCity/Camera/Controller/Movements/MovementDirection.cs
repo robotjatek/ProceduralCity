@@ -1,4 +1,4 @@
-﻿namespace ProceduralCity.Camera.Movements
+﻿namespace ProceduralCity.Camera.Controller.Movements
 {
     enum MovementDirection
     {

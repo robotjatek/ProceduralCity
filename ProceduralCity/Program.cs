@@ -3,6 +3,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 
 using ProceduralCity.Camera;
+using ProceduralCity.Camera.Controller;
 using ProceduralCity.Config;
 using ProceduralCity.Generators;
 using ProceduralCity.Renderer;

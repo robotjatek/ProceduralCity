@@ -30,12 +30,12 @@ To Do:
     - Follow a random path (curves?)
  */
 using OpenTK.Mathematics;
-using ProceduralCity.Camera.Movements;
+using ProceduralCity.Camera.Controller.Movements;
 using ProceduralCity.Config;
 
 using System;
 
-namespace ProceduralCity.Camera
+namespace ProceduralCity.Camera.Controller
 {
 
     internal class CameraController : IMovementHandler

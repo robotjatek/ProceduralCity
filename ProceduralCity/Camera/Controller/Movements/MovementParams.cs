@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace ProceduralCity.Camera.Movements
+namespace ProceduralCity.Camera.Controller.Movements
 {
     class MovementParams
     {

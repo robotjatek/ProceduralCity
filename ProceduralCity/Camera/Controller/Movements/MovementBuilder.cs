@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ProceduralCity.Camera.Movements
+namespace ProceduralCity.Camera.Controller.Movements
 {
     static class MovementBuilder
     {
@@ -36,9 +36,8 @@ namespace ProceduralCity.Camera.Movements
                 case MovementType.STAND:
                     return new StandMovement();
                 default:
-                    throw new ArgumentException("Unknown movement type", nameof(movementType));
+                    throw new NotImplementedException($"Unknown movement type: {nameof(movementType)}");
             }
-
         }
     }
 }

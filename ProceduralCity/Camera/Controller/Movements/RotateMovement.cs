@@ -1,4 +1,6 @@
-﻿namespace ProceduralCity.Camera.Movements
+﻿using ProceduralCity.Camera.Controller;
+
+namespace ProceduralCity.Camera.Controller.Movements
 {
     class RotateMovement : IMovement
     {
