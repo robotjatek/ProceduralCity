@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace ProceduralCity
+namespace ProceduralCity.Camera
 {
     public interface ICamera
     {

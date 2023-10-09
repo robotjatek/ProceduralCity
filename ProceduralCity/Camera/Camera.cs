@@ -1,7 +1,7 @@
 ﻿using System;
 using OpenTK.Mathematics;
 
-namespace ProceduralCity
+namespace ProceduralCity.Camera
 {
     class Camera : ICamera
     {
