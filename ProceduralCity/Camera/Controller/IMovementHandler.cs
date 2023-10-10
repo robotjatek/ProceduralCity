@@ -7,5 +7,7 @@ namespace ProceduralCity.Camera.Controller
         void HandleStraightMovement(StraightMovement movement, float deltaTime);
         void HandleRotateMovement(RotateMovement movement, float deltaTime);
         void HandleStandMovement(StandMovement movement, float deltaTime);
+
+        void HandlePlaneMovement(PlaneMovement movement, float deltaTime);
     }
 }

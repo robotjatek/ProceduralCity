@@ -26,10 +26,22 @@ namespace ProceduralCity.Camera
             _position.Z -= (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
         }
 
+        public void MoveForwardOnAPlane(float delta)
+        {
+            _position.X += (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
+            _position.Z -= (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
+        }
+
         public void MoveBackward(float delta)
         {
             _position.X -= (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
             _position.Y += (float)Math.Sin(_verticalAngle * Math.PI / 180.0f) * _velocity * delta;
+            _position.Z += (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
+        }
+
+        public void MoveBackwardOnAPlane(float delta)
+        {
+            _position.X -= (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
             _position.Z += (float)Math.Cos(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
         }
 
@@ -53,6 +65,11 @@ namespace ProceduralCity.Camera
         public void SetVertical(float vertical, float delta)
         {
             _verticalAngle += vertical * _velocity * SPEED_MAGIC * delta;
+        }
+
+        public void SetVerticalInstant(float vertical)
+        {
+            _verticalAngle = vertical;
         }
 
         public Matrix4 Use()

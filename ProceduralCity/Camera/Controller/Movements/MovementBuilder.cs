@@ -9,6 +9,7 @@ namespace ProceduralCity.Camera.Controller.Movements
             STRAIGHT,
             STAND,
             ROTATE,
+            PLANE,
         }
 
         public static IMovement BuildRandomMovement(MovementParams buildParams)
@@ -16,18 +17,17 @@ namespace ProceduralCity.Camera.Controller.Movements
             Random _random = new();
             var enumValues = Enum.GetValues(typeof(MovementType));
             var movementType = (MovementType)enumValues.GetValue(_random.Next(enumValues.Length));
+            var distanceToCityCenter = (buildParams.CityCenterPosition - buildParams.CameraPosition).Length;
 
             switch (movementType)
             {
                 case MovementType.STRAIGHT:
                     {
-                        var distanceToCityCenter = (buildParams.CityCenterPosition - buildParams.CameraPosition).Length;
                         return new StraightMovement
                         {
                             Direction = distanceToCityCenter > buildParams.MaxDistance ? MovementDirection.A : MovementDirection.B
                         };
                     }
-
                 case MovementType.ROTATE:
                     return new RotateMovement
                     {
@@ -35,6 +35,15 @@ namespace ProceduralCity.Camera.Controller.Movements
                     };
                 case MovementType.STAND:
                     return new StandMovement();
+                case MovementType.PLANE:
+                    {
+                        var verticalAngle = _random.Next(0, 90);
+                        return new PlaneMovement
+                        {
+                            VerticalAngle = verticalAngle,
+                            Direction = distanceToCityCenter > buildParams.MaxDistance ? MovementDirection.A : MovementDirection.B
+                        };
+                    }
                 default:
                     throw new NotImplementedException($"Unknown movement type: {nameof(movementType)}");
             }

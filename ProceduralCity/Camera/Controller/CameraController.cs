@@ -18,18 +18,19 @@ Rotate around the city center
 Fade out-Fade-in effect when teleporting
 Toggle between flyby and user camera
 Command pattern for movement commands
+Move on a plane while looking down at a certain angle
 
 In progress:
 
 
 To Do:
 - Select a random movement and move the camera
-    - Move while looking down
     - Strafe with vertical angle parameter set
     - Rotate around an arbitrary position/object
-    - Follow a random path (curves?)
+    - Follow a random path with street level shots too (curves?)
  */
 using OpenTK.Mathematics;
+
 using ProceduralCity.Camera.Controller.Movements;
 using ProceduralCity.Config;
 
@@ -113,6 +114,19 @@ namespace ProceduralCity.Camera.Controller
         public void HandleStandMovement(StandMovement movement, float deltaTime)
         {
             // Do nothing
+        }
+
+        public void HandlePlaneMovement(PlaneMovement movement, float deltaTime)
+        {
+            _camera.SetVerticalInstant(movement.VerticalAngle);
+            if (movement.Direction != MovementDirection.A)
+            {
+                _camera.MoveForwardOnAPlane(deltaTime);
+            }
+            else if (movement.Direction != MovementDirection.B)
+            {
+                _camera.MoveBackwardOnAPlane(deltaTime);
+            }
         }
 
         public void ToggleFlyby()
