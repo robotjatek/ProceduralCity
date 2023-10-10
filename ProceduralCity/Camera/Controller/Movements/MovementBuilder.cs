@@ -10,6 +10,7 @@ namespace ProceduralCity.Camera.Controller.Movements
             STAND,
             ROTATE,
             PLANE,
+            PLANE_STRAFE
         }
 
         public static IMovement BuildRandomMovement(MovementParams buildParams)
@@ -39,6 +40,15 @@ namespace ProceduralCity.Camera.Controller.Movements
                     {
                         var verticalAngle = _random.Next(0, 90);
                         return new PlaneMovement
+                        {
+                            VerticalAngle = verticalAngle,
+                            Direction = distanceToCityCenter > buildParams.MaxDistance ? MovementDirection.A : MovementDirection.B
+                        };
+                    }
+                case MovementType.PLANE_STRAFE:
+                    {
+                        var verticalAngle = _random.Next(0, 90);
+                        return new PlaneStrafeMovement
                         {
                             VerticalAngle = verticalAngle,
                             Direction = distanceToCityCenter > buildParams.MaxDistance ? MovementDirection.A : MovementDirection.B

@@ -19,13 +19,13 @@ Fade out-Fade-in effect when teleporting
 Toggle between flyby and user camera
 Command pattern for movement commands
 Move on a plane while looking down at a certain angle
+Strafe with vertical angle parameter set
 
 In progress:
 
 
 To Do:
 - Select a random movement and move the camera
-    - Strafe with vertical angle parameter set
     - Rotate around an arbitrary position/object
     - Follow a random path with street level shots too (curves?)
  */
@@ -101,6 +101,19 @@ namespace ProceduralCity.Camera.Controller
 
         public void HandleRotateMovement(RotateMovement movement, float deltaTime)
         {
+            if (movement.Direction == MovementDirection.A)
+            {
+                _camera.StrafeLeft(deltaTime);
+            }
+            else if (movement.Direction == MovementDirection.B)
+            {
+                _camera.StrafeRight(deltaTime);
+            }
+        }
+
+        public void HandlePlaneStrafeMovement(PlaneStrafeMovement movement, float deltaTime)
+        {
+            _camera.SetVerticalInstant(movement.VerticalAngle);
             if (movement.Direction == MovementDirection.A)
             {
                 _camera.StrafeLeft(deltaTime);
