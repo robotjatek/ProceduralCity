@@ -18,7 +18,7 @@ namespace ProceduralCity.Camera
             _verticalAngle = verticalAngle;
             _velocity = 30f;
         }
-
+        
         public void MoveForward(float delta)
         {
             _position.X += (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
@@ -95,13 +95,14 @@ namespace ProceduralCity.Camera
             Matrix4.LookAt(_position, position, Vector3.UnitY).ExtractRotation().ToEulerAngles(out Vector3 rotation);
 
             /*
-             * NOTE: this is a little hacky way to ensure that the rotation is always correct.
-             * It does the job for now, but it needs to be revised in the future.
-             * Also extacting rotation from the lookat matrix seems a little wasteful. 
+             * NOTE: this is a little hacky way to ensure that the rotation is always correct
+             * and the camera is never upside  down. It does the job for now, but it needs to
+             * be revised in the future. Also extacting rotation from the lookat matrix seems
+             * a little wasteful. 
             */
             var direction = _position - position;
             _horizontalAngle = direction.Z < 0 ? 180 - MathHelper.RadiansToDegrees(rotation.Y) : MathHelper.RadiansToDegrees(rotation.Y);
-            // TODO: implement vertical angle lookAt
+            _verticalAngle = direction.Z < 0 ? 180 -  MathHelper.RadiansToDegrees(rotation.X) : MathHelper.RadiansToDegrees(rotation.X);
         }
 
         public Vector3 GetPosition()
