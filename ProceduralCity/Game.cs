@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 
 namespace ProceduralCity
 {
-    //TODO: run code analyzer and fix all messages introduced by the dotnet version bump
     //TODO: fix billboard texture coordinates
     //TODO: textures on buildings seem to be upside down
     //TODO: document how to show text on screen. This was working before look it up in the git history

@@ -9,7 +9,7 @@ namespace ProceduralCity.Renderer
 {
     class Skybox : ISkybox, IRenderable, IDisposable
     {
-        private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly List<Mesh> _meshes = new();
         private readonly ITexture _texture;
         private readonly Shader _shader;
 
@@ -46,7 +46,7 @@ namespace ProceduralCity.Renderer
             _meshes.Add(new Mesh(vertices, uvs, new[] { _texture }, _shader));
         }
 
-        private IEnumerable<Vector3> CreateVertices()
+        private static IEnumerable<Vector3> CreateVertices()
         {
             return new[]
             {

@@ -9,7 +9,7 @@ namespace ProceduralCity.Renderer.Utils
     {
         private readonly IRenderer _renderer;
         private readonly IBackBufferRenderer _backbufferRenderer;
-        private readonly Shader _shader = new Shader("vs.vert", "Noise/Noise.frag");
+        private readonly Shader _shader = new("vs.vert", "Noise/Noise.frag");
         private readonly Texture _texture;
 
         public NoiseRenderer(ILogger logger, Texture texture)

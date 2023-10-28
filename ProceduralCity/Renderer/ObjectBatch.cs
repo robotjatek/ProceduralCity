@@ -14,8 +14,8 @@ namespace ProceduralCity.Renderer
 
         private readonly Shader _shader;
         private readonly IEnumerable<ITexture> _textures;
-        private readonly List<Vector3> _vertices = new List<Vector3>();
-        private readonly List<Vector2> _UVs = new List<Vector2>();
+        private readonly List<Vector3> _vertices = new();
+        private readonly List<Vector2> _UVs = new();
 
         private Vector3[] Vertices { get; set; }
         private Vector2[] UVs { get; set; }

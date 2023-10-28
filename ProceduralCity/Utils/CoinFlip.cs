@@ -4,7 +4,7 @@ namespace ProceduralCity.Utils
 {
     class CoinFlip
     {
-        private readonly static Random _random = new Random();
+        private readonly static Random _random = new();
 
         public static bool Flip()
         {

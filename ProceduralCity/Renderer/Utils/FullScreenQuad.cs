@@ -5,7 +5,7 @@ namespace ProceduralCity.Renderer.Utils
 {
     class FullScreenQuad : IRenderable
     {
-        private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly List<Mesh> _meshes = new();
         private readonly Shader _shader;
         private readonly IEnumerable<ITexture> _textures;
 

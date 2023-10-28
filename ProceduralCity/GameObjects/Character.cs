@@ -9,7 +9,7 @@ namespace ProceduralCity.GameObjects
 {
     class Character : IRenderable
     {
-        private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly List<Mesh> _meshes = new();
         private readonly ITexture _texture;
         private readonly Shader _shader;
 

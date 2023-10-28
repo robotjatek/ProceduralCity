@@ -15,10 +15,10 @@ namespace ProceduralCity.Renderer
     {
         private readonly Shader _shader;
         private readonly IEnumerable<ITexture> _textures;
-        private readonly List<Vector3> _vertices = new List<Vector3>();
-        private readonly List<Vector2> _UVs = new List<Vector2>();
+        private readonly List<Vector3> _vertices = new();
+        private readonly List<Vector2> _UVs = new();
 
-        private readonly List<Ref<Matrix4>> _instanceModels = new List<Ref<Matrix4>>();
+        private readonly List<Ref<Matrix4>> _instanceModels = new();
         private Matrix4[] _instanceModelMatrixValues;
         private bool disposedValue;
         private bool _ready = false;

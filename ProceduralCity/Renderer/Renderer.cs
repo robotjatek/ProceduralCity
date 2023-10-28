@@ -12,7 +12,7 @@ namespace ProceduralCity.Renderer
 {
     class Renderer : IRenderer, IDisposable
     {
-        private readonly Dictionary<(int textureId, int shaderId), IBatch> _batches = new Dictionary<(int, int), IBatch>();
+        private readonly Dictionary<(int textureId, int shaderId), IBatch> _batches = new();
 
         public Action BeforeRender { get; set; }
 
@@ -43,7 +43,7 @@ namespace ProceduralCity.Renderer
                 if (mesh.Shader == null)
                 {
                     Log.Logger.Error($"Shader is null");
-                    throw new ArgumentException();
+                    throw new InvalidOperationException("Shader can not be null");
                 }
 
                 var textureHash = mesh.Textures.Select(t => t.Id).CalculateHash();
@@ -80,7 +80,7 @@ namespace ProceduralCity.Renderer
             }
         }
 
-        private IBatch CreateBatch(bool instanced, Shader shader, IEnumerable<ITexture> textures)
+        private static IBatch CreateBatch(bool instanced, Shader shader, IEnumerable<ITexture> textures)
         {
             if (instanced)
             {

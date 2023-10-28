@@ -4,9 +4,9 @@
     {
         public int Value { get; set; }
 
-        public void Visit(int location, UniformHandler uniformHandler)
+        public readonly void Visit(int location, UniformHandler uniformHandler)
         {
-            uniformHandler.Dispatch(location, this);
+            UniformHandler.Dispatch(location, this);
         }
     }
 }
