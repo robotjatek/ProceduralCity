@@ -178,7 +178,7 @@ namespace ProceduralCity.Camera.Controller
         {
             var rnd = new Random();
             // x, height, y;
-            var height = _configuration.MaxBuildingHeight + 10.0f;
+            var height = rnd.Next(_configuration.MaxBuildingHeight + 10, _configuration.MaxBuildingHeight + 200);
             var nx = (float)rnd.NextDouble() * _configuration.WorldSize;
             var ny = (float)rnd.NextDouble() * _configuration.WorldSize;
 

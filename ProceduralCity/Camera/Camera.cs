@@ -102,7 +102,9 @@ namespace ProceduralCity.Camera
             */
             var direction = _position - position;
             _horizontalAngle = direction.Z < 0 ? 180 - MathHelper.RadiansToDegrees(rotation.Y) : MathHelper.RadiansToDegrees(rotation.Y);
-            _verticalAngle = direction.Z < 0 ? 180 -  MathHelper.RadiansToDegrees(rotation.X) : MathHelper.RadiansToDegrees(rotation.X);
+            // _verticalAngle = direction.Z < 0 ? 180 -  MathHelper.RadiansToDegrees(rotation.X) : MathHelper.RadiansToDegrees(rotation.X);
+            _verticalAngle = 0;
+           // TODO: changing the vertical angle has some strange sideeffects in some edge cases, so it is disabled now
         }
 
         public Vector3 GetPosition()
