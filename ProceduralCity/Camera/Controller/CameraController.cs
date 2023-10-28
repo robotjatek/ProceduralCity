@@ -26,8 +26,8 @@ In progress:
 
 To Do:
 - Select a random movement and move the camera
+    - Follow a random path with street level shots too (curves?) (work in progress on: path_movement branch)
     - Rotate around an arbitrary position/object
-    - Follow a random path with street level shots too (curves?)
  */
 using OpenTK.Mathematics;
 
@@ -179,8 +179,8 @@ namespace ProceduralCity.Camera.Controller
             var rnd = new Random();
             // x, height, y;
             var height = rnd.Next(_configuration.MaxBuildingHeight + 10, _configuration.MaxBuildingHeight + 200);
-            var nx = (float)rnd.NextDouble() * _configuration.WorldSize;
-            var ny = (float)rnd.NextDouble() * _configuration.WorldSize;
+            var nx = (float)Math.Clamp(rnd.NextDouble(), 0.1f, 0.9f) * _configuration.WorldSize;
+            var ny = (float)Math.Clamp(rnd.NextDouble(), 0.1f, 0.9f) * _configuration.WorldSize;
 
             var pos = new Vector3(nx, height, ny);
             _camera.SetPosition(pos);

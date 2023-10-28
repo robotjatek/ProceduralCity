@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 
 namespace ProceduralCity
 {
-    //TODO: automatic camera flyby
     //TODO: run code analyzer and fix all messages introduced by the dotnet version bump
     //TODO: fix billboard texture coordinates
     //TODO: textures on buildings seem to be upside down
