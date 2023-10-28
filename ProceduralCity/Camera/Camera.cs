@@ -16,7 +16,7 @@ namespace ProceduralCity.Camera
             _position = position;
             _horizontalAngle = horizontalAngle;
             _verticalAngle = verticalAngle;
-            _velocity = 30f;
+            _velocity = 300f;
         }
         
         public void MoveForward(float delta)
@@ -101,8 +101,11 @@ namespace ProceduralCity.Camera
              * a little wasteful. 
             */
             var direction = _position - position;
+            direction.Normalize();
+            
             _horizontalAngle = direction.Z < 0 ? 180 - MathHelper.RadiansToDegrees(rotation.Y) : MathHelper.RadiansToDegrees(rotation.Y);
-            _verticalAngle = direction.Z < 0 ? 180 -  MathHelper.RadiansToDegrees(rotation.X) : MathHelper.RadiansToDegrees(rotation.X);
+            //_verticalAngle = direction.Z < 0 ? 180 -  MathHelper.RadiansToDegrees(rotation.X) : MathHelper.RadiansToDegrees(rotation.X);
+            _verticalAngle = 0; // TODO: setting vertical angle anything other than 0 causes problems in certain cases. This may be an Euler angle issue. Quaternions may solve the problem.
         }
 
         public Vector3 GetPosition()

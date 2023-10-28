@@ -158,13 +158,12 @@ namespace ProceduralCity.Generators
                 }
             }
         }
-
-        public IEnumerable<GroundNode> GenerateSites()
+        public BspTree GenerateSites()
         {
             _logger.Information("Generating ground 2D tree");
             var tree = new BspTree(_worldSize, _config);
             SplitNode(tree.Root, maxLevel: 10);
-            return tree.GetLeaves();
+            return tree;
         }
 
         private void SplitNode(GroundNode node, int maxLevel)
