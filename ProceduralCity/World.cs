@@ -15,6 +15,7 @@ namespace ProceduralCity
         private readonly IGroundGenerator _groundGenerator;
         private readonly IBuildingGenerator _buildingGenerator;
         private readonly ILogger _logger;
+        private readonly BspTree _bspTree;
 
         public IEnumerable<TrafficLight> Traffic
         {
@@ -24,24 +25,30 @@ namespace ProceduralCity
             }
         }
 
+        public BspTree SitesBsp
+        {
+            get { return _bspTree; }
+        }
+
         public World(IGroundGenerator groundGenerator, IBuildingGenerator buildingGenerator, ILogger logger)
         {
             _logger = logger;
             _groundGenerator = groundGenerator;
             _buildingGenerator = buildingGenerator;
 
-            var sites = _groundGenerator.GenerateSites();
-            _logger.Information("Number of sites: {siteCount}", sites.Count());
+            _bspTree = _groundGenerator.GenerateSites();
+            var siteLeafs = _bspTree.GetLeaves();
+            _logger.Information("Number of sites: {siteCount}", siteLeafs.Count());
             var groundPlane = _groundGenerator.CreateGroundPlane();
             _renderables.Add(groundPlane);
-            var streetLights = _groundGenerator.CreateStreetLights(sites);
+            var streetLights = _groundGenerator.CreateStreetLights(siteLeafs);
             _renderables.AddRange(streetLights);
 
-            var trafficLights = _groundGenerator.CreateTrafficLights(sites);
+            var trafficLights = _groundGenerator.CreateTrafficLights(siteLeafs);
             _trafficLights.AddRange(trafficLights);
             _logger.Information("Number of traffic lights: {trafficLightCount}", trafficLights.Count());
 
-            var buildings = _buildingGenerator.GenerateBuildings(sites);
+            var buildings = _buildingGenerator.GenerateBuildings(siteLeafs);
             _renderables.AddRange(buildings);
         }
 
