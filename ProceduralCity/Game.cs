@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
-
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using ProceduralCity.Camera;
+using ProceduralCity.Camera.Controller;
 using ProceduralCity.Config;
 using ProceduralCity.GameObjects;
 using ProceduralCity.Renderer;
@@ -14,11 +12,14 @@ using ProceduralCity.Renderer.Uniform;
 using ProceduralCity.Renderer.Utils;
 
 using Serilog;
-using OpenTK.Windowing.GraphicsLibraryFramework;
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ProceduralCity
 {
-    //TODO: automatic camera flyby
+    //TODO: run code analyzer and fix all messages introduced by the dotnet version bump
     //TODO: fix billboard texture coordinates
     //TODO: textures on buildings seem to be upside down
     //TODO: document how to show text on screen. This was working before look it up in the git history
@@ -31,6 +32,7 @@ namespace ProceduralCity
     //TODO: add more variety to the existing building types
     //TODO: Do not animate hidden traffic lights
     //TODO: Do not render hidden traffic lights
+    //TODO: Building LOD levels
     //TODO: Render skybox into texture when generating the world, to reduce GPU usage
     //TODO: Add the ability to render post process effects in a lower resolution
     //TODO: Generators should not own any texture or shader references, these should be asked from a resource manager class
@@ -51,6 +53,7 @@ namespace ProceduralCity
         private readonly IRenderer _skyboxRenderer;
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
+        private readonly CameraController _cameraController;
         private readonly IWorld _world;
 
         private readonly OpenGlContext _context;
@@ -71,6 +74,7 @@ namespace ProceduralCity
             IAppConfig config,
             ILogger logger,
             ICamera camera,
+            CameraController cameraController,
             IWorld world,
             OpenGlContext context,
             IRenderer renderer,
@@ -79,6 +83,8 @@ namespace ProceduralCity
             ISkybox skybox)
         {
             _camera = camera;
+            _cameraController = cameraController;
+            _cameraController.SetFadeout = this.SetFadeout;
             _logger = logger;
             _config = config;
 
@@ -138,8 +144,8 @@ namespace ProceduralCity
 
         private void ConfigureContext()
         {
-            _context.RenderFrame += (e) => this.OnRenderFrame(e);
-            _context.UpdateFrame += (e) => this.OnUpdateFrame(e);
+            _context.RenderFrame += this.OnRenderFrame;
+            _context.UpdateFrame += this.OnUpdateFrame;
             _context.Size = new Vector2i(_config.ResolutionWidth, _config.ResolutionHeight);
             _context.Resize += (e) => OnResize();
             _context.KeyDown += OnKeyDown;
@@ -152,7 +158,50 @@ namespace ProceduralCity
 
         private void OnUpdateFrame(FrameEventArgs e)
         {
+            var keyboardState = _context.KeyboardState;
+            HandleCameraInput(e, keyboardState);
+
+            _cameraController.Update((float)e.Time);
             Parallel.ForEach(_traffic, t => t.Move((float)e.Time)); // TODO: only animate visible traffic
+        }
+
+        private void HandleCameraInput(FrameEventArgs e, KeyboardState keyboardState)
+        {
+            if (keyboardState[Keys.A])
+            {
+                _camera.StrafeLeft((float)e.Time);
+            }
+            else if (keyboardState[Keys.D])
+            {
+                _camera.StrafeRight((float)e.Time);
+            }
+
+            if (keyboardState[Keys.W])
+            {
+                _camera.MoveForward((float)e.Time);
+            }
+            else if (keyboardState[Keys.S])
+            {
+                _camera.MoveBackward((float)e.Time);
+            }
+
+            if (keyboardState[Keys.Up])
+            {
+                _camera.SetVertical(-1.0f, (float)e.Time);
+            }
+            else if (keyboardState[Keys.Down])
+            {
+                _camera.SetVertical(1.0f, (float)e.Time);
+            }
+
+            if (keyboardState[Keys.Left])
+            {
+                _camera.SetHorizontal(-1.0f, (float)e.Time);
+            }
+            else if (keyboardState[Keys.Right])
+            {
+                _camera.SetHorizontal(1.0f, (float)e.Time);
+            }
         }
 
         private void OnRenderFrame(FrameEventArgs e)
@@ -200,42 +249,6 @@ namespace ProceduralCity
                 _context.Close();
             }
 
-            if (e.Key == Keys.A)
-            {
-                _camera.StrafeLeft();
-            }
-            else if (e.Key == Keys.D)
-            {
-                _camera.StrafeRight();
-            }
-
-            if (e.Key == Keys.W)
-            {
-                _camera.MoveForward();
-            }
-            else if (e.Key == Keys.S)
-            {
-                _camera.MoveBackward();
-            }
-
-            if (e.Key == Keys.Up)
-            {
-                _camera.SetVertical(-1.0f);
-            }
-            else if (e.Key == Keys.Down)
-            {
-                _camera.SetVertical(1.0f);
-            }
-
-            if (e.Key == Keys.Left)
-            {
-                _camera.SetHorizontal(-1.0f);
-            }
-            else if (e.Key == Keys.Right)
-            {
-                _camera.SetHorizontal(1.0f);
-            }
-
             if (e.Alt && e.Key == Keys.Enter)
             {
                 _context.ToggleFullscreen();
@@ -260,6 +273,16 @@ namespace ProceduralCity
             {
                 ToggleFrameLimit();
             }
+
+            if (e.Key == Keys.T)
+            {
+                _cameraController.TeleportToNewPosition();
+            }
+
+            if (e.Key == Keys.F)
+            {
+                _cameraController.ToggleFlyby();
+            }
         }
 
         private void ToggleFrameLimit()
@@ -283,6 +306,14 @@ namespace ProceduralCity
             _ndcRenderer.AddToScene(fullScreenQuad);
 
             _isBloomEnabled = !_isBloomEnabled;
+        }
+
+        private void SetFadeout(float fadeout)
+        {
+            _fullscreenShader.SetUniformValue("fadeFactor", new FloatUniform
+            {
+                Value = fadeout
+            });
         }
 
         public void Dispose()

@@ -28,7 +28,7 @@ namespace ProceduralCity.Renderer
         {
             Vertices = vertices;
             UVs = uvs;
-            Textures = textures ?? throw new ArgumentNullException("Textures cannot be null!");
+            Textures = textures ?? throw new ArgumentNullException(nameof(textures), "Textures cannot be null!");
             Shader = shader;
         }
     }
