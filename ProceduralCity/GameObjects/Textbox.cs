@@ -71,6 +71,7 @@ namespace ProceduralCity.GameObjects
             private set;
         }
 
+        // Fonts are generated with this tool: https://evanw.github.io/font-texture-generator/
         public Textbox(string fontName)
         {
             CursorAdvance = 0;

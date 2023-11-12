@@ -55,7 +55,7 @@ namespace ProceduralCity.Renderer
         {
             Id = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Id);
-            // StbImage.stbi_set_flip_vertically_on_load(1); // TODO: this is disabled for now, because billboard textures have their texture coordinates in the wrong order
+            StbImage.stbi_set_flip_vertically_on_load(1);
 
             var image = ImageResult.FromStream(File.OpenRead($"{defaultFolder}/{fileName}"), ColorComponents.RedGreenBlueAlpha);
             Width = image.Width;
@@ -71,24 +71,6 @@ namespace ProceduralCity.Renderer
             GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, maxAniso);
 
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-
-
-            //var image = new SFML.Graphics.Image($"{defaultFolder}/{fileName}");
-            //Width = (int) image.Size.X;
-            //Height = (int) image.Size.Y;
-
-
-            //GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)image.Size.X, (int)image.Size.Y, 0, PixelFormat.Rgba, PixelType.UnsignedByte, image.Pixels);
-
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
-
-            //GL.GetFloat((GetPName)ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt, out float maxAniso);
-            //GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, maxAniso);
-
-            //GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
         }
 
         public void Bind(TextureUnit textureUnit)

@@ -16,7 +16,7 @@ namespace ProceduralCity.Camera
             _position = position;
             _horizontalAngle = horizontalAngle;
             _verticalAngle = verticalAngle;
-            _velocity = 30f;
+            _velocity = 60f;
         }
         
         public void MoveForward(float delta)

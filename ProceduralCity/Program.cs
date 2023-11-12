@@ -49,7 +49,7 @@ namespace ProceduralCity
         private static Serilog.Core.Logger CreateLogger()
         {
             var logger = new LoggerConfiguration()
-                            .WriteTo.Async(writeTo => writeTo.Console())
+                            .WriteTo.Console()
                             .MinimumLevel.Verbose()
                             .Enrich.FromLogContext()
                             .CreateLogger();
