@@ -12,7 +12,7 @@ namespace ProceduralCity.Renderer
 {
     class Renderer : IRenderer, IDisposable
     {
-        private readonly Dictionary<(int textureId, int shaderId), IBatch> _batches = new();
+        private readonly Dictionary<(int textureId, int shaderId), IBatch> _batches = [];
 
         public Action BeforeRender { get; set; }
 

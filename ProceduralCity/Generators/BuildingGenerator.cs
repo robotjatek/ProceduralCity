@@ -20,6 +20,7 @@ namespace ProceduralCity.Generators
             //  Blocky
         }
 
+        internal static readonly string[] fragmentShaders = ["fs.frag", "fog.frag"];
         private readonly Shader _buildingShader;
         private readonly Vector2 _areaBorder;
         private readonly Random _random = new();
@@ -32,7 +33,7 @@ namespace ProceduralCity.Generators
         {
             _config = config;
 
-            _buildingShader = new Shader("vs.vert", new[] { "fs.frag", "fog.frag" });
+            _buildingShader = new Shader("vs.vert", fragmentShaders);
             _buildingShader.SetUniformValue("tex", new IntUniform
             {
                 Value = 0
@@ -91,6 +92,7 @@ namespace ProceduralCity.Generators
         }
 
         private bool disposedValue = false;
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

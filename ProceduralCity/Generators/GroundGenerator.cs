@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
 using OpenTK.Mathematics;
 
 using ProceduralCity.Config;
@@ -21,13 +23,13 @@ namespace ProceduralCity.Generators
         // "Light sources" like traffic lights, street ligths or billboards are not affected by the fog by design. (For now at least...)
         private readonly Shader _lightShader = new("vs.vert", "street_light.frag");
         private readonly ColorGenerator _colorGenerator;
-        private readonly List<Vector3> _lightColors = new()
-        {
+        private readonly List<Vector3> _lightColors =
+        [
             new Vector3(1f, 0.82f, 0.698f), //Sodium vapor
             new Vector3(0.847f, 0.969f, 1f), //Mercury Vapor
             new Vector3(0.949f, 0.988f, 1f), //Metal Halide
             new Vector3(1f, 0.718f, 0.298f), //High Pressure Sodium
-        };
+        ];
 
         public GroundGenerator(IAppConfig config, ILogger logger, ColorGenerator colorGenerator)
         {
@@ -95,7 +97,7 @@ namespace ProceduralCity.Generators
             return traffic;
         }
 
-        private IEnumerable<TrafficLight> CreateTrafficOnCircuit(int maxPerSegment, Waypoint firstWaypoint)
+        private ReadOnlyCollection<TrafficLight> CreateTrafficOnCircuit(int maxPerSegment, Waypoint firstWaypoint)
         {
             var traffic = new List<TrafficLight>();
             var current = firstWaypoint;
@@ -108,7 +110,7 @@ namespace ProceduralCity.Generators
                 current = current.Next;
             } while (current != firstWaypoint);
 
-            return traffic;
+            return traffic.AsReadOnly();
         }
 
         private IEnumerable<TrafficLight> CreateTrafficOnSegment(Waypoint start, Waypoint finish, int maxPerSegment)

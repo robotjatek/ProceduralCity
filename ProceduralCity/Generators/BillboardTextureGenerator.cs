@@ -17,18 +17,18 @@ namespace ProceduralCity.Generators
         private readonly IAppConfig _config;
         private readonly Matrix4 _projectionMatrix;
 
-        private static readonly string[] _prefixes = new[]
-        {
+        private static readonly string[] _prefixes =
+        [
             "i",
             "my",
             "Mega ",
             "Super ",
             "National ",
             "Federal "
-        };
+        ];
 
-        private static readonly string[] _first = new[]
-        {
+        private static readonly string[] _first =
+        [
             "Global",
             "Internet",
             "Vortex",
@@ -52,10 +52,10 @@ namespace ProceduralCity.Generators
             "Massive",
             "Sun",
             "Wolf"
-        };
+        ];
 
-        private static readonly string[] _second = new[]
-        {
+        private static readonly string[] _second =
+        [
             "Industries",
             "Technologies",
             "Systems",
@@ -77,7 +77,7 @@ namespace ProceduralCity.Generators
             "USA",
             "Studios",
             "Bank"
-        };
+        ];
 
         public BillboardTextureGenerator(ILogger logger, IAppConfig config)
         {

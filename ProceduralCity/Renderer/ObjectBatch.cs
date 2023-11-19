@@ -8,14 +8,14 @@ using ProceduralCity.Renderer.Uniform;
 
 namespace ProceduralCity.Renderer
 {
-    class ObjectBatch : IBatch, IDisposable
+    class ObjectBatch(Shader shader, IEnumerable<ITexture> textures) : IBatch, IDisposable
     {
         private bool disposedValue = false;
 
-        private readonly Shader _shader;
-        private readonly IEnumerable<ITexture> _textures;
-        private readonly List<Vector3> _vertices = new();
-        private readonly List<Vector2> _UVs = new();
+        private readonly Shader _shader = shader;
+        private readonly IEnumerable<ITexture> _textures = textures;
+        private readonly List<Vector3> _vertices = [];
+        private readonly List<Vector2> _UVs = [];
 
         private Vector3[] Vertices { get; set; }
         private Vector2[] UVs { get; set; }
@@ -24,12 +24,6 @@ namespace ProceduralCity.Renderer
         private int _vaoId;
         private int _vertexVboId;
         private int _uvVboId;
-
-        public ObjectBatch(Shader shader, IEnumerable<ITexture> textures)
-        {
-            _shader = shader;
-            _textures = textures;
-        }
 
         public void AddMesh(Mesh m)
         {
@@ -72,9 +66,9 @@ namespace ProceduralCity.Renderer
             var vertexLayoutId = 0;
             var uvLayoutId = 2;
 
-            Vertices = _vertices.ToArray();
+            Vertices = [.. _vertices];
             _vertices.Clear();
-            UVs = _UVs.ToArray();
+            UVs = [.. _UVs];
             _UVs.Clear();
 
             _vaoId = GL.GenVertexArray();

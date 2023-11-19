@@ -14,7 +14,7 @@ namespace ProceduralCity.GameObjects
         private Waypoint _target;
         private readonly Shader _headlightShader; //TODO: disable backface culling on this and use 1 mesh only with 1 shader
         private readonly Shader _rearLightShader;
-        private readonly List<Mesh> _meshes = new();
+        private readonly List<Mesh> _meshes = [];
 
         public Matrix4 Model { get; private set; } = Matrix4.Identity;
 

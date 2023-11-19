@@ -7,8 +7,8 @@ namespace ProceduralCity.Renderer.Utils
 {
     class NoiseRenderer : IDisposable
     {
-        private readonly IRenderer _renderer;
-        private readonly IBackBufferRenderer _backbufferRenderer;
+        private readonly Renderer _renderer;
+        private readonly BackBufferRenderer _backbufferRenderer;
         private readonly Shader _shader = new("vs.vert", "Noise/Noise.frag");
         private readonly Texture _texture;
 

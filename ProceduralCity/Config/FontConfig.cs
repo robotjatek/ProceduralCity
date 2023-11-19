@@ -58,6 +58,6 @@ namespace ProceduralCity.Config
 
         public long Height { get; set; }
 
-        public Dictionary<string, CharProperties> Characters { get; set; } = new Dictionary<string, CharProperties>();
+        public Dictionary<string, CharProperties> Characters { get; set; } = [];
     }
 }

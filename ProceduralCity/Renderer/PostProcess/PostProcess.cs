@@ -10,8 +10,8 @@ namespace ProceduralCity.Renderer.PostProcess
     class PostProcess : IDisposable
     {
         private readonly ILogger _logger;
-        private readonly IBackBufferRenderer _backbufferRenderer;
-        private readonly IRenderer _renderer;
+        private readonly BackBufferRenderer _backbufferRenderer;
+        private readonly Renderer _renderer;
         private readonly Shader _effect;
         private readonly Matrix4 _proj = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
         private readonly IEnumerable<Texture> _inputTextures;

@@ -5,21 +5,16 @@ using ProceduralCity.Config;
 
 namespace ProceduralCity.Generators
 {
-    class BspTree
+    class BspTree(Vector2 quadSize, IAppConfig config)
     {
-        public GroundNode Root { get; private set; }
-
-        public BspTree(Vector2 quadSize, IAppConfig config)
-        {
-            Root = new GroundNode(Vector2.Zero, quadSize, config);
-        }
+        public GroundNode Root { get; private set; } = new GroundNode(Vector2.Zero, quadSize, config);
 
         public IEnumerable<GroundNode> GetLeaves()
         {
             return GetChildren(Root);
         }
 
-        private IEnumerable<GroundNode> GetChildren(GroundNode node)
+        private static IEnumerable<GroundNode> GetChildren(GroundNode node)
         {
             foreach (var child in node.Children)
             {

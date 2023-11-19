@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using OpenTK.Mathematics;
 
@@ -13,7 +14,7 @@ namespace ProceduralCity.Renderer
     {
         private readonly ILogger _logger;
         private readonly Random _random = new();
-        private readonly List<Mesh> _meshes = new();
+        private readonly List<Mesh> _meshes = [];
         private readonly Shader _shader;
         private readonly ColorGenerator _colorGenerator;
 
@@ -126,7 +127,7 @@ namespace ProceduralCity.Renderer
             _logger.Information("Cloud colors set to: {cloudColor1}, {cloudColor2}", color1, color2);
         }
 
-        private static IEnumerable<Vector3> CreateVertices()
+        private static ReadOnlyCollection<Vector3> CreateVertices()
         {
             return new[]
             {
@@ -171,7 +172,7 @@ namespace ProceduralCity.Renderer
                 new Vector3(1.0f, -1.0f, -1.0f),
                 new Vector3(-1.0f, -1.0f,  1.0f),
                 new Vector3(1.0f, -1.0f,  1.0f)
-            };
+            }.AsReadOnly();
         }
 
         private bool disposedValue = false;

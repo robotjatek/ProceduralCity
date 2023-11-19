@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 using OpenTK.Graphics.OpenGL;
@@ -11,14 +10,14 @@ using ProceduralCity.Utils;
 
 namespace ProceduralCity.Renderer
 {
-    class InstancedBatch : IBatch, IDisposable
+    class InstancedBatch(Shader shader, IEnumerable<ITexture> textures) : IBatch, IDisposable
     {
-        private readonly Shader _shader;
-        private readonly IEnumerable<ITexture> _textures;
-        private readonly List<Vector3> _vertices = new();
-        private readonly List<Vector2> _UVs = new();
+        private readonly Shader _shader = shader;
+        private readonly IEnumerable<ITexture> _textures = textures;
+        private readonly List<Vector3> _vertices = [];
+        private readonly List<Vector2> _UVs = [];
 
-        private readonly List<Ref<Matrix4>> _instanceModels = new();
+        private readonly List<Ref<Matrix4>> _instanceModels = [];
         private Matrix4[] _instanceModelMatrixValues;
         private bool disposedValue;
         private bool _ready = false;
@@ -31,16 +30,10 @@ namespace ProceduralCity.Renderer
 
         private Vector2[] UVs { get; set; }
 
-        public InstancedBatch(Shader shader, IEnumerable<ITexture> textures)
-        {
-            _shader = shader;
-            _textures = textures;
-        }
-
         public void AddMesh(Mesh m)
         {
             //TODO: throw exception if ready == true 
-            if (!_vertices.Any())
+            if (_vertices.Count == 0)
             {
                 _vertices.AddRange(m.Vertices);
                 _UVs.AddRange(m.UVs);
@@ -84,9 +77,9 @@ namespace ProceduralCity.Renderer
             var vertexLayoutId = 0;
             var uvLayoutId = 2;
 
-            Vertices = _vertices.ToArray();
+            Vertices = [.. _vertices];
             _vertices.Clear();
-            UVs = _UVs.ToArray();
+            UVs = [.. _UVs];
             _UVs.Clear();
             _instanceModelMatrixValues = new Matrix4[_instanceModels.Count];
 

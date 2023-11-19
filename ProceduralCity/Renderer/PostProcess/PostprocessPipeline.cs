@@ -26,14 +26,14 @@ namespace ProceduralCity.Renderer.PostProcess
             _inputTexture = inputTexture; // Rendered 3D world
             _outputTexture = outputTexture;
 
-            _postprocess = new List<PostProcess>()
-            {
+            _postprocess =
+            [
                 // All three needed for the bloom effect
                 new PostProcess(logger, new[] { _inputTexture }, _outputTexture, _lumaEffect),
                 new PostProcess(logger, new[] { _outputTexture }, _outputTexture, _horizontalBlurEffect),
                 new PostProcess(logger, new[] { _outputTexture }, _outputTexture, _verticalBlurEffect),
                 new PostProcess(logger, new[] { _inputTexture, _outputTexture }, _outputTexture, _blendEffect),
-            };
+            ];
 
             _lumaEffect.SetUniformValue("u_LuminanceTreshold", new FloatUniform
             {

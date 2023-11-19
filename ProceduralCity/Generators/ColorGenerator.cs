@@ -9,8 +9,8 @@ namespace ProceduralCity.Generators
         private readonly Random _random = new();
 
         // RGB colors
-        private readonly Color4[] _cloudColors = new[]
-        {
+        private readonly Color4[] _cloudColors =
+        [
             new Color4(0, 1.0f, 0, 1), //green
             new Color4(0, 0, 1.0f, 1), //blue
             new Color4(1, 0, 0, 1), //red
@@ -19,7 +19,7 @@ namespace ProceduralCity.Generators
             new Color4(0.6f, 0, 0.6f, 1), //purple
             new Color4(1.0f, 1.0f, 0.1f, 1), //yellow
             new Color4(1.0f, 0.2f, 0.33f, 1), //"radical red"
-        };
+        ];
 
         public Color4 Primary { get; private set; } = Color4.Black;
         public Color4 Secondary { get; private set; } = Color4.Black;

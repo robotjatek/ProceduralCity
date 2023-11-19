@@ -7,22 +7,15 @@ using ProceduralCity.Config;
 
 namespace ProceduralCity.Generators
 {
-    public class GroundNode
+    public class GroundNode(Vector2 startPosition, Vector2 endPosition, IAppConfig config)
     {
-        private readonly IAppConfig _config;
+        private readonly IAppConfig _config = config;
 
-        public Vector2 StartPosition { get; private set; }
+        public Vector2 StartPosition { get; private set; } = startPosition;
 
-        public Vector2 EndPosition { get; private set; }
+        public Vector2 EndPosition { get; private set; } = endPosition;
 
-        public List<GroundNode> Children { get; private set; } = new List<GroundNode>();
-
-        public GroundNode(Vector2 startPosition, Vector2 endPosition, IAppConfig config)
-        {
-            StartPosition = startPosition;
-            EndPosition = endPosition;
-            _config = config;
-        }
+        public List<GroundNode> Children { get; private set; } = [];
 
         public IEnumerable<GroundNode> Split(Random random)
         {

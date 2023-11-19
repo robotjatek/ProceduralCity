@@ -13,7 +13,7 @@ namespace ProceduralCity.Renderer
 {
     class Shader : IDisposable
     {
-        private readonly Dictionary<string, int> _uniformLocations = new();
+        private readonly Dictionary<string, int> _uniformLocations = [];
         private readonly UniformHandler _uniformHandler = new();
 
         public int ProgramId
@@ -33,11 +33,10 @@ namespace ProceduralCity.Renderer
             var vertexFiles = vertexShaders.Select(LoadTextFile);
             var fragmentFiles = fragmentShaders.Select(LoadTextFile);
 
-            var vertexHandles = vertexFiles.Select(vertexHandle => CompileShader(vertexHandle, ShaderType.VertexShader));
+            var vertexHandles = vertexFiles.Select(vertexHandle => CompileShader(vertexHandle, ShaderType.VertexShader)).ToArray();
             var fragmentHandles = fragmentFiles.Select(fragmentHandle => CompileShader(fragmentHandle, ShaderType.FragmentShader));
-
-            var shaderHandles = vertexHandles.Concat(fragmentHandles);
-
+            int[] shaderHandles = [..vertexHandles, ..fragmentHandles];
+                
             ProgramId = LinkShaders(shaderHandles);
 
             shaderHandles.ForEach(GL.DeleteProgram);

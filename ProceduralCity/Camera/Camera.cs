@@ -3,22 +3,14 @@ using OpenTK.Mathematics;
 
 namespace ProceduralCity.Camera
 {
-    class Camera : ICamera
+    class Camera(Vector3 position, float horizontalAngle, float verticalAngle) : ICamera
     {
         private const int SPEED_MAGIC = 2;
-        private Vector3 _position;
-        private float _horizontalAngle;
-        private float _verticalAngle;
-        private readonly float _velocity;
+        private Vector3 _position = position;
+        private float _horizontalAngle = horizontalAngle;
+        private float _verticalAngle = verticalAngle;
+        private readonly float _velocity = 60f;
 
-        public Camera(Vector3 position, float horizontalAngle, float verticalAngle)
-        {
-            _position = position;
-            _horizontalAngle = horizontalAngle;
-            _verticalAngle = verticalAngle;
-            _velocity = 60f;
-        }
-        
         public void MoveForward(float delta)
         {
             _position.X += (float)Math.Sin(_horizontalAngle * Math.PI / 180.0f) * _velocity * delta;
