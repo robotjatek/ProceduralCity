@@ -28,15 +28,19 @@ namespace ProceduralCity.Generators
         private readonly IAppConfig _config;
         private readonly IBillboardBuilder _billboardBuilder;
 
-        public BuildingGenerator(ILogger logger, IAppConfig config, IBillboardBuilder billboardBuilder)
+        public BuildingGenerator(ILogger logger, IAppConfig config, IBillboardBuilder billboardBuilder, ColorGenerator colorGenerator)
         {
             _config = config;
 
-            _buildingShader = new Shader("vs.vert", "fs.frag");
+            _buildingShader = new Shader("vs.vert", new[] { "fs.frag", "fog.frag" });
             _buildingShader.SetUniformValue("tex", new IntUniform
             {
                 Value = 0
             });
+
+            SetFogColor(colorGenerator.Mixed);
+            colorGenerator.OnColorChanged += () => SetFogColor(colorGenerator.Mixed);
+
             _buildingTextures = _config.BuildingTextures.Select(c => new Texture(c)).ToArray();
             _areaBorder = new Vector2(_config.AreaBorderSize);
             _logger = logger;
@@ -74,6 +78,18 @@ namespace ProceduralCity.Generators
             };
         }
 
+        private void SetFogColor(Color4 color)
+        {
+            _buildingShader.SetUniformValue("fogColor", new Vector3Uniform
+            {
+                Value = new Vector3(color.R, color.G, color.B)
+            });
+            _buildingShader.SetUniformValue("fogDensity", new FloatUniform
+            {
+                Value = 4.0f
+            });
+        }
+
         private bool disposedValue = false;
         protected virtual void Dispose(bool disposing)
         {
@@ -81,6 +97,8 @@ namespace ProceduralCity.Generators
             {
                 if (disposing)
                 {
+                    _logger.Information("Disposing building generator");
+
                     _buildingShader.Dispose();
                     _billboardBuilder.Dispose();
                     Array.ForEach(_buildingTextures, t => t.Dispose());

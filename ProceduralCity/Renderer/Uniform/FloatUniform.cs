@@ -1,11 +1,11 @@
 ﻿namespace ProceduralCity.Renderer.Uniform
 {
-    struct FloatUniform : IUniformValue
+    readonly struct FloatUniform : IUniformValue
     {
         public float Value
         {
             get;
-            set;
+            init;
         }
 
         public readonly void Visit(int location, UniformHandler uniformHandler)

@@ -1,8 +1,8 @@
 ﻿namespace ProceduralCity.Renderer.Uniform
 {
-    struct IntUniform : IUniformValue
+    readonly struct IntUniform : IUniformValue
     {
-        public int Value { get; set; }
+        public int Value { get; init; }
 
         public readonly void Visit(int location, UniformHandler uniformHandler)
         {

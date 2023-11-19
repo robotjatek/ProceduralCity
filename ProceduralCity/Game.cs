@@ -6,6 +6,7 @@ using ProceduralCity.Camera;
 using ProceduralCity.Camera.Controller;
 using ProceduralCity.Config;
 using ProceduralCity.GameObjects;
+using ProceduralCity.Generators;
 using ProceduralCity.Renderer;
 using ProceduralCity.Renderer.PostProcess;
 using ProceduralCity.Renderer.Uniform;
@@ -22,8 +23,6 @@ namespace ProceduralCity
     //TODO: document how to show text on screen. This was working before look it up in the git history
     //TODO: show fps counter on screen instead of the titlebar
     //TODO: dynamic text rendering
-    //TODO: fog
-    //TODO: Global HUE for the world affecting sky/building/window/fog colors
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
@@ -36,7 +35,7 @@ namespace ProceduralCity
     //TODO: dispose all generators after the generation has been completed
     //TODO: Incorporate shared logic between InstancedBatch and ObjectBatch into a shared class
     //TODO: Mipmaping modes for generated textures (created with new Texture(w,h))
-    //TODO: add decal rendering (stencil buffer?) [streetlights, billboards]
+    //TODO: add decal rendering (stencil buffer?) [streetlights, billboards] (polygonOffset opengl?)
     //TODO: add state change capability to the renderer
     class Game : IGame, IDisposable
     {
@@ -52,6 +51,7 @@ namespace ProceduralCity
         private readonly ICamera _camera;
         private readonly CameraController _cameraController;
         private readonly IWorld _world;
+        private readonly ColorGenerator _colorGenerator;
 
         private readonly OpenGlContext _context;
         private readonly BackBufferRenderer _worldRenderer;
@@ -77,11 +77,12 @@ namespace ProceduralCity
             IRenderer renderer,
             IRenderer ndcRenderer,
             IRenderer skyboxRenderer,
-            ISkybox skybox)
+            ISkybox skybox,
+            ColorGenerator colorGenerator)
         {
             _camera = camera;
             _cameraController = cameraController;
-            _cameraController.SetFadeout = this.SetFadeout;
+            _cameraController.SetFadeout = SetFadeout;
             _logger = logger;
             _config = config;
 
@@ -90,6 +91,7 @@ namespace ProceduralCity
 
             _skybox = skybox;
             _world = world;
+            _colorGenerator = colorGenerator;
 
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
@@ -128,7 +130,7 @@ namespace ProceduralCity
             _postprocessTexture = new Texture(_config.ResolutionWidth, _config.ResolutionHeight);
             _postprocessPipeline = new PostprocessPipeline(_logger, _config, _worldRenderer.Texture, _postprocessTexture);
 
-            _fullscreenShader = new Shader("vs.vert", "fs.frag");
+            _fullscreenShader = new Shader("vs.vert", "fullscreen.frag");
             _fullscreenShader.SetUniformValue("tex", new IntUniform
             {
                 Value = 0
@@ -258,6 +260,7 @@ namespace ProceduralCity
 
             if (e.Key == Keys.G)
             {
+                _colorGenerator.GenerateColors();
                 _skybox.Update();
             }
 

@@ -77,7 +77,7 @@ namespace ProceduralCity.GameObjects
             CursorAdvance = 0;
             _fontmap = new Texture($"{fontName}/font.png", "Fonts");
             _fontConfig = new FontConfig(fontName);
-            _shader = new Shader("vs.vert", "font.frag");
+            _shader = new Shader("vs.vert", new[] { "font.frag", "colorTools.frag" });
             _shader.SetUniformValue("tex", new IntUniform
             {
                 Value = 0

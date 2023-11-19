@@ -42,6 +42,7 @@ namespace ProceduralCity
             builder.RegisterType<ProceduralSkybox>().As<ISkybox>().SingleInstance();
             builder.RegisterType<BillboardTextureGenerator>().As<IBillboardTextureGenerator>().SingleInstance();
             builder.RegisterType<BillboardBuilder>().As<IBillboardBuilder>().SingleInstance();
+            builder.RegisterType<ColorGenerator>().SingleInstance();
 
             return builder.Build();
         }

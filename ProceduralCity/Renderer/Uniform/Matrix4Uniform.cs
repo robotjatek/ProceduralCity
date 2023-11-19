@@ -2,12 +2,12 @@
 
 namespace ProceduralCity.Renderer.Uniform
 {
-    struct Matrix4Uniform : IUniformValue
+    readonly struct Matrix4Uniform : IUniformValue
     {
         public Matrix4 Value
         {
             get;
-            set;
+            init;
         }
 
         public readonly void Visit(int location, UniformHandler uniformHandler)

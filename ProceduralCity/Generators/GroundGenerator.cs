@@ -17,8 +17,10 @@ namespace ProceduralCity.Generators
         private readonly Random _random = new();
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
-        private readonly Shader _planeShader = new("vs.vert", "FlatColored.frag");
+        private readonly Shader _planeShader = new("vs.vert", new string[] { "FlatColored.frag", "fog.frag" });
+        // "Light sources" like traffic lights, street ligths or billboards are not affected by the fog by design. (For now at least...)
         private readonly Shader _lightShader = new("vs.vert", "street_light.frag");
+        private readonly ColorGenerator _colorGenerator;
         private readonly List<Vector3> _lightColors = new()
         {
             new Vector3(1f, 0.82f, 0.698f), //Sodium vapor
@@ -27,21 +29,36 @@ namespace ProceduralCity.Generators
             new Vector3(1f, 0.718f, 0.298f), //High Pressure Sodium
         };
 
-        public GroundGenerator(IAppConfig config, ILogger logger)
+        public GroundGenerator(IAppConfig config, ILogger logger, ColorGenerator colorGenerator)
         {
             _config = config;
             _logger = logger;
+            _colorGenerator = colorGenerator;
             _worldSize = new Vector2(config.WorldSize);
-        }
 
-        public IRenderable CreateGroundPlane()
-        {
             _planeShader.SetUniformValue("u_color", new Vector3Uniform
             {
                 Value = new Vector3(0.025f, 0.025f, 0.025f)
             });
+            SetFogColor(_colorGenerator.Mixed);
+            colorGenerator.OnColorChanged += () => SetFogColor(colorGenerator.Mixed);
+        }
 
+        public IRenderable CreateGroundPlane()
+        {
             return new GroundPlane(new Vector3(0, 0, 0), new Vector2(_config.WorldSize), _planeShader);
+        }
+
+        private void SetFogColor(Color4 color)
+        {
+            _planeShader.SetUniformValue("fogColor", new Vector3Uniform
+            {
+                Value = new Vector3(color.R, color.G, color.B)
+            });
+            _planeShader.SetUniformValue("fogDensity", new FloatUniform
+            {
+                Value = 4.0f
+            });
         }
 
         private readonly Shader _headLightShader = new("instanced.vert", "street_light.frag"); //TODO: maybe one shader only, and set uniforms before render?

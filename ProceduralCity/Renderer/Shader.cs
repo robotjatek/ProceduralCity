@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+
 using OpenTK.Graphics.OpenGL;
+
+using ProceduralCity.Extensions;
 using ProceduralCity.Renderer.Uniform;
 using Serilog;
 
@@ -18,18 +22,25 @@ namespace ProceduralCity.Renderer
             private set;
         }
 
-        public Shader(string vertexShader, string fragmentShader)
+        public Shader(string vertexShader, string fragmentShader) : this(new[] { vertexShader }, new[] { fragmentShader }) { }
+
+        public Shader(IEnumerable<string> vertexShaders, string fragmentShader) : this(vertexShaders, new[] { fragmentShader }) { }
+
+        public Shader(string vertexShader, IEnumerable<string> fragmentShaders) : this(new[] { vertexShader }, fragmentShaders) { }
+
+        public Shader(IEnumerable<string> vertexShaders, IEnumerable<string> fragmentShaders)
         {
-            string vertexFile = LoadTextFile(vertexShader);
-            string fragmentFile = LoadTextFile(fragmentShader);
+            var vertexFiles = vertexShaders.Select(LoadTextFile);
+            var fragmentFiles = fragmentShaders.Select(LoadTextFile);
 
-            var vertexHandle = CompileShader(vertexFile, ShaderType.VertexShader);
-            var fragmentHandle = CompileShader(fragmentFile, ShaderType.FragmentShader);
+            var vertexHandles = vertexFiles.Select(vertexHandle => CompileShader(vertexHandle, ShaderType.VertexShader));
+            var fragmentHandles = fragmentFiles.Select(fragmentHandle => CompileShader(fragmentHandle, ShaderType.FragmentShader));
 
-            ProgramId = LinkShaders(vertexHandle, fragmentHandle);
+            var shaderHandles = vertexHandles.Concat(fragmentHandles);
 
-            GL.DeleteShader(vertexHandle);
-            GL.DeleteShader(fragmentHandle);
+            ProgramId = LinkShaders(shaderHandles);
+
+            shaderHandles.ForEach(GL.DeleteProgram);
         }
 
         public void SetUniformValue<T>(string uniformName, T value) where T : IUniformValue
@@ -63,11 +74,14 @@ namespace ProceduralCity.Renderer
             GL.UseProgram(0);
         }
 
-        private static int LinkShaders(int vertexHandle, int fragmentHandle)
+        private static int LinkShaders(IEnumerable<int> shaderHandles)
         {
             var programId = GL.CreateProgram();
-            GL.AttachShader(programId, vertexHandle);
-            GL.AttachShader(programId, fragmentHandle);
+            shaderHandles.ForEach(shaderHandle =>
+            {
+                GL.AttachShader(programId, shaderHandle);
+            });
+            
             GL.LinkProgram(programId);
             return programId;
         }
