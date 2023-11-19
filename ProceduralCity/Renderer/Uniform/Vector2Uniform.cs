@@ -2,12 +2,12 @@
 
 namespace ProceduralCity.Renderer.Uniform
 {
-    struct Vector2Uniform : IUniformValue
+    readonly struct Vector2Uniform : IUniformValue
     {
         public Vector2 Value
         {
             get;
-            set;
+            init;
         }
 
         public readonly void Visit(int location, UniformHandler uniformHandler)

@@ -14,10 +14,10 @@ void main()
 
 	if(luminance < u_LuminanceTreshold)
 	{
-		fragmentColor = vec4(0);
+		fragmentColor = vec4(0); // Postprocess pipeline is additive. Returning 0 essentially leaves the pixel unchanged.
 	}
 	else
 	{
-		fragmentColor = texture(tex, fTexCoord) * mix(0, 1, 1.0f/u_LuminanceTreshold);
+		fragmentColor = texture(tex, fTexCoord) * clamp(0, 1, smoothstep(0, .4f, 1.0f/u_LuminanceTreshold));
 	}
 }
