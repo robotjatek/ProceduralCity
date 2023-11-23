@@ -10,6 +10,8 @@ using ProceduralCity.Utils;
 
 namespace ProceduralCity.Renderer
 {
+    // TODO: remove and add objects dynamicallly
+    // TODO: do not update matrices for culled objects
     class InstancedBatch(Shader shader, IEnumerable<ITexture> textures) : IBatch, IDisposable
     {
         private readonly Shader _shader = shader;

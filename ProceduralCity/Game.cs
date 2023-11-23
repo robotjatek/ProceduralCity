@@ -17,9 +17,12 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Immutable;
 
 namespace ProceduralCity
 {
+    // High priority tasks
     //TODO: document how to show text on screen. This was working before look it up in the git history
     //TODO: show fps counter on screen instead of the titlebar
     //TODO: dynamic text rendering
@@ -29,6 +32,8 @@ namespace ProceduralCity
     //TODO: Do not animate hidden traffic lights
     //TODO: Do not render hidden traffic lights
     //TODO: Building LOD levels
+
+    // Low priority tasks
     //TODO: Render skybox into texture when generating the world, to reduce GPU usage
     //TODO: Add the ability to render post process effects in a lower resolution
     //TODO: Generators should not own any texture or shader references, these should be asked from a resource manager class
@@ -116,7 +121,7 @@ namespace ProceduralCity
             _skyboxRenderer.AddToScene(skybox);
 
             _traffic = _world.Traffic;
-            _renderer.AddToScene(_traffic);
+            _renderer.AddToScene(_traffic); // TODO: rendering traffic should be dynamic, based on the camera frustum
             _renderer.AddToScene(_world.Renderables);
 
             _backbufferTexture = new Texture(_config.ResolutionWidth, config.ResolutionHeight);
@@ -159,9 +164,26 @@ namespace ProceduralCity
         {
             var keyboardState = _context.KeyboardState;
             HandleCameraInput(e, keyboardState);
-
             _cameraController.Update((float)e.Time);
-            Parallel.ForEach(_traffic, t => t.Move((float)e.Time)); // TODO: only animate visible traffic
+
+            // Naive approach: Iterate through every objects and check if its in the camera frustum
+            var naiveTrafficInstances = _traffic
+                .AsParallel()
+                .Where(traffic => _camera.IsInViewFrustum(traffic.Position))
+                .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // everything that is 700f further
+                .ToImmutableArray();
+
+            
+
+            // TODO: v2: Put objects in a quadtree, and check if quadtree leaves are in the camera frustum
+            // TODO: get only those that are in the visible leaves
+            // TODO: iterate through only theese and check if they are in the camera frustum
+
+            // Visible traffic should not be determined by distance to the camera but by camera frustum.
+            // As of witch lights are in the camera frustum should be determined be querying a quadtree
+            // TODO: Select only those that are in the view frustum
+            // TODO: Select only those that are not occluded by other geometry
+            Parallel.ForEach(naiveTrafficInstances, t => t.Move((float)e.Time)); // TODO: only animate visible traffic
         }
 
         private void HandleCameraInput(FrameEventArgs e, KeyboardState keyboardState)
@@ -186,11 +208,11 @@ namespace ProceduralCity
 
             if (keyboardState[Keys.Up])
             {
-                _camera.SetVertical(-1.0f, (float)e.Time);
+                _camera.SetVertical(1.0f, (float)e.Time);
             }
             else if (keyboardState[Keys.Down])
             {
-                _camera.SetVertical(1.0f, (float)e.Time);
+                _camera.SetVertical(-1.0f, (float)e.Time);
             }
 
             if (keyboardState[Keys.Left])
@@ -207,7 +229,7 @@ namespace ProceduralCity
         {
             CountFps(e);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            var viewMatrix = _camera.Use();
+            var viewMatrix = _camera.ViewMatrix;
 
             _worldRenderer.Clear();
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
@@ -235,7 +257,8 @@ namespace ProceduralCity
         {
             _logger.Information("Window resized: {x}x{y}", _context.Size.X, _context.Size.Y);
             GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
-            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.ClientRectangle.Size.X / _context.ClientRectangle.Size.Y, 1.0f, 5000.0f);
+            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.ClientRectangle.Size.X / _context.ClientRectangle.Size.Y, 1.0f, 4000.0f);
+           _camera.ProjectionMatrix = _projectionMatrix;
             _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
             _worldRenderer.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
             _postprocessPipeline.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);

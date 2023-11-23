@@ -18,10 +18,7 @@ namespace ProceduralCity
 
         public IEnumerable<TrafficLight> Traffic
         {
-            get
-            {
-                return _trafficLights;
-            }
+            get => _trafficLights;
         }
 
         public World(IGroundGenerator groundGenerator, IBuildingGenerator buildingGenerator, ILogger logger)

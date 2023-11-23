@@ -113,7 +113,7 @@ namespace ProceduralCity.Camera.Controller
 
         public void HandlePlaneStrafeMovement(PlaneStrafeMovement movement, float deltaTime)
         {
-            _camera.SetVerticalInstant(movement.VerticalAngle);
+            _camera.SetVerticalInstant(MathHelper.DegreesToRadians(movement.VerticalAngle));
             if (movement.Direction == MovementDirection.A)
             {
                 _camera.StrafeLeft(deltaTime);
@@ -131,7 +131,7 @@ namespace ProceduralCity.Camera.Controller
 
         public void HandlePlaneMovement(PlaneMovement movement, float deltaTime)
         {
-            _camera.SetVerticalInstant(movement.VerticalAngle);
+            _camera.SetVerticalInstant(MathHelper.DegreesToRadians(movement.VerticalAngle));
             if (movement.Direction != MovementDirection.A)
             {
                 _camera.MoveForwardOnAPlane(deltaTime);
@@ -177,17 +177,27 @@ namespace ProceduralCity.Camera.Controller
         public void TeleportToNewPosition()
         {
             var rnd = new Random();
-            // x, height, y;
             var height = rnd.Next(_configuration.MaxBuildingHeight + 10, _configuration.MaxBuildingHeight + 200);
-            var nx = (float)Math.Clamp(rnd.NextDouble(), 0.1f, 0.9f) * _configuration.WorldSize;
-            var ny = (float)Math.Clamp(rnd.NextDouble(), 0.1f, 0.9f) * _configuration.WorldSize;
+            var minDistanceToCenter = 2000f;
+            var randomAngle = (float)(new Random().NextDouble() * 2 * Math.PI);
+            var randomDistance = minDistanceToCenter + (float)(new Random().NextDouble() * (_configuration.WorldSize / 2.0f - minDistanceToCenter));
+            var randomPoint = PolarToCartesian(randomDistance, randomAngle);
+            var randomCoordinate = new Vector2(_configuration.WorldSize / 2.0f, _configuration.WorldSize / 2.0f) + randomPoint;
 
-            var pos = new Vector3(nx, height, ny);
-            _camera.SetPosition(pos);
+            _camera.Position = new Vector3(randomCoordinate.X, height, randomCoordinate.Y);
+
+
             LookAtCityCenter();
             PickMovement();
             _elapsedTimeSinceLastTeleport = 0;
 
+        }
+
+        static Vector2 PolarToCartesian(float radius, float angle)
+        {
+            var x = radius * MathF.Cos(angle);
+            var y = radius * MathF.Sin(angle);
+            return new Vector2(x, y);
         }
 
         // Picks a movement mode and direction which the camera will follow until the next state change
@@ -195,7 +205,7 @@ namespace ProceduralCity.Camera.Controller
         {
             var buildParams = new MovementParams
             {
-                CameraPosition = _camera.GetPosition(),
+                CameraPosition = _camera.Position,
                 CityCenterPosition = _cityCenterPosition,
                 MaxDistance = _maxDistance,
             };
