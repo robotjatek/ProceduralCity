@@ -11,7 +11,7 @@ using Serilog;
 
 namespace ProceduralCity.Renderer
 {
-    class Shader : IDisposable
+    public class Shader : IDisposable
     {
         private readonly Dictionary<string, int> _uniformLocations = [];
         private readonly UniformHandler _uniformHandler = new();

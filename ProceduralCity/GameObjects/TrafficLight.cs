@@ -6,7 +6,7 @@ using ProceduralCity.Utils;
 
 namespace ProceduralCity.GameObjects
 {
-    class TrafficLight : IRenderable // TODO: inferface for bounding volume?
+    public class TrafficLight : IRenderable
     {
         private readonly float _speed;
         private static readonly Vector3 UP = new(0, 1, 0);
@@ -32,6 +32,8 @@ namespace ProceduralCity.GameObjects
 
             CreateHeadLight();
             CreateBackLight();
+
+            Move(0); // Transform the object to its initial position
         }
 
         private void CreateHeadLight()

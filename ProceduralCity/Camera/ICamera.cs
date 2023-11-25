@@ -1,5 +1,7 @@
 ﻿using OpenTK.Mathematics;
 
+using ProceduralCity.Utils;
+
 namespace ProceduralCity.Camera
 {
     interface ICamera
@@ -37,6 +39,10 @@ namespace ProceduralCity.Camera
 
 
         bool IsInViewFrustum(Vector3 point);
+
+        bool IsInViewFrustum(BoundingBox box);
+
+        bool IsInViewFrustum(BoundingSphere sphere);
 
         public Matrix4 ProjectionMatrix
         {

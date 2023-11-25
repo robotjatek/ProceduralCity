@@ -2,7 +2,7 @@
 
 namespace ProceduralCity.Renderer.Uniform
 {
-    class UniformHandler
+    public class UniformHandler
     {
         public static void Dispatch(int location, IntUniform value)
         {

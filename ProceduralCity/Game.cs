@@ -167,23 +167,28 @@ namespace ProceduralCity
             _cameraController.Update((float)e.Time);
 
             // Naive approach: Iterate through every objects and check if its in the camera frustum
-            var naiveTrafficInstances = _traffic
-                .AsParallel()
-                .Where(traffic => _camera.IsInViewFrustum(traffic.Position))
-                .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // everything that is 700f further
-                .ToImmutableArray();
+            //var culledTrafficInstanes = _traffic
+            //    .AsParallel()
+            //    .Where(traffic => _camera.IsInViewFrustum(traffic.Position))
+            //    .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // everything that is closer than 700f
+            //    .ToImmutableArray();
 
-            
+
+            // TODO: the recursive culling is way slower than the naive approach - this needs further work
+            var culledTrafficInstanes = _world.BspTree.GetLeafsInFrustum(_camera)
+                .SelectMany(site => site.Traffic)
+                .AsParallel()
+                .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // everything that is closer than 700f
+                .Where(traffic => _camera.IsInViewFrustum(traffic.Position))
+                .ToImmutableArray();
 
             // TODO: v2: Put objects in a quadtree, and check if quadtree leaves are in the camera frustum
             // TODO: get only those that are in the visible leaves
             // TODO: iterate through only theese and check if they are in the camera frustum
 
             // Visible traffic should not be determined by distance to the camera but by camera frustum.
-            // As of witch lights are in the camera frustum should be determined be querying a quadtree
-            // TODO: Select only those that are in the view frustum
             // TODO: Select only those that are not occluded by other geometry
-            Parallel.ForEach(naiveTrafficInstances, t => t.Move((float)e.Time)); // TODO: only animate visible traffic
+            Parallel.ForEach(culledTrafficInstanes, t => t.Move((float)e.Time)); // Only animate visible traffic
         }
 
         private void HandleCameraInput(FrameEventArgs e, KeyboardState keyboardState)

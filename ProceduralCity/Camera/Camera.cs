@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using OpenTK.Mathematics;
+
+using ProceduralCity.Utils;
 
 namespace ProceduralCity.Camera
 {
@@ -116,7 +120,17 @@ namespace ProceduralCity.Camera
 
         public bool IsInViewFrustum(Vector3 point)
         {
-            return _frustum.IsPointInViewFrustum(point);
+            return _frustum.IsInViewFrustum(point);
+        }
+
+        public bool IsInViewFrustum(BoundingBox box)
+        {
+            return _frustum.IsInViewFrustum(box);
+        }
+
+        public bool IsInViewFrustum(BoundingSphere sphere)
+        {
+            return _frustum.IsInViewFrustum(sphere);
         }
 
         public class Frustum
@@ -151,7 +165,7 @@ namespace ProceduralCity.Camera
                 return frustum;
             }
 
-            public bool IsPointInViewFrustum(Vector3 point)
+            public bool IsInViewFrustum(Vector3 point)
             {
                 // Dot product is positive if the point is on the same side of the planes normal vector...
                 // If all dot products for all the planes are positive, then the point is inside the frustum
@@ -169,9 +183,65 @@ namespace ProceduralCity.Camera
                 return false;
             }
 
+            public bool IsInViewFrustum(BoundingBox box)
+            {
+                // Early discard based on a sphere collision
+                var sphere = box.BoundingSphere;
+                if (!IsInViewFrustum(sphere))
+                    return false;
+
+                // If any of the corners is inside the camera the box considered visible. Fast path for culling test
+                if (box.Corners.Any(IsInViewFrustum))
+                    return true;
+
+                // If the box intersects with at least one plane, it is considered visible
+                return !GetPlanes().Any(plane => box.Corners.All(corner => PointPlaneDotProduct(corner, plane) < 0));
+
+                /*
+                * This code does the same as the linq query in the last return statement. I leave it here for clarity reasons:
+                *foreach (var plane in GetPlanes())
+                *{
+                *    var outside = box.Corners.All(corner => PointPlaneDistance(corner, plane) < 0);
+                *    if (outside)
+                *        return false;
+                *}
+                * //The box intersects with at least one plane
+                * return true;
+                */
+            }
+
+            public bool IsInViewFrustum(BoundingSphere sphere)
+            {
+                foreach (var plane in GetPlanes())
+                {
+                    var dotProduct = PointPlaneDotProduct(sphere.Center, plane);
+
+                    // If the sphere is completely behind the plane, it's outside
+                    if (dotProduct < -sphere.Radius)
+                        return false;
+
+                    // If the sphere is intersecting with the plane, it's still considered inside
+                    if (Math.Abs(dotProduct) < sphere.Radius)
+                        return true;
+                }
+
+                // The sphere intersects with all planes or is inside the frustum
+                return true;
+            }
+
             private static float PointPlaneDotProduct(Vector3 point, Vector4 plane)
             {
                 return point.X * plane.X + point.Y * plane.Y + point.Z * plane.Z + plane.W;
+            }
+
+            private IEnumerable<Vector4> GetPlanes()
+            {
+                yield return LeftPlane;
+                yield return RightPlane;
+                yield return TopPlane;
+                yield return BottomPlane;
+                yield return NearPlane;
+                yield return FarPlane;
             }
 
             private void NormalizePlanes()

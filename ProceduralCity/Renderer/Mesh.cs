@@ -7,7 +7,7 @@ using ProceduralCity.Utils;
 
 namespace ProceduralCity.Renderer
 {
-    class Mesh
+    public class Mesh
     {
         public IEnumerable<Vector3> Vertices { get; private set; }
         public IEnumerable<Vector2> UVs { get; private set; }

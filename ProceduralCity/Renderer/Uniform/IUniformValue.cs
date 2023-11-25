@@ -1,6 +1,6 @@
 ﻿namespace ProceduralCity.Renderer.Uniform
 {
-    interface IUniformValue
+    public interface IUniformValue
     {
         void Visit(int location, UniformHandler uniformHandler);
     }

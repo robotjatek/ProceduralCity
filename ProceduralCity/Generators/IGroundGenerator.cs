@@ -7,7 +7,7 @@ namespace ProceduralCity.Generators
 {
     internal interface IGroundGenerator : IDisposable
     {
-        IEnumerable<GroundNode> GenerateSites();
+        BspTree GenerateSites();
         IRenderable CreateGroundPlane();
         IEnumerable<IRenderable> CreateStreetLights(IEnumerable<GroundNode> sites);
         IEnumerable<TrafficLight> CreateTrafficLights(IEnumerable<GroundNode> sites);
