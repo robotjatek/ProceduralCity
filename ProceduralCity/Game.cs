@@ -166,27 +166,14 @@ namespace ProceduralCity
             HandleCameraInput(e, keyboardState);
             _cameraController.Update((float)e.Time);
 
-            // Naive approach: Iterate through every objects and check if its in the camera frustum
-            //var culledTrafficInstanes = _traffic
-            //    .AsParallel()
-            //    .Where(traffic => _camera.IsInViewFrustum(traffic.Position))
-            //    .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // everything that is closer than 700f
-            //    .ToImmutableArray();
+            var sites = _world.BspTree.GetLeafsInFrustum(_camera).ToImmutableArray();
 
-
-            // TODO: the recursive culling is way slower than the naive approach - this needs further work
-            var culledTrafficInstanes = _world.BspTree.GetLeafsInFrustum(_camera)
+            var culledTrafficInstanes = sites
                 .SelectMany(site => site.Traffic)
                 .AsParallel()
-                .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // everything that is closer than 700f
                 .Where(traffic => _camera.IsInViewFrustum(traffic.Position))
+                .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is furter than 700f
                 .ToImmutableArray();
-
-            // TODO: v2: Put objects in a quadtree, and check if quadtree leaves are in the camera frustum
-            // TODO: get only those that are in the visible leaves
-            // TODO: iterate through only theese and check if they are in the camera frustum
-
-            // Visible traffic should not be determined by distance to the camera but by camera frustum.
             // TODO: Select only those that are not occluded by other geometry
             Parallel.ForEach(culledTrafficInstanes, t => t.Move((float)e.Time)); // Only animate visible traffic
         }

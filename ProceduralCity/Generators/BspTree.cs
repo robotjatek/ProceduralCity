@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using OpenTK.Mathematics;
 
@@ -8,14 +9,16 @@ using ProceduralCity.Config;
 namespace ProceduralCity.Generators
 {
     /// <summary>
-    /// A custom class for making generating the building sites easier.
-    /// This class should only be used with the generator classes. For rendering a custumised faster datastructure is needed
+    /// A custom quadtree-like datastructure containing GroundNodes
     /// </summary>
-    /// <param name="quadSize">The dimensions of the full area. This area will be split to 2by2 children recursively.</param>
-    /// <param name="config"></param>
-    class BspTree(Vector2 quadSize, IAppConfig config)
+    public class BspTree
     {
-        public GroundNode Root { get; private set; } = new GroundNode(Vector2.Zero, quadSize, config);
+        public GroundNode Root { get; private set; }
+
+        public BspTree(Vector2 quadSize, IAppConfig config)
+        {
+             Root = new GroundNode(Vector2.Zero, quadSize, config);
+        }
 
         /// <summary>
         /// Get all leafs of the tree
@@ -23,25 +26,7 @@ namespace ProceduralCity.Generators
         /// <returns>All leafs of the tree. (Nodes that do not have any children)</returns>
         public IEnumerable<GroundNode> GetLeafs()
         {
-            return GetChildren(Root);
-        }
-
-        private static IEnumerable<GroundNode> GetChildren(GroundNode node)
-        {
-            foreach (var child in node.Children)
-            {
-                if (child.Children.Count == 0)
-                {
-                    yield return child;
-                }
-                else
-                {
-                    foreach (var n in GetChildren(child))
-                    {
-                        yield return n;
-                    }
-                }
-            }
+           return TraverseTree(Root);
         }
 
         /// <summary>
@@ -51,35 +36,38 @@ namespace ProceduralCity.Generators
         /// <returns>The leafs that are visible by the camera</returns>
         public IEnumerable<GroundNode> GetLeafsInFrustum(ICamera camera)
         {
-            return GetChildrenInCameraFrustum(Root, camera);
+            return TraverseTree(Root, node => camera.IsInViewFrustum(node.BoundingBox));
         }
 
-        private static IEnumerable<GroundNode> GetChildrenInCameraFrustum(GroundNode node, ICamera camera)
+        /// <summary>
+        /// Traverses the tree starting from the specified node, applying the specified filter.
+        /// </summary>
+        /// <param name="startNode">The starting node of the traversal.</param>
+        /// <param name="nodeFilter">A filter to determine whether a node should be included.</param>
+        /// <returns>The nodes that satisfy the filter condition.</returns>
+        private static IEnumerable<GroundNode> TraverseTree(GroundNode startNode, Func<GroundNode, bool> filter = null)
         {
-            // Check if the current node's bounding box is outside the view frustum
-            if (!camera.IsInViewFrustum(node.BoundingBox))
-            {
-                yield break;
-            }
+            var stack = new Stack<GroundNode>();
+            stack.Push(startNode);
 
-            foreach (var child in node.Children)
+            while (stack.Count > 0)
             {
-                // If the child's bounding box is outside the frustum, skip it
-                if (!camera.IsInViewFrustum(child.BoundingBox))
+                var node = stack.Pop();
+
+                if (filter != null && !filter(node))
                 {
                     continue;
                 }
 
-                // TODO: extract this to a method
-                if (child.Children.Count == 0)
+                if (node.Children.Count == 0)
                 {
-                    yield return child;
+                    yield return node;
                 }
                 else
                 {
-                    foreach (var n in GetChildrenInCameraFrustum(child, camera))
+                    foreach (var child in node.Children)
                     {
-                        yield return n;
+                        stack.Push(child);
                     }
                 }
             }

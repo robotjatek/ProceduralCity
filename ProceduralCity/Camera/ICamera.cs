@@ -4,7 +4,7 @@ using ProceduralCity.Utils;
 
 namespace ProceduralCity.Camera
 {
-    interface ICamera
+    public interface ICamera
     {
         void MoveForward(float delta);
 
