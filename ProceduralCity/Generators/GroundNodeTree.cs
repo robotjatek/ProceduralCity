@@ -9,7 +9,8 @@ using ProceduralCity.Config;
 namespace ProceduralCity.Generators
 {
     /// <summary>
-    /// A custom quadtree-like datastructure containing GroundNodes
+    /// A custom quadtree-like datastructure containing GroundNodes.
+    /// This class only contains the root node and the necessary facilities to recursively walk the tree. Either considering a camera frustum or not.
     /// </summary>
     public class GroundNodeTree
     {

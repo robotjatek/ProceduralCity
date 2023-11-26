@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 using System.Threading.Tasks;
 
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
 using ProceduralCity.Renderer.Uniform;
-using ProceduralCity.Utils;
 
 namespace ProceduralCity.Renderer
 {

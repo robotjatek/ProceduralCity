@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Mathematics;
 
-using ProceduralCity.Utils;
-
 namespace ProceduralCity.Renderer
 {
     public class Mesh

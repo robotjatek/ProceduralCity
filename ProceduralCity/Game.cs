@@ -172,7 +172,7 @@ namespace ProceduralCity
                 .SelectMany(site => site.Traffic)
                 .AsParallel()
                 .Where(traffic => _camera.IsInViewFrustum(traffic.Position))
-                .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is furter than 700f
+                .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is further than 700f
                 .ToImmutableArray();
             // TODO: Select only those that are not occluded by other geometry
             Parallel.ForEach(culledTrafficInstanes, t => t.Move((float)e.Time)); // Only animate visible traffic
