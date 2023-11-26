@@ -69,7 +69,8 @@ namespace ProceduralCity.GameObjects
             CalculateTarget();
             TransformObject(elapsedTime);
 
-            _meshes.ForEach(a => a.Model.Value = Model);
+            _meshes[0].Model = Model;
+            _meshes[1].Model = Model;
         }
 
         private void TransformObject(float elapsedTime)

@@ -15,7 +15,7 @@ namespace ProceduralCity.Renderer
         public Shader Shader { get; private set; }
         public bool IsInstanced { get; set; } = false;
 
-        public Ref<Matrix4> Model { get; set; } = new Ref<Matrix4>();
+        public Matrix4 Model { get; set; } = new Matrix4();
 
         public Mesh(IEnumerable<Vector3> vertices, IEnumerable<Vector2> uvs, Shader shader)
         {

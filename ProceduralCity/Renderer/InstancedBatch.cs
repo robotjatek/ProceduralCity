@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 
 using OpenTK.Graphics.OpenGL;
@@ -10,7 +12,7 @@ using ProceduralCity.Utils;
 
 namespace ProceduralCity.Renderer
 {
-    // TODO: remove and add objects dynamicallly
+    // TODO: remove and add objects dynamically
     // TODO: do not update matrices for culled objects
     class InstancedBatch(Shader shader, IEnumerable<ITexture> textures) : IBatch, IDisposable
     {
@@ -19,8 +21,8 @@ namespace ProceduralCity.Renderer
         private readonly List<Vector3> _vertices = [];
         private readonly List<Vector2> _UVs = [];
 
-        private readonly List<Ref<Matrix4>> _instanceModels = [];
-        private Matrix4[] _instanceModelMatrixValues;
+        private readonly List<Mesh> _meshes = [];
+        private Matrix4[] _instanceModelMatrixValues; // Temp array for model matrix updates.
         private bool disposedValue;
         private bool _ready = false;
         private int _vaoId;
@@ -34,13 +36,19 @@ namespace ProceduralCity.Renderer
 
         public void AddMesh(Mesh m)
         {
-            //TODO: throw exception if ready == true 
+            if (_ready)
+            {
+                throw new InvalidOperationException("This batch is already initialized. You cannot add more instances to it");
+            }
+
             if (_vertices.Count == 0)
             {
                 _vertices.AddRange(m.Vertices);
                 _UVs.AddRange(m.UVs);
             }
-            _instanceModels.Add(m.Model);
+            _meshes.Add(m);
+
+            // TODO: dynamically update the instance models in every frame to only contain data for meshes that are not culled
         }
 
         public void Draw(Matrix4 projection, Matrix4 view)
@@ -70,7 +78,7 @@ namespace ProceduralCity.Renderer
             });
 
             _shader.Use();
-            GL.DrawArraysInstanced(PrimitiveType.Triangles, 0, Vertices.Length, _instanceModels.Count);
+            GL.DrawArraysInstanced(PrimitiveType.Triangles, 0, Vertices.Length, _meshes.Count);
             GL.BindVertexArray(0);
         }
 
@@ -83,7 +91,7 @@ namespace ProceduralCity.Renderer
             _vertices.Clear();
             UVs = [.. _UVs];
             _UVs.Clear();
-            _instanceModelMatrixValues = new Matrix4[_instanceModels.Count];
+            _instanceModelMatrixValues = new Matrix4[_meshes.Count];
 
             _vaoId = GL.GenVertexArray();
             GL.BindVertexArray(_vaoId);
@@ -102,7 +110,7 @@ namespace ProceduralCity.Renderer
 
             _instancedModelVbo = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, _instanceModels.Count * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, _meshes.Count * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
             GL.EnableVertexAttribArray(3);
             GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 0);
             GL.VertexAttribDivisor(3, 1);
@@ -126,13 +134,12 @@ namespace ProceduralCity.Renderer
 
         private void SetupInstancedArray()
         {
-            Parallel.For(0, _instanceModels.Count, (i) =>
+            Parallel.For(0, _meshes.Count, (i) =>
             {
-                _instanceModelMatrixValues[i] = _instanceModels[i].Value;
+                _instanceModelMatrixValues[i] = _meshes[i].Model;
             });
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, _instanceModels.Count * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
             GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, _instanceModelMatrixValues.Length * Vector4.SizeInBytes * 4, _instanceModelMatrixValues);
         }
 

@@ -8,12 +8,12 @@ using ProceduralCity.Renderer.Uniform;
 
 namespace ProceduralCity.Renderer
 {
-    class ObjectBatch(Shader shader, IEnumerable<ITexture> textures) : IBatch, IDisposable
+    public class ObjectBatch : IBatch, IDisposable
     {
         private bool disposedValue = false;
 
-        private readonly Shader _shader = shader;
-        private readonly IEnumerable<ITexture> _textures = textures;
+        private readonly Shader _shader;
+        private readonly IEnumerable<ITexture> _textures;
         private readonly List<Vector3> _vertices = [];
         private readonly List<Vector2> _UVs = [];
 
@@ -24,6 +24,12 @@ namespace ProceduralCity.Renderer
         private int _vaoId;
         private int _vertexVboId;
         private int _uvVboId;
+
+        public ObjectBatch(Shader shader, IEnumerable<ITexture> textures)
+        {
+            _shader = shader;
+            _textures = textures;
+        }
 
         public void AddMesh(Mesh m)
         {
