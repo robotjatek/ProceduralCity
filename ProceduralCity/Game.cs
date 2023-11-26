@@ -166,7 +166,7 @@ namespace ProceduralCity
             HandleCameraInput(e, keyboardState);
             _cameraController.Update((float)e.Time);
 
-            var sites = _world.BspTree.GetLeafsInFrustum(_camera).ToImmutableArray();
+            var sites = _world.BspTree.GetLeavesInFrustum(_camera).ToImmutableArray();
 
             var culledTrafficInstanes = sites
                 .SelectMany(site => site.Traffic)

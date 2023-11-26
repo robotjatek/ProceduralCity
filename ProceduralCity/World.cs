@@ -15,9 +15,9 @@ namespace ProceduralCity
         private readonly IGroundGenerator _groundGenerator;
         private readonly IBuildingGenerator _buildingGenerator;
         private readonly ILogger _logger;
-        private readonly BspTree _bspTree;
+        private readonly GroundNodeTree _bspTree;
 
-        public BspTree BspTree => _bspTree;
+        public GroundNodeTree BspTree => _bspTree;
 
         public IEnumerable<TrafficLight> Traffic => _trafficLights;
 
@@ -28,7 +28,7 @@ namespace ProceduralCity
             _buildingGenerator = buildingGenerator;
 
             _bspTree = _groundGenerator.GenerateSites();
-            var sites = _bspTree.GetLeafs();
+            var sites = _bspTree.GetLeaves();
             _logger.Information("Number of sites: {siteCount}", sites.Count());
             var groundPlane = _groundGenerator.CreateGroundPlane();
             _renderables.Add(groundPlane);

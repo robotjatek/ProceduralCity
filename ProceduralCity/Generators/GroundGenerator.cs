@@ -179,10 +179,10 @@ namespace ProceduralCity.Generators
             }
         }
 
-        public BspTree GenerateSites()
+        public GroundNodeTree GenerateSites()
         {
             _logger.Information("Generating ground 2D tree");
-            var tree = new BspTree(_worldSize, _config);
+            var tree = new GroundNodeTree(_worldSize, _config);
             SplitNode(tree.Root, maxLevel: 10);
             return tree;
         }

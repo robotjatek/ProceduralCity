@@ -11,30 +11,30 @@ namespace ProceduralCity.Generators
     /// <summary>
     /// A custom quadtree-like datastructure containing GroundNodes
     /// </summary>
-    public class BspTree
+    public class GroundNodeTree
     {
         public GroundNode Root { get; private set; }
 
-        public BspTree(Vector2 quadSize, IAppConfig config)
+        public GroundNodeTree(Vector2 quadSize, IAppConfig config)
         {
              Root = new GroundNode(Vector2.Zero, quadSize, config);
         }
 
         /// <summary>
-        /// Get all leafs of the tree
+        /// Get all leaves of the tree
         /// </summary>
-        /// <returns>All leafs of the tree. (Nodes that do not have any children)</returns>
-        public IEnumerable<GroundNode> GetLeafs()
+        /// <returns>All leaves of the tree. (Nodes that do not have any children)</returns>
+        public IEnumerable<GroundNode> GetLeaves()
         {
            return TraverseTree(Root);
         }
 
         /// <summary>
-        /// Walk through the tree in a recursive manner and return only those leafs that are in the camera's view frustum.
+        /// Walk through the tree in a recursive manner and return only those leaves that are in the camera's view frustum.
         /// </summary>
         /// <param name="camera"></param>
-        /// <returns>The leafs that are visible by the camera</returns>
-        public IEnumerable<GroundNode> GetLeafsInFrustum(ICamera camera)
+        /// <returns>The leaves that are visible by the camera</returns>
+        public IEnumerable<GroundNode> GetLeavesInFrustum(ICamera camera)
         {
             return TraverseTree(Root, node => camera.IsInViewFrustum(node.BoundingBox));
         }
