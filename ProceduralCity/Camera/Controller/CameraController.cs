@@ -52,9 +52,8 @@ using OpenTK.Mathematics;
 using ProceduralCity.Camera.Controller.Movements;
 using ProceduralCity.Config;
 
-using Serilog;
-
 using System;
+using System.Linq;
 
 namespace ProceduralCity.Camera.Controller
 {
@@ -115,7 +114,6 @@ namespace ProceduralCity.Camera.Controller
 
         public void HandleStraightMovement(StraightMovement movement, float deltaTime)
         {
-            Log.Information("Straight movement");
             if (movement.Direction == MovementDirection.A)
             {
                 _camera.MoveForward(deltaTime);
@@ -128,7 +126,6 @@ namespace ProceduralCity.Camera.Controller
 
         public void HandleRotateMovement(RotateMovement movement, float deltaTime)
         {
-            Log.Information("Rotate movement");
             if (movement.Direction == MovementDirection.A)
             {
                 _camera.StrafeLeft(deltaTime);
@@ -154,7 +151,6 @@ namespace ProceduralCity.Camera.Controller
 
         public void HandleStandMovement(StandMovement movement, float deltaTime)
         {
-            Log.Information("Stand movement");
             // Do nothing
         }
 
@@ -173,7 +169,6 @@ namespace ProceduralCity.Camera.Controller
 
         public void HandlePathMovement(PathMovement movement, float deltaTime)
         {
-            Log.Information("Path movement");
             /*
             * v1)
                -- Select a position on the root level which is not in a corneer
@@ -191,13 +186,13 @@ namespace ProceduralCity.Camera.Controller
 
             if (movement.FirstTick)
             {
-                _camera.Position = movement.StartPosition;
+                _camera.Position = movement.Path.First();
             }
 
-            _camera.LookAt(movement.EndPosition);
+            _camera.LookAt(movement.Path.Skip(1).First());
             _camera.MoveForward(deltaTime);
 
-            if ((_camera.Position - movement.EndPosition).Length < 10.0f)
+            if ((_camera.Position - movement.Path.Skip(1).First()).Length < 10.0f)
             {
                 TeleportToNewPosition();
                 // TODO: start moving to the next position

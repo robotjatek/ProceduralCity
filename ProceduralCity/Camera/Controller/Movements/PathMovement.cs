@@ -1,12 +1,12 @@
 ﻿using OpenTK.Mathematics;
 
+using System.Collections.Generic;
+
 namespace ProceduralCity.Camera.Controller.Movements
 {
     internal class PathMovement : IMovement
     {
-        public Vector3 StartPosition { get; init; }
-
-        public Vector3 EndPosition { get; init; }
+        public IEnumerable<Vector3> Path { get; init; }
 
         public bool FirstTick { get; private set; } = true;
 

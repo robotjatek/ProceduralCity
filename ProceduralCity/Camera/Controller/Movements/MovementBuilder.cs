@@ -98,7 +98,6 @@ namespace ProceduralCity.Camera.Controller.Movements
                     // Build a path with the start and the selected neighbour
                     // -----------------------------------------------
 
-                    // TODO: camera errors in some movement cases
                     // TODO: repeat steps to create a path
                     // TODO: in the future: Create bezier curve with the path
 
@@ -108,8 +107,7 @@ namespace ProceduralCity.Camera.Controller.Movements
 
                     return new PathMovement
                     {
-                        StartPosition = startPos,
-                        EndPosition = endPos
+                        Path = new[] { startPos, endPos },
                     };
                 default:
                     throw new NotImplementedException($"Unknown movement type: {nameof(movementType)}");
