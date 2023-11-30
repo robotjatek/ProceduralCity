@@ -61,7 +61,15 @@ namespace ProceduralCity.Camera.Controller.Movements
                         };
                     }
                 case MovementType.PATH:
-                    var levelChilds = buildParams.World.BspTree.Root.Children;
+                    // TODO: this is a dummy implementation. Replace this with a real one
+
+                    // This dummy implementation does the following:
+                    // Select a random waypoint on the current level
+                    // Get all neighbouring waypoints for the selected position
+                    // Select a neigbouring waypoint
+                    // Build a path with the start and the selected neighbour
+
+                    var levelChilds = buildParams.World.GroundNodeTree.Root.Children;
                     var allPossibleWaypointsOnTheCurrentLevel = levelChilds.SelectMany(r => new[]
                     {
                         r.TopLeftCorner,
@@ -69,11 +77,14 @@ namespace ProceduralCity.Camera.Controller.Movements
                         r.BottomLeftCorner,
                         r.BottomRightCorner
                     })
-                        .Where(n => NotOnWorldCorners(buildParams.World.BspTree.Root, n)) // Exclude the world corners (0,0), (0,MAX_Y), (MAX_X,0), (MAX_X, MAX_Y)
+                        .Where(n => NotOnWorldCorners(buildParams.World.GroundNodeTree.Root, n)) // Exclude the world corners (0,0), (0,MAX_Y), (MAX_X,0), (MAX_X, MAX_Y)
                         .Distinct();
 
                     var randomWaypoint = allPossibleWaypointsOnTheCurrentLevel.ElementAt(_random.Next(allPossibleWaypointsOnTheCurrentLevel.Count()));
-                    var nodes = buildParams.World.BspTree.Root.NodesOnPoint(randomWaypoint);
+                    var startNode = buildParams.World.GroundNodeTree.Root.NodesOnPoint(randomWaypoint).FirstOrDefault();
+
+
+                    var nodes = buildParams.World.GroundNodeTree.Root.NodesOnPoint(randomWaypoint);
                     var nextPossibleWaypoints  = nodes.SelectMany(n => (new[]
                     {
                         n.TopLeftCorner,
@@ -83,13 +94,13 @@ namespace ProceduralCity.Camera.Controller.Movements
                     })).Except(new[] { randomWaypoint })
                     .Where(n => // Only differ in EXACTLY one coordinate (either X or Y) essentially giving back a neighbour AND not on world corners
                     {
-                        return DiffersInOneAxisOnly(n, randomWaypoint) && NotOnWorldCorners(buildParams.World.BspTree.Root, n);
+                        return DiffersInOneAxisOnly(n, randomWaypoint) && NotOnWorldCorners(buildParams.World.GroundNodeTree.Root, n);
 
                     })
                     .Distinct();
                     var randomNextWaypoint = nextPossibleWaypoints.ElementAt(_random.Next(nextPossibleWaypoints.Count()));
 
-                    var nn = buildParams.World.BspTree.Root.NodesOnPoint(randomNextWaypoint).ToArray();
+                    var nn = buildParams.World.GroundNodeTree.Root.NodesOnPoint(randomNextWaypoint).ToArray();
 
                     // Partially completed:
                     // select 1 random out of the 9 possible
