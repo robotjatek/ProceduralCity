@@ -25,7 +25,7 @@ namespace ProceduralCity.Camera.Controller.Movements
             var enumValues = Enum.GetValues(typeof(MovementType));
             var movementType = (MovementType)enumValues.GetValue(_random.Next(enumValues.Length));
             var distanceToCityCenter = (buildParams.CityCenterPosition - buildParams.CameraPosition).Length;
-            
+
             switch (MovementType.PATH)
             {
                 case MovementType.STRAIGHT:
@@ -85,7 +85,7 @@ namespace ProceduralCity.Camera.Controller.Movements
 
 
                     var nodes = buildParams.World.GroundNodeTree.Root.NodesOnPoint(randomWaypoint);
-                    var nextPossibleWaypoints  = nodes.SelectMany(n => (new[]
+                    var nextPossibleWaypoints = nodes.SelectMany(n => (new[]
                     {
                         n.TopLeftCorner,
                         n.TopRightCorner,
@@ -142,7 +142,7 @@ namespace ProceduralCity.Camera.Controller.Movements
             return !((n.X == 0 && n.Y == 0) ||
                 (n.X == rootNode.EndPosition.X && n.Y == rootNode.EndPosition.Y) ||
                 (n.X == rootNode.EndPosition.X && n.Y == 0) ||
-                (n.X == 0 && n.Y == rootNode.EndPosition.Y)                );
+                (n.X == 0 && n.Y == rootNode.EndPosition.Y));
         }
     }
 }
