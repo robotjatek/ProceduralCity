@@ -81,8 +81,6 @@ namespace ProceduralCity.Camera.Controller.Movements
                         .Distinct();
 
                     var randomWaypoint = allPossibleWaypointsOnTheCurrentLevel.ElementAt(_random.Next(allPossibleWaypointsOnTheCurrentLevel.Count()));
-                    var startNode = buildParams.World.GroundNodeTree.Root.NodesOnPoint(randomWaypoint).FirstOrDefault();
-
 
                     var nodes = buildParams.World.GroundNodeTree.Root.NodesOnPoint(randomWaypoint);
                     var nextPossibleWaypoints = nodes.SelectMany(n => (new[]
@@ -110,6 +108,7 @@ namespace ProceduralCity.Camera.Controller.Movements
                     // -----------------------------------------------
 
                     // TODO: repeat steps to create a path
+                    // TODO: consider all leafs of the tree when creating a path
                     // TODO: in the future: Create bezier curve with the path
 
 
