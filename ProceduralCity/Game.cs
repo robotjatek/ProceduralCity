@@ -29,7 +29,6 @@ namespace ProceduralCity
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
-    //TODO: Do not animate hidden traffic lights
     //TODO: Do not render hidden traffic lights
     //TODO: Building LOD levels
 
@@ -174,7 +173,7 @@ namespace ProceduralCity
                 .Where(traffic => _camera.IsInViewFrustum(traffic.Position))
                 .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is further than 700f
                 .ToImmutableArray();
-            // TODO: Select only those that are not occluded by other geometry
+
             Parallel.ForEach(culledTrafficInstanes, t => t.Move((float)e.Time)); // Only animate visible traffic
         }
 
