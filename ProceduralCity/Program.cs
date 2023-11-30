@@ -33,7 +33,7 @@ namespace ProceduralCity
             builder.Register(c => appConfig).As<IAppConfig>().SingleInstance();
             builder.Register(c => context).As<OpenGlContext>().SingleInstance();
             builder.RegisterType<Game>().As<IGame>().OnRelease(game => game.Dispose()).InstancePerLifetimeScope();
-            builder.Register(c => new Camera.Camera(new Vector3(-1, 120, -1), 135, 0)).As<ICamera>().SingleInstance();
+            builder.Register(c => new Camera.Camera(new Vector3(-1, 120, -1), 45, 0)).As<ICamera>().SingleInstance();
             builder.RegisterType<CameraController>().SingleInstance();
             builder.RegisterType<GroundGenerator>().As<IGroundGenerator>().SingleInstance();
             builder.RegisterType<BuildingGenerator>().As<IBuildingGenerator>().SingleInstance();
@@ -42,6 +42,7 @@ namespace ProceduralCity
             builder.RegisterType<ProceduralSkybox>().As<ISkybox>().SingleInstance();
             builder.RegisterType<BillboardTextureGenerator>().As<IBillboardTextureGenerator>().SingleInstance();
             builder.RegisterType<BillboardBuilder>().As<IBillboardBuilder>().SingleInstance();
+            builder.RegisterType<ColorGenerator>().SingleInstance();
 
             return builder.Build();
         }
@@ -49,7 +50,7 @@ namespace ProceduralCity
         private static Serilog.Core.Logger CreateLogger()
         {
             var logger = new LoggerConfiguration()
-                            .WriteTo.Async(writeTo => writeTo.Console())
+                            .WriteTo.Console()
                             .MinimumLevel.Verbose()
                             .Enrich.FromLogContext()
                             .CreateLogger();

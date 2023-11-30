@@ -5,6 +5,7 @@ using OpenTK.Mathematics;
 using ProceduralCity.Config;
 using ProceduralCity.GameObjects;
 using ProceduralCity.Renderer;
+using ProceduralCity.Renderer.Uniform;
 using ProceduralCity.Utils;
 
 namespace ProceduralCity.Generators
@@ -15,11 +16,20 @@ namespace ProceduralCity.Generators
         private readonly Random _random = new();
         private readonly Texture[] _billboardTextures;
         private readonly IAppConfig _config;
-        private readonly Shader _shader = new("vs.vert", "fs.frag");
+        private readonly Shader _shader = new("vs.vert", new[] { "billboard.frag", "colorTools.frag" });
+        private readonly ColorGenerator _colorGenerator;
 
-        public BillboardBuilder(IAppConfig config, IBillboardTextureGenerator billboardTextureGenerator)
+        public BillboardBuilder(IAppConfig config, IBillboardTextureGenerator billboardTextureGenerator, ColorGenerator colorGenerator)
         {
             _config = config;
+
+            _colorGenerator = colorGenerator;
+            _colorGenerator.OnColorChanged += () =>
+            {
+                SetBillboardColor(CreateBillboardColor());
+            };
+            SetBillboardColor(CreateBillboardColor());
+
             _billboardTextures = new Texture[_config.BillboardTextureNumber];
             _billboardTextures = Enumerable.Range(0, _config.BillboardTextureNumber)
                 .Select(n => new Texture(_config.BillboardTextureWidth, _config.BillboardTextureHeight)).ToArray();
@@ -113,6 +123,22 @@ namespace ProceduralCity.Generators
         public bool HasBillboards()
         {
             return _billboardTextures.Length > 0;
+        }
+
+        private Vector4 CreateBillboardColor()
+        {
+            var billboardColorHsv = Color4.ToHsv(_colorGenerator.Mixed);
+            billboardColorHsv.Y = 0.2f; // Saturation
+            billboardColorHsv.Z = 0.85f; // Light
+            return billboardColorHsv;
+        }
+
+        private void SetBillboardColor(Vector4 billboardColorHsv)
+        {
+            _shader.SetUniformValue("billboardColor", new Vector3Uniform
+            {
+                Value = billboardColorHsv.Xyz
+            });
         }
     }
 }

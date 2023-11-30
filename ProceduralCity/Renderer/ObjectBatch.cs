@@ -8,14 +8,14 @@ using ProceduralCity.Renderer.Uniform;
 
 namespace ProceduralCity.Renderer
 {
-    class ObjectBatch : IBatch, IDisposable
+    public class ObjectBatch : IBatch, IDisposable
     {
         private bool disposedValue = false;
 
         private readonly Shader _shader;
         private readonly IEnumerable<ITexture> _textures;
-        private readonly List<Vector3> _vertices = new();
-        private readonly List<Vector2> _UVs = new();
+        private readonly List<Vector3> _vertices = [];
+        private readonly List<Vector2> _UVs = [];
 
         private Vector3[] Vertices { get; set; }
         private Vector2[] UVs { get; set; }
@@ -72,9 +72,9 @@ namespace ProceduralCity.Renderer
             var vertexLayoutId = 0;
             var uvLayoutId = 2;
 
-            Vertices = _vertices.ToArray();
+            Vertices = [.. _vertices];
             _vertices.Clear();
-            UVs = _UVs.ToArray();
+            UVs = [.. _UVs];
             _UVs.Clear();
 
             _vaoId = GL.GenVertexArray();

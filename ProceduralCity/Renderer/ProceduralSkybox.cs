@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using OpenTK.Mathematics;
 
+using ProceduralCity.Generators;
 using ProceduralCity.Renderer.Uniform;
 using Serilog;
 
@@ -12,19 +14,9 @@ namespace ProceduralCity.Renderer
     {
         private readonly ILogger _logger;
         private readonly Random _random = new();
-        private readonly List<Mesh> _meshes = new();
+        private readonly List<Mesh> _meshes = [];
         private readonly Shader _shader;
-        private readonly Vector3[] _cloudColors = new[]
-        {
-            new Vector3(0, 1.0f, 0), //green
-            new Vector3(0, 0, 1.0f), //blue
-            new Vector3(1, 0, 0), //red
-            new Vector3(0.59f, 0.29f, 0), //brown
-            new Vector3(1.0f, 0.50f, 0), //orange
-            new Vector3(0.6f, 0, 0.6f), //purple
-            new Vector3(1.0f, 1.0f, 0.1f), //yellow
-            new Vector3(1.0f, 0.2f, 0.33f), //"radical red"
-        };
+        private readonly ColorGenerator _colorGenerator;
 
         public IEnumerable<Mesh> Meshes
         {
@@ -34,10 +26,12 @@ namespace ProceduralCity.Renderer
             }
         }
 
-        public ProceduralSkybox(ILogger logger)
+        public ProceduralSkybox(ILogger logger, ColorGenerator colorGenerator)
         {
             _logger = logger;
             _shader = new Shader("skybox/skybox.vert", "skybox/proceduralSkybox.frag");
+            _colorGenerator = colorGenerator;
+
             GenerateSky();
 
             var vertices = CreateVertices();
@@ -53,11 +47,15 @@ namespace ProceduralCity.Renderer
 
         private void GenerateSky()
         {
-            var (color1, color2) = GenerateCloudColors();
-            var skyColor = Vector3.Clamp(MixCloudColors(color1, color2), new Vector3(0), new Vector3(1));
-            SetSkyColor(skyColor, skyColor * 0.15f);
+            var (color1, color2) = (_colorGenerator.Primary, _colorGenerator.Secondary);
+            SetCloudColors(color1, color2);
+
+            // This is the gradient color of the sky, without the clouds
+            var skyColor = new Vector3(_colorGenerator.Mixed.R, _colorGenerator.Mixed.G, _colorGenerator.Mixed.B);
+            SetSkyTransientColor(skyColor, skyColor * 0.15f);
+
             SetCloudCutoffValue();
-            SetSeeds();
+            SetSeeds(); // Sets the seeds for the value noise algorithm
         }
 
         private void SetSeeds()
@@ -89,12 +87,7 @@ namespace ProceduralCity.Renderer
             });
         }
 
-        private static Vector3 MixCloudColors(Vector3 color1, Vector3 color2)
-        {
-            return (color1 + color2) * 0.3f;
-        }
-
-        private void SetSkyColor(Vector3 bottomColor, Vector3 topColor)
+        private void SetSkyTransientColor(Vector3 bottomColor, Vector3 topColor)
         {
             _shader.SetUniformValue("u_sky_bottom_color", new Vector3Uniform
             {
@@ -119,25 +112,22 @@ namespace ProceduralCity.Renderer
             _logger.Information("Cloud cutoff value set to: {cutoff}", cutoff);
         }
 
-        private (Vector3 color1, Vector3 color2) GenerateCloudColors()
+        private void SetCloudColors(Color4 color1, Color4 color2)
         {
-            var cloudColor1 = _cloudColors[_random.Next(0, _cloudColors.Length)];
             _shader.SetUniformValue("u_cloud_color_1", new Vector3Uniform
             {
-                Value = cloudColor1
+                Value = new Vector3(color1.R, color1.G, color1.B)
             });
 
-            var cloudColor2 = _cloudColors[_random.Next(0, _cloudColors.Length)];
             _shader.SetUniformValue("u_cloud_color_2", new Vector3Uniform
             {
-                Value = cloudColor2
+                Value = new Vector3(color2.R, color2.G, color2.B)
             });
 
-            _logger.Information("Generated cloud colors: {cloudColor1}, {cloudColor2}", cloudColor1, cloudColor2);
-            return (cloudColor1, cloudColor2);
+            _logger.Information("Cloud colors set to: {cloudColor1}, {cloudColor2}", color1, color2);
         }
 
-        private static IEnumerable<Vector3> CreateVertices()
+        private static ReadOnlyCollection<Vector3> CreateVertices()
         {
             return new[]
             {
@@ -182,7 +172,7 @@ namespace ProceduralCity.Renderer
                 new Vector3(1.0f, -1.0f, -1.0f),
                 new Vector3(-1.0f, -1.0f,  1.0f),
                 new Vector3(1.0f, -1.0f,  1.0f)
-            };
+            }.AsReadOnly();
         }
 
         private bool disposedValue = false;

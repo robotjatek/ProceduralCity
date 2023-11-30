@@ -9,7 +9,7 @@ namespace ProceduralCity.GameObjects
 {
     class Character : IRenderable
     {
-        private readonly List<Mesh> _meshes = new();
+        private readonly List<Mesh> _meshes = [];
         private readonly ITexture _texture;
         private readonly Shader _shader;
 
@@ -43,11 +43,11 @@ namespace ProceduralCity.GameObjects
             var topY = bottomY - height;
             var left = originPosition.X - originX;
 
-            var vertices = PrimitiveUtils.CreateSpriteVertices(new Vector2(left, topY), width, height);
+            var vertices = PrimitiveUtils.CreateCharacterVertices(new Vector2(left, topY), width, height);
 
             var s = (float)charConfig.X / texture.Width;
             var t = (float)charConfig.Y / texture.Height;
-            var uvs = PrimitiveUtils.CreateSpriteUVs(new Vector2(s, t), (float)charConfig.Width / texture.Width, (float)charConfig.Height / texture.Height);
+            var uvs = PrimitiveUtils.CreateCharacterUVs(new Vector2(s, t), (float)charConfig.Width / texture.Width, (float)charConfig.Height / texture.Height);
 
             _meshes.Add(new Mesh(vertices, uvs, new[] { _texture }, _shader));
         }

@@ -4,7 +4,7 @@ using OpenTK.Mathematics;
 
 namespace ProceduralCity.GameObjects
 {
-    class Waypoint
+    public class Waypoint
     {
         public Vector3 Position
         {

@@ -9,8 +9,8 @@ namespace ProceduralCity.Renderer
 {
     class Skybox : ISkybox, IRenderable, IDisposable
     {
-        private readonly List<Mesh> _meshes = new();
-        private readonly ITexture _texture;
+        private readonly List<Mesh> _meshes = [];
+        private readonly CubemapTexture _texture;
         private readonly Shader _shader;
 
         public IEnumerable<Mesh> Meshes
@@ -33,7 +33,7 @@ namespace ProceduralCity.Renderer
                 "skybox/hq/front.jpg",
             };
 
-            _texture = new CubemapTexture(filenames.ToList());
+            _texture = new CubemapTexture([.. filenames]);
             _shader = new Shader("skybox/skybox.vert", "skybox/skybox.frag");
             _shader.SetUniformValue("skybox", new IntUniform
             {
@@ -46,10 +46,10 @@ namespace ProceduralCity.Renderer
             _meshes.Add(new Mesh(vertices, uvs, new[] { _texture }, _shader));
         }
 
-        private static IEnumerable<Vector3> CreateVertices()
+        private static Vector3[] CreateVertices()
         {
-            return new[]
-            {
+            return
+            [
                 new Vector3(-1.0f,  1.0f, -1.0f),
                 new Vector3(-1.0f, -1.0f, -1.0f),
                 new Vector3(1.0f, -1.0f, -1.0f),
@@ -91,7 +91,7 @@ namespace ProceduralCity.Renderer
                 new Vector3(1.0f, -1.0f, -1.0f),
                 new Vector3(-1.0f, -1.0f,  1.0f),
                 new Vector3(1.0f, -1.0f,  1.0f)
-            };
+            ];
         }
 
         private bool disposedValue = false;

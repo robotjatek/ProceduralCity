@@ -10,6 +10,6 @@ namespace ProceduralCity
     {
         IEnumerable<IRenderable> Renderables { get; }
         IEnumerable<TrafficLight> Traffic { get; }
-        BspTree SitesBsp {  get; }
+        GroundNodeTree BspTree { get; }
     }
 }

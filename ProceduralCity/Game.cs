@@ -6,6 +6,7 @@ using ProceduralCity.Camera;
 using ProceduralCity.Camera.Controller;
 using ProceduralCity.Config;
 using ProceduralCity.GameObjects;
+using ProceduralCity.Generators;
 using ProceduralCity.Renderer;
 using ProceduralCity.Renderer.PostProcess;
 using ProceduralCity.Renderer.Uniform;
@@ -16,29 +17,29 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Immutable;
 
 namespace ProceduralCity
 {
-    //TODO: fix billboard texture coordinates
-    //TODO: textures on buildings seem to be upside down
+    // High priority tasks
     //TODO: document how to show text on screen. This was working before look it up in the git history
     //TODO: show fps counter on screen instead of the titlebar
     //TODO: dynamic text rendering
-    //TODO: fog
-    //TODO: Global HUE for the world affecting sky/building/window/fog colors
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
-    //TODO: Do not animate hidden traffic lights
     //TODO: Do not render hidden traffic lights
     //TODO: Building LOD levels
+
+    // Low priority tasks
     //TODO: Render skybox into texture when generating the world, to reduce GPU usage
     //TODO: Add the ability to render post process effects in a lower resolution
     //TODO: Generators should not own any texture or shader references, these should be asked from a resource manager class
     //TODO: dispose all generators after the generation has been completed
     //TODO: Incorporate shared logic between InstancedBatch and ObjectBatch into a shared class
     //TODO: Mipmaping modes for generated textures (created with new Texture(w,h))
-    //TODO: add decal rendering (stencil buffer?) [streetlights, billboards]
+    //TODO: add decal rendering (stencil buffer?) [streetlights, billboards] (polygonOffset opengl?)
     //TODO: add state change capability to the renderer
     class Game : IGame, IDisposable
     {
@@ -54,6 +55,7 @@ namespace ProceduralCity
         private readonly ICamera _camera;
         private readonly CameraController _cameraController;
         private readonly IWorld _world;
+        private readonly ColorGenerator _colorGenerator;
 
         private readonly OpenGlContext _context;
         private readonly BackBufferRenderer _worldRenderer;
@@ -79,11 +81,12 @@ namespace ProceduralCity
             IRenderer renderer,
             IRenderer ndcRenderer,
             IRenderer skyboxRenderer,
-            ISkybox skybox)
+            ISkybox skybox,
+            ColorGenerator colorGenerator)
         {
             _camera = camera;
             _cameraController = cameraController;
-            _cameraController.SetFadeout = this.SetFadeout;
+            _cameraController.SetFadeout = SetFadeout;
             _logger = logger;
             _config = config;
 
@@ -92,6 +95,7 @@ namespace ProceduralCity
 
             _skybox = skybox;
             _world = world;
+            _colorGenerator = colorGenerator;
 
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
@@ -116,7 +120,7 @@ namespace ProceduralCity
             _skyboxRenderer.AddToScene(skybox);
 
             _traffic = _world.Traffic;
-            _renderer.AddToScene(_traffic);
+            _renderer.AddToScene(_traffic); // TODO: rendering traffic should be dynamic, based on the camera frustum
             _renderer.AddToScene(_world.Renderables);
 
             _backbufferTexture = new Texture(_config.ResolutionWidth, config.ResolutionHeight);
@@ -130,7 +134,7 @@ namespace ProceduralCity
             _postprocessTexture = new Texture(_config.ResolutionWidth, _config.ResolutionHeight);
             _postprocessPipeline = new PostprocessPipeline(_logger, _config, _worldRenderer.Texture, _postprocessTexture);
 
-            _fullscreenShader = new Shader("vs.vert", "fs.frag");
+            _fullscreenShader = new Shader("vs.vert", "fullscreen.frag");
             _fullscreenShader.SetUniformValue("tex", new IntUniform
             {
                 Value = 0
@@ -159,9 +163,18 @@ namespace ProceduralCity
         {
             var keyboardState = _context.KeyboardState;
             HandleCameraInput(e, keyboardState);
-
             _cameraController.Update((float)e.Time);
-            Parallel.ForEach(_traffic, t => t.Move((float)e.Time)); // TODO: only animate visible traffic
+
+            var sites = _world.BspTree.GetLeavesInFrustum(_camera).ToImmutableArray();
+
+            var culledTrafficInstanes = sites
+                .SelectMany(site => site.Traffic)
+                .AsParallel()
+                .Where(traffic => _camera.IsInViewFrustum(traffic.Position))
+                .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is further than 700f
+                .ToImmutableArray();
+
+            Parallel.ForEach(culledTrafficInstanes, t => t.Move((float)e.Time)); // Only animate visible traffic
         }
 
         private void HandleCameraInput(FrameEventArgs e, KeyboardState keyboardState)
@@ -186,11 +199,11 @@ namespace ProceduralCity
 
             if (keyboardState[Keys.Up])
             {
-                _camera.SetVertical(-1.0f, (float)e.Time);
+                _camera.SetVertical(1.0f, (float)e.Time);
             }
             else if (keyboardState[Keys.Down])
             {
-                _camera.SetVertical(1.0f, (float)e.Time);
+                _camera.SetVertical(-1.0f, (float)e.Time);
             }
 
             if (keyboardState[Keys.Left])
@@ -207,7 +220,7 @@ namespace ProceduralCity
         {
             CountFps(e);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            var viewMatrix = _camera.Use();
+            var viewMatrix = _camera.ViewMatrix;
 
             _worldRenderer.Clear();
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
@@ -235,7 +248,8 @@ namespace ProceduralCity
         {
             _logger.Information("Window resized: {x}x{y}", _context.Size.X, _context.Size.Y);
             GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
-            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.ClientRectangle.Size.X / _context.ClientRectangle.Size.Y, 1.0f, 5000.0f);
+            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.ClientRectangle.Size.X / _context.ClientRectangle.Size.Y, 1.0f, 4000.0f);
+           _camera.ProjectionMatrix = _projectionMatrix;
             _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
             _worldRenderer.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
             _postprocessPipeline.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
@@ -260,6 +274,7 @@ namespace ProceduralCity
 
             if (e.Key == Keys.G)
             {
+                _colorGenerator.GenerateColors();
                 _skybox.Update();
             }
 

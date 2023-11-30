@@ -13,7 +13,8 @@ namespace ProceduralCity.GameObjects
 {
     class Textbox : IDisposable
     {
-        private readonly List<IRenderable> _text = new();
+        internal static readonly string[] fragmentShaders = ["font.frag", "colorTools.frag"];
+        private readonly List<IRenderable> _text = [];
         private readonly Texture _fontmap;
         private readonly Shader _shader;
         private readonly FontConfig _fontConfig;
@@ -71,12 +72,13 @@ namespace ProceduralCity.GameObjects
             private set;
         }
 
+        // Fonts are generated with this tool: https://evanw.github.io/font-texture-generator/
         public Textbox(string fontName)
         {
             CursorAdvance = 0;
             _fontmap = new Texture($"{fontName}/font.png", "Fonts");
             _fontConfig = new FontConfig(fontName);
-            _shader = new Shader("vs.vert", "font.frag");
+            _shader = new Shader("vs.vert", fragmentShaders);
             _shader.SetUniformValue("tex", new IntUniform
             {
                 Value = 0

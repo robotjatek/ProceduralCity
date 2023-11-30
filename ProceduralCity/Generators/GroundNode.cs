@@ -4,63 +4,47 @@ using System.Linq;
 using OpenTK.Mathematics;
 
 using ProceduralCity.Config;
+using ProceduralCity.GameObjects;
+using ProceduralCity.Utils;
 
 namespace ProceduralCity.Generators
 {
     public class GroundNode
     {
+        private readonly BoundingBox _boundingBox;
         private readonly IAppConfig _config;
+        private readonly List<TrafficLight> _trafficLights = [];
 
-        public Vector2 StartPosition { get; private set; } // Top left
+        public BoundingBox BoundingBox => _boundingBox;
 
-        public Vector2 EndPosition { get; private set; } // Bottom right
+        public Vector2 StartPosition { get; private set; }  // Top left
+        public Vector2 EndPosition { get; private set; }  // Top left
+
+        public List<GroundNode> Children { get; private set; } = [];
+
+        public List<TrafficLight> Traffic => _trafficLights;
 
         /// <summary>
         /// Alias for StartPosition
         /// </summary>
-        public Vector2 TopLeftCorner
-        {
-            get
-            {
-                return StartPosition;
-            }
-        }
-
+        public Vector2 TopLeftCorner => StartPosition;
 
         /// <summary>
         /// Alias for EndPosition
         /// </summary>
-        public Vector2 BottomRightCorner
-        {
-            get
-            {
-                return EndPosition;
-            }
-        }
+        public Vector2 BottomRightCorner => EndPosition;
 
-        public Vector2 TopRightCorner
-        {
-            get
-            {
-                return new Vector2(EndPosition.X, StartPosition.Y);
-            }
-        }
+        public Vector2 TopRightCorner => new(EndPosition.X, StartPosition.Y);
 
-        public Vector2 BottomLeftCorner
-        {
-            get
-            {
-                return new Vector2(StartPosition.X, EndPosition.Y);
-            }
-        }
-
-        public List<GroundNode> Children { get; private set; } = new List<GroundNode>();
+        public Vector2 BottomLeftCorner => new(StartPosition.X, EndPosition.Y);
 
         public GroundNode(Vector2 startPosition, Vector2 endPosition, IAppConfig config)
         {
             StartPosition = startPosition;
             EndPosition = endPosition;
             _config = config;
+
+            _boundingBox = new BoundingBox(TopLeftCorner, TopRightCorner, BottomLeftCorner, BottomRightCorner, config.MaxBuildingHeight);
         }
 
         public IEnumerable<GroundNode> Split(Random random)
@@ -78,11 +62,10 @@ namespace ProceduralCity.Generators
             var splitPoint = new Vector2(StartPosition.X + verticalSplit, StartPosition.Y + horizontalSplit);
 
             /*
-             * 0 | 1
-             * -----
-             * 2 | 3
-             */
-
+            * 0 | 1
+            * -----
+            * 2 | 3
+            */
             var children = new[]
             {
                     new GroundNode(StartPosition, splitPoint, _config),
@@ -107,6 +90,11 @@ namespace ProceduralCity.Generators
         public float HorizontalLength()
         {
             return EndPosition.Y - StartPosition.Y;
+        }
+
+        public void AddTrafficLights(IEnumerable<TrafficLight> lights)
+        {
+            _trafficLights.AddRange(lights);
         }
 
         /// <summary>

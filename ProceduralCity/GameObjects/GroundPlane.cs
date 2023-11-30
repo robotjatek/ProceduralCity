@@ -9,7 +9,7 @@ namespace ProceduralCity.GameObjects
 {
     class GroundPlane : IRenderable
     {
-        private readonly List<Mesh> _meshes = new();
+        private readonly List<Mesh> _meshes = [];
 
         public IEnumerable<Mesh> Meshes
         {

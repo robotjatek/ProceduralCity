@@ -3,7 +3,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace ProceduralCity.Renderer
 {
-    interface ITexture : IDisposable
+    public interface ITexture : IDisposable
     {
         int Id { get; }
 

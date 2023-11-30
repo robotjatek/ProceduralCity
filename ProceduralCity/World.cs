@@ -10,25 +10,16 @@ namespace ProceduralCity
 {
     class World : IDisposable, IWorld
     {
-        private readonly List<IRenderable> _renderables = new();
-        private readonly List<TrafficLight> _trafficLights = new();
+        private readonly List<IRenderable> _renderables = [];
+        private readonly List<TrafficLight> _trafficLights = [];
         private readonly IGroundGenerator _groundGenerator;
         private readonly IBuildingGenerator _buildingGenerator;
         private readonly ILogger _logger;
-        private readonly BspTree _bspTree;
+        private readonly GroundNodeTree _groundNodeTree;
 
-        public IEnumerable<TrafficLight> Traffic
-        {
-            get
-            {
-                return _trafficLights;
-            }
-        }
+        public GroundNodeTree BspTree => _groundNodeTree;
 
-        public BspTree SitesBsp
-        {
-            get { return _bspTree; }
-        }
+        public IEnumerable<TrafficLight> Traffic => _trafficLights;
 
         public World(IGroundGenerator groundGenerator, IBuildingGenerator buildingGenerator, ILogger logger)
         {
@@ -36,19 +27,19 @@ namespace ProceduralCity
             _groundGenerator = groundGenerator;
             _buildingGenerator = buildingGenerator;
 
-            _bspTree = _groundGenerator.GenerateSites();
-            var siteLeafs = _bspTree.GetLeaves();
-            _logger.Information("Number of sites: {siteCount}", siteLeafs.Count());
+            _groundNodeTree = _groundGenerator.GenerateSites();
+            var sites = _groundNodeTree.GetLeaves();
+            _logger.Information("Number of sites: {siteCount}", sites.Count());
             var groundPlane = _groundGenerator.CreateGroundPlane();
             _renderables.Add(groundPlane);
-            var streetLights = _groundGenerator.CreateStreetLights(siteLeafs);
+            var streetLights = _groundGenerator.CreateStreetLights(sites);
             _renderables.AddRange(streetLights);
 
-            var trafficLights = _groundGenerator.CreateTrafficLights(siteLeafs);
+            var trafficLights = _groundGenerator.CreateTrafficLights(sites);
             _trafficLights.AddRange(trafficLights);
             _logger.Information("Number of traffic lights: {trafficLightCount}", trafficLights.Count());
 
-            var buildings = _buildingGenerator.GenerateBuildings(siteLeafs);
+            var buildings = _buildingGenerator.GenerateBuildings(sites);
             _renderables.AddRange(buildings);
         }
 

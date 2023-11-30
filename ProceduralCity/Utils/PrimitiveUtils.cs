@@ -1,33 +1,51 @@
 ﻿using System.Collections.Generic;
+
 using OpenTK.Mathematics;
 
 namespace ProceduralCity.Utils
 {
     static class PrimitiveUtils
     {
-        public static IEnumerable<Vector3> CreateSpriteVertices(Vector2 position, float width, float height)
+        /// <summary>
+        /// Creates vertices for charaters in a textbox.
+        /// Usually should be used in conjuction with CreateCharacterUVs
+        /// </summary>
+        /// <param name="position">The position of the character in the framebuffer</param>
+        /// <param name="width">Width of the character in pixels.</param>
+        /// <param name="height">Height of the character in pixels.</param>
+        /// <returns>An enumerable of vertices used in character rendering.</returns>
+        public static IEnumerable<Vector3> CreateCharacterVertices(Vector2 position, float width, float height)
         {
             return new[]
             {
-                new Vector3(position.X, position.Y, 0.0f),
-                new Vector3(position.X + width, position.Y, 0.0f),
-                new Vector3(position.X, position.Y + height, 0.0f),
-                new Vector3(position.X, position.Y + height, 0.0f),
-                new Vector3(position.X + width, position.Y, 0.0f),
-                new Vector3(position.X + width, position.Y + height, 0.0f)
+                new Vector3(position.X, position.Y, 0),
+                new Vector3(position.X, position.Y + height, 0),
+                new Vector3(position.X + width, position.Y, 0),
+                new Vector3(position.X + width, position.Y, 0),
+                new Vector3(position.X, position.Y + height, 0),
+                new Vector3(position.X + width, position.Y + height, 0),
             };
         }
 
-        public static IEnumerable<Vector2> CreateSpriteUVs(Vector2 position, float width, float height)
+        /// <summary>
+        /// Creates UV coordinates for 2D sprites used in text rendering.
+        /// Should be used in conjunction with CreateSpriteVertices.
+        /// </summary>
+        /// <param name="position">The top left corner of the character in the bitmap.</param>
+        /// <param name="width">The width of the character (related to the texture width)</param>
+        /// <param name="height">The height of the character (related to the texture height)</param>
+        /// <returns>An enumerable of the UV coordintes.</returns>
+        public static IEnumerable<Vector2> CreateCharacterUVs(Vector2 position, float width, float height)
         {
+            // Coordinates are flipped on the Y axis
             return new[]
             {
-                new Vector2(position.X, position.Y),
-                new Vector2(position.X + width, position.Y),
-                new Vector2(position.X, position.Y + height),
-                new Vector2(position.X, position.Y + height),
-                new Vector2(position.X + width, position.Y),
-                new Vector2(position.X + width, position.Y + height),
+                new Vector2(position.X, 1.0f - position.Y),
+                new Vector2(position.X, 1.0f - (position.Y + height)),
+                new Vector2(position.X + width, 1.0f - position.Y),
+                new Vector2(position.X + width, 1.0f - position.Y),
+                new Vector2(position.X, 1.0f - (position.Y + height)),
+                new Vector2(position.X + width, 1.0f -(position.Y + height)),
             };
         }
 
