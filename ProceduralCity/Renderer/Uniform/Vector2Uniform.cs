@@ -2,7 +2,7 @@
 
 namespace ProceduralCity.Renderer.Uniform
 {
-    readonly struct Vector2Uniform : IUniformValue
+    public readonly struct Vector2Uniform : IUniformValue
     {
         public Vector2 Value
         {

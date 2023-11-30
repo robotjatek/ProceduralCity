@@ -1,5 +1,7 @@
 ﻿using OpenTK.Mathematics;
 
+using ProceduralCity.Utils;
+
 namespace ProceduralCity.Camera
 {
     public interface ICamera
@@ -33,12 +35,22 @@ namespace ProceduralCity.Camera
         /// <param name="vertical">The vertical angle of the camera</param>
         void SetVerticalInstant(float vertical);
 
-        Matrix4 Use();
+        Vector3 Position { get; set; }
 
-        void SetPosition(Vector3 position);
 
-        Vector3 GetPosition();
+        bool IsInViewFrustum(Vector3 point);
 
-        void LookAt(Vector3 position);
+        bool IsInViewFrustum(BoundingBox box);
+
+        bool IsInViewFrustum(BoundingSphere sphere);
+
+        public Matrix4 ProjectionMatrix
+        {
+            get; set;
+        }
+
+        public Matrix4 ViewMatrix { get; }
+        
+        void LookAt(Vector3 target);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ProceduralCity.GameObjects;
+using ProceduralCity.Generators;
 using ProceduralCity.Renderer;
 
 namespace ProceduralCity
@@ -9,5 +10,6 @@ namespace ProceduralCity
     {
         IEnumerable<IRenderable> Renderables { get; }
         IEnumerable<TrafficLight> Traffic { get; }
+        GroundNodeTree BspTree { get; }
     }
 }

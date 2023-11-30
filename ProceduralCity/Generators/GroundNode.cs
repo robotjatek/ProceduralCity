@@ -4,23 +4,54 @@ using System.Linq;
 using OpenTK.Mathematics;
 
 using ProceduralCity.Config;
+using ProceduralCity.GameObjects;
+using ProceduralCity.Utils;
 
 namespace ProceduralCity.Generators
 {
-    public class GroundNode(Vector2 startPosition, Vector2 endPosition, IAppConfig config)
+    public class GroundNode
     {
-        private readonly IAppConfig _config = config;
+        private readonly BoundingBox _boundingBox;
+        private readonly IAppConfig _config;
+        private readonly List<TrafficLight> _trafficLights = [];
 
-        public Vector2 StartPosition { get; private set; } = startPosition;
+        public BoundingBox BoundingBox => _boundingBox;
 
-        public Vector2 EndPosition { get; private set; } = endPosition;
+        public Vector2 StartPosition { get; private set; }  // Top left
+
+        public Vector2 EndPosition { get; private set; } // Bottom right
 
         public List<GroundNode> Children { get; private set; } = [];
 
+        public List<TrafficLight> Traffic => _trafficLights;
+
+        /// <summary>
+        /// Alias for StartPosition
+        /// </summary>
+        public Vector2 TopLeftCorner => StartPosition;
+
+        /// <summary>
+        /// Alias for EndPosition
+        /// </summary>
+        public Vector2 BottomRightCorner => EndPosition;
+
+        public Vector2 TopRightCorner => new(EndPosition.X, StartPosition.Y);
+
+        public Vector2 BottomLeftCorner => new(StartPosition.X, EndPosition.Y);
+
+        public GroundNode(Vector2 startPosition, Vector2 endPosition, IAppConfig config)
+        {
+            StartPosition = startPosition;
+            EndPosition = endPosition;
+            _config = config;
+
+            _boundingBox = new BoundingBox(TopLeftCorner, TopRightCorner, BottomLeftCorner, BottomRightCorner, config.MaxBuildingHeight);
+        }
+
         public IEnumerable<GroundNode> Split(Random random)
         {
-            var verticalLength = (int)VerticalLenght();
-            var horizontalLength = (int)HorizontalLenght();
+            var verticalLength = (int)VerticalLength();
+            var horizontalLength = (int)HorizontalLength();
 
             var verticalSliceLength = verticalLength / 3;
             var horizontalSliceLength = horizontalLength / 3;
@@ -31,6 +62,11 @@ namespace ProceduralCity.Generators
 
             var splitPoint = new Vector2(StartPosition.X + verticalSplit, StartPosition.Y + horizontalSplit);
 
+            /*
+            * 0 | 1
+            * -----
+            * 2 | 3
+            */
             var children = new[]
             {
                     new GroundNode(StartPosition, splitPoint, _config),
@@ -39,7 +75,7 @@ namespace ProceduralCity.Generators
                     new GroundNode(splitPoint, EndPosition, _config)
             };
 
-            if (children.All(n => n.VerticalLenght() > _config.MinVerticalBlockLength && n.HorizontalLenght() > _config.MinHorizontalBlockLength))
+            if (children.All(n => n.VerticalLength() > _config.MinVerticalBlockLength && n.HorizontalLength() > _config.MinHorizontalBlockLength))
             {
                 Children.AddRange(children);
             }
@@ -47,14 +83,19 @@ namespace ProceduralCity.Generators
             return Children;
         }
 
-        public float VerticalLenght()
+        public float VerticalLength()
         {
             return EndPosition.X - StartPosition.X;
         }
 
-        public float HorizontalLenght()
+        public float HorizontalLength()
         {
             return EndPosition.Y - StartPosition.Y;
+        }
+
+        public void AddTrafficLights(IEnumerable<TrafficLight> lights)
+        {
+            _trafficLights.AddRange(lights);
         }
     }
 }

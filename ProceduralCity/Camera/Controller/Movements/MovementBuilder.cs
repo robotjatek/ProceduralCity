@@ -38,7 +38,7 @@ namespace ProceduralCity.Camera.Controller.Movements
                     return new StandMovement();
                 case MovementType.PLANE:
                     {
-                        var verticalAngle = _random.Next(0, 90);
+                        var verticalAngle = _random.Next(-90, 0); // -90 straight down, 0 staight up (in deg)
                         return new PlaneMovement
                         {
                             VerticalAngle = verticalAngle,
@@ -47,7 +47,7 @@ namespace ProceduralCity.Camera.Controller.Movements
                     }
                 case MovementType.PLANE_STRAFE:
                     {
-                        var verticalAngle = _random.Next(0, 90);
+                        var verticalAngle = _random.Next(-90, 0); // -90 straight down, 0 staight up (in deg)
                         return new PlaneStrafeMovement
                         {
                             VerticalAngle = verticalAngle,

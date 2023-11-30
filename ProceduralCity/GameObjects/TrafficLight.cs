@@ -6,7 +6,7 @@ using ProceduralCity.Utils;
 
 namespace ProceduralCity.GameObjects
 {
-    class TrafficLight : IRenderable
+    public class TrafficLight : IRenderable
     {
         private readonly float _speed;
         private static readonly Vector3 UP = new(0, 1, 0);
@@ -18,10 +18,9 @@ namespace ProceduralCity.GameObjects
 
         public Matrix4 Model { get; private set; } = Matrix4.Identity;
 
-        public IEnumerable<Mesh> Meshes
-        {
-            get { return _meshes; }
-        }
+        public IEnumerable<Mesh> Meshes => _meshes;
+
+        public Vector3 Position { get { return _position; } }
 
         public TrafficLight(Vector3 position, Waypoint target, Shader headLightShader, Shader rearLightShader, float speed)
         {
@@ -33,12 +32,18 @@ namespace ProceduralCity.GameObjects
 
             CreateHeadLight();
             CreateBackLight();
+
+            Move(0); // Transform the object to its initial position
         }
 
         private void CreateHeadLight()
         {
-            var vertices = PrimitiveUtils.CreateBacksideVertices(new Vector3(0), new Vector2(2), 1);
-            var uvs = PrimitiveUtils.CreateBackUVs();
+            // PrimitiveUtils.CreateBacksideVertices was originally meant to create 3D objects in view space. Here it is abused to create a 2D object in model space
+            var vertices = PrimitiveUtils.CreateBacksideVertices( 
+                position: new Vector3(0), // Initial vertex position does not matter when constructing the object, because we handle this object as if it is in model space (as every other should be)
+                area: new Vector2(2, 0), // First parameter of the area is the WIDTH. As this function is a 3D object creator function, the second argument of the "area" has no meaining here.
+                height: 1); 
+            var uvs = PrimitiveUtils.CreateBackUVs(); // TODO: kellenek UV-k? Empty array miért nem jó? => empty array-jel nem rendereli ki...
 
             var mesh = new Mesh(vertices, uvs, _headlightShader)
             {
@@ -49,7 +54,7 @@ namespace ProceduralCity.GameObjects
 
         private void CreateBackLight()
         {
-            var vertices = PrimitiveUtils.CreateFrontVertices(new Vector3(0), new Vector2(2), 1);
+            var vertices = PrimitiveUtils.CreateFrontVertices(new Vector3(0), new Vector2(2, 0), 1);
             var uvs = PrimitiveUtils.CreateFrontUvs();
 
             var mesh = new Mesh(vertices, uvs, _rearLightShader)
@@ -64,7 +69,8 @@ namespace ProceduralCity.GameObjects
             CalculateTarget();
             TransformObject(elapsedTime);
 
-            _meshes.ForEach(a => a.Model.Value = Model);
+            _meshes[0].Model = Model;
+            _meshes[1].Model = Model;
         }
 
         private void TransformObject(float elapsedTime)

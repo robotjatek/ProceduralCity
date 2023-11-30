@@ -2,7 +2,7 @@
 
 namespace ProceduralCity.Renderer.Uniform
 {
-    readonly struct Matrix4Uniform : IUniformValue
+    public readonly struct Matrix4Uniform : IUniformValue
     {
         public Matrix4 Value
         {

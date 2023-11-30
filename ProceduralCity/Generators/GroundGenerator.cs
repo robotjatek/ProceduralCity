@@ -90,8 +90,9 @@ namespace ProceduralCity.Generators
                 };
 
                 var firstWaypoint = Waypoint.CreateCircle(corners);
-                var t = CreateTrafficOnCircuit(5, firstWaypoint);
-                traffic.AddRange(t);
+                var trafficOnCircuit = CreateTrafficOnCircuit(5, firstWaypoint);
+                traffic.AddRange(trafficOnCircuit);
+                site.AddTrafficLights(trafficOnCircuit);
             }
 
             return traffic;
@@ -178,12 +179,12 @@ namespace ProceduralCity.Generators
             }
         }
 
-        public IEnumerable<GroundNode> GenerateSites()
+        public GroundNodeTree GenerateSites()
         {
             _logger.Information("Generating ground 2D tree");
-            var tree = new BspTree(_worldSize, _config);
+            var tree = new GroundNodeTree(_worldSize, _config);
             SplitNode(tree.Root, maxLevel: 10);
-            return tree.GetLeaves();
+            return tree;
         }
 
         private void SplitNode(GroundNode node, int maxLevel)
