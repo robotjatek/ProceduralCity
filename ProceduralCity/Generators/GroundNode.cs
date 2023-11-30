@@ -18,7 +18,7 @@ namespace ProceduralCity.Generators
         public BoundingBox BoundingBox => _boundingBox;
 
         public Vector2 StartPosition { get; private set; }  // Top left
-        public Vector2 EndPosition { get; private set; }  // Bottom right
+        public Vector2 EndPosition { get; private set; } // Bottom right
 
         public List<GroundNode> Children { get; private set; } = [];
 
