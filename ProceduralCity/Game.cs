@@ -236,7 +236,6 @@ namespace ProceduralCity
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix);
             _worldRenderer.RenderToTexture(_textRenderer, _textRendererMatrix, Matrix4.Identity);
-
             if (_isBloomEnabled)
                 _postprocessPipeline.RunPipeline();
 

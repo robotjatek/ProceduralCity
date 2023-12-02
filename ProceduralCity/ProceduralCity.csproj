@@ -109,7 +109,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Docs\" />
     <Folder Include="Textures\" />
   </ItemGroup>
   <ItemGroup>
