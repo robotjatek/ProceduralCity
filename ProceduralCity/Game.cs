@@ -23,7 +23,8 @@ using System.Collections.Immutable;
 namespace ProceduralCity
 {
     // High priority tasks
-    //TODO: document how to show text on screen. This was working before look it up in the git history
+    //TODO: render onscreen text AFTER the postprocess pipeline
+
     //TODO: show fps counter on screen instead of the titlebar
     //TODO: dynamic text rendering
     //TODO: generate building textures procedurally
@@ -51,6 +52,12 @@ namespace ProceduralCity
         private readonly IRenderer _renderer;
         private readonly IRenderer _ndcRenderer;
         private readonly IRenderer _skyboxRenderer;
+
+        private readonly IRenderer _textRenderer;
+        private Matrix4 _textRendererMatrix = Matrix4.Identity;
+        private readonly Textbox _textbox = new Textbox("Consolas")
+            .WithText("Árvíztűrő tükörfúrógép", new Vector2(10, 0));
+
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
         private readonly CameraController _cameraController;
@@ -81,6 +88,7 @@ namespace ProceduralCity
             IRenderer renderer,
             IRenderer ndcRenderer,
             IRenderer skyboxRenderer,
+            IRenderer textRenderer,
             ISkybox skybox,
             ColorGenerator colorGenerator)
         {
@@ -106,6 +114,8 @@ namespace ProceduralCity
 
             _renderer = renderer;
             _ndcRenderer = ndcRenderer;
+            _textRenderer = textRenderer;
+            _textRenderer.AddToScene(_textbox.Text);
             _skyboxRenderer = skyboxRenderer;
 
             _skyboxRenderer.BeforeRender = () =>
@@ -225,6 +235,7 @@ namespace ProceduralCity
             _worldRenderer.Clear();
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix);
+            _worldRenderer.RenderToTexture(_textRenderer, _textRendererMatrix, Matrix4.Identity);
 
             if (_isBloomEnabled)
                 _postprocessPipeline.RunPipeline();
@@ -251,6 +262,7 @@ namespace ProceduralCity
             _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.ClientRectangle.Size.X / _context.ClientRectangle.Size.Y, 1.0f, 4000.0f);
            _camera.ProjectionMatrix = _projectionMatrix;
             _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
+            _textRendererMatrix = Matrix4.CreateOrthographicOffCenter(0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 0, -1, 1);
             _worldRenderer.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
             _postprocessPipeline.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
         }
