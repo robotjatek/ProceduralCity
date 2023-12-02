@@ -1,14 +1,14 @@
 ﻿using OpenTK.Mathematics;
 
-using System.Collections.Generic;
-
 namespace ProceduralCity.Camera.Controller.Movements
 {
     internal class PathMovement : IMovement
     {
-        public IEnumerable<Vector3> Path { get; init; }
+        public Vector3[] Path { get; init; }
 
-        public bool FirstTick { get; private set; } = true;
+        public bool FirstTick { get; set; } = true;
+
+        public int CurrentPathIndex { get; set; } = 0;
 
         public void Handle(IMovementHandler handler, float deltaTime)
         {

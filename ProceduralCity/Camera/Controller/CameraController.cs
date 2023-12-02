@@ -26,25 +26,12 @@ In progress:
     -- Inject IWorld instance
     -- IWorld should contain the sites BSP tree
     -- Based on the BSP tree calculate a random street coordinate on the street level
-
-v1)
-    -- Select a position on the root level
-    -- Select a second position on the root level
-    -- Move between the selected positions
-
-v2) 
-    -- Select destination one level down
-    -- Calculate path between the start and the end position
-    -- Move between the selected positions
-
-v3) 
-    -- Select destination anywhere in the tree
-    -- Calculate path between the start and the end position
+    -- Create a path on the street level
+    -- Move the camera along the path
 
 
 To Do:
 - Select a random movement and move the camera
-    - Follow a random path with street level shots too (curves?) (work in progress on: path_movement branch)
     - Rotate around an arbitrary position/object
  */
 using OpenTK.Mathematics;
@@ -170,32 +157,27 @@ namespace ProceduralCity.Camera.Controller
         public void HandlePathMovement(PathMovement movement, float deltaTime)
         {
             /*
-            * v1)
-               -- Select a position on the root level which is not in a corneer
-               -- Select a second position on the root level which is not in a corner
-               -- On the first tick teleport to the start position
-               -- Move between the selected positions
-               -- 4 children of the root node 5 possible start/end points except the world corners (9 on all, but corners are excluded so only 5 remains)
-            */
-
-            /*
-             * TODO: path contains waypoints
-             * TODO: build a path with possible waypoints
-             * TODO: move between waypoints
+             * TODO in the future: use a bezier curve or spline to move between waypoints
              */
 
             if (movement.FirstTick)
             {
                 _camera.Position = movement.Path.First();
+                _camera.LookAt(movement.Path.Skip(1).First());
+                movement.FirstTick = false;
+                movement.CurrentPathIndex = 1;
             }
 
-            _camera.LookAt(movement.Path.Skip(1).First());
-            _camera.MoveForward(deltaTime);
-
-            if ((_camera.Position - movement.Path.Skip(1).First()).Length < 10.0f)
+            if (movement.CurrentPathIndex < movement.Path.Length)
             {
-                TeleportToNewPosition();
-                // TODO: start moving to the next position
+                var currentWaypoint = movement.Path[movement.CurrentPathIndex];
+                _camera.LookAt(currentWaypoint);
+                _camera.MoveForward(deltaTime);
+
+                if (Vector3.Distance(_camera.Position, currentWaypoint) < 1.5f)
+                {
+                    movement.CurrentPathIndex++;
+                }
             }
         }
 
