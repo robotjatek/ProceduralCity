@@ -15,7 +15,6 @@ using ProceduralCity.Renderer.Utils;
 using Serilog;
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Immutable;
@@ -76,8 +75,6 @@ namespace ProceduralCity
 
         private double _elapsedFrameTime = 0;
 
-        private readonly IEnumerable<TrafficLight> _traffic;
-
         public Game(
             IAppConfig config,
             ILogger logger,
@@ -129,8 +126,7 @@ namespace ProceduralCity
             };
             _skyboxRenderer.AddToScene(skybox);
 
-            _traffic = _world.Traffic;
-            _renderer.AddToScene(_traffic); // TODO: rendering traffic should be dynamic, based on the camera frustum
+            _renderer.AddToScene(_world.Traffic); // TODO: rendering traffic should be dynamic, based on the camera frustum
             _renderer.AddToScene(_world.Renderables);
 
             _backbufferTexture = new Texture(_config.ResolutionWidth, config.ResolutionHeight);
@@ -326,7 +322,7 @@ namespace ProceduralCity
                 _ndcTexture = _postprocessTexture;
             }
 
-            _ndcRenderer.Clear();
+            _ndcRenderer.Clear(); // TODO: this may be leaking memory
             var fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
             _ndcRenderer.AddToScene(fullScreenQuad);
 
