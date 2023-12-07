@@ -23,6 +23,7 @@ namespace ProceduralCity
 {
     // High priority tasks
     //TODO: render onscreen text AFTER the postprocess pipeline
+    //TODO: rethink the postprocess pipeline - reimplement bloom effect
 
     //TODO: show fps counter on screen instead of the titlebar
     //TODO: dynamic text rendering

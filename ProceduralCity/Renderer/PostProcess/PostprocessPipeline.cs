@@ -14,7 +14,7 @@ namespace ProceduralCity.Renderer.PostProcess
         private readonly Texture _inputTexture;
         private readonly Texture _outputTexture;
 
-        private readonly List<PostProcess> _postprocess;
+        private readonly List<PostProcess> _postprocessEffects;
         private readonly Shader _lumaEffect = new("vs.vert", "PostProcess/luminance.frag");
         private readonly Shader _blendEffect = new("vs.vert", "PostProcess/blend.frag");
         private readonly Shader _horizontalBlurEffect = new("vs.vert", "PostProcess/blur.frag");
@@ -26,12 +26,15 @@ namespace ProceduralCity.Renderer.PostProcess
             _inputTexture = inputTexture; // Rendered 3D world
             _outputTexture = outputTexture;
 
-            _postprocess =
+            _postprocessEffects =
             [
                 // All three needed for the bloom effect
-                new PostProcess(logger, new[] { _inputTexture }, _outputTexture, _lumaEffect),
-                new PostProcess(logger, new[] { _outputTexture }, _outputTexture, _horizontalBlurEffect),
-                new PostProcess(logger, new[] { _outputTexture }, _outputTexture, _verticalBlurEffect),
+                new PostProcess(logger, new[] { _inputTexture }, _outputTexture, _lumaEffect), // Extract pixels that are above a given luminance threshold. Pixels below the threshold are black
+                new PostProcess(logger, new[] { _outputTexture }, _outputTexture, _horizontalBlurEffect), // Blur the output of the luminance effect horziontally
+                new PostProcess(logger, new[] { _outputTexture }, _outputTexture, _verticalBlurEffect), // Blur the image further vertically
+                // The output after this stage is the pixels that are above the given luminance threshold with blur appied to them. This is a significantly darker picture than the input
+
+                // The last stage blends the output of the previous stage with the input picture
                 new PostProcess(logger, new[] { _inputTexture, _outputTexture }, _outputTexture, _blendEffect),
             ];
 
@@ -71,22 +74,22 @@ namespace ProceduralCity.Renderer.PostProcess
                 Value = new Vector2(0, 1f / _inputTexture.Height)
             });
 
-            _logger.Information("Post-process pipeline has been set up with {postprocess_count} effects", _postprocess.Count);
+            _logger.Information("Post-process pipeline has been set up with {postprocess_count} effects", _postprocessEffects.Count);
         }
 
         public void RunPipeline()
         {
-            foreach (var p in _postprocess)
+            foreach (var effect in _postprocessEffects)
             {
-                p.DoPostProcess();
+                effect.DoPostProcess();
             }
         }
 
         public void Resize(int width, int height, float scale)
         {
-            foreach (var p in _postprocess)
+            foreach (var effect in _postprocessEffects)
             {
-                p.Resize(width, height, scale);
+                effect.Resize(width, height, scale);
             }
         }
 
@@ -102,7 +105,7 @@ namespace ProceduralCity.Renderer.PostProcess
                     _blendEffect.Dispose();
                     _horizontalBlurEffect.Dispose();
                     _verticalBlurEffect.Dispose();
-                    foreach (var p in _postprocess)
+                    foreach (var p in _postprocessEffects)
                     {
                         p.Dispose();
                     }
