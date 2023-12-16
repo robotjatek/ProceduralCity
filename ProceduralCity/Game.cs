@@ -50,7 +50,7 @@ namespace ProceduralCity
 
         private readonly IRenderer _textRenderer;
         private Matrix4 _textRendererMatrix = Matrix4.Identity;
-        private readonly Textbox _textbox = new("Consolas");
+        private readonly Textbox _fpsCounterTextbox = new("Consolas");
 
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
@@ -240,9 +240,9 @@ namespace ProceduralCity
                 var fps = Math.Round(1f / e.Time, 0);
                 _context.Title = $"{_config.WindowTitle} - FPS: {fps}";
 
-                _textbox.WithText(text: $"{fps} FPS", scale: 0.4f);
+                _fpsCounterTextbox.WithText(text: $"{fps} FPS", scale: 0.4f);
                 _textRenderer.Clear();
-                _textRenderer.AddToScene(_textbox.Text);
+                _textRenderer.AddToScene(_fpsCounterTextbox.Text);
 
                 _elapsedFrameTime = 0;
             }
@@ -334,7 +334,7 @@ namespace ProceduralCity
             _fullscreenShader.Dispose();
             _backbufferTexture.Dispose();
             _postprocessPipeline.Dispose();
-            _textbox.Dispose();
+            _fpsCounterTextbox.Dispose();
         }
     }
 }
