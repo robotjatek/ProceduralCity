@@ -15,7 +15,6 @@ using ProceduralCity.Renderer.Utils;
 using Serilog;
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Immutable;
@@ -23,7 +22,6 @@ using System.Collections.Immutable;
 namespace ProceduralCity
 {
     // High priority tasks
-    //TODO: document how to show text on screen. This was working before look it up in the git history
     //TODO: show fps counter on screen instead of the titlebar
     //TODO: dynamic text rendering
     //TODO: generate building textures procedurally
@@ -44,13 +42,19 @@ namespace ProceduralCity
     class Game : IGame, IDisposable
     {
         private Matrix4 _projectionMatrix = Matrix4.Identity;
-        private Matrix4 _ndcRendererMatrix;
+        private Matrix4 _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
 
         private readonly IAppConfig _config;
         private readonly ILogger _logger;
         private readonly IRenderer _renderer;
         private readonly IRenderer _ndcRenderer;
         private readonly IRenderer _skyboxRenderer;
+
+        private readonly IRenderer _textRenderer;
+        private Matrix4 _textRendererMatrix = Matrix4.Identity;
+        private readonly Textbox _textbox = new Textbox("Consolas")
+            .WithText("Árvíztűrő tükörfúrógép", new Vector2(10, 0));
+
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
         private readonly CameraController _cameraController;
@@ -64,12 +68,8 @@ namespace ProceduralCity
 
         private bool _isBloomEnabled = true;
         private readonly PostprocessPipeline _postprocessPipeline;
-        private readonly Texture _postprocessTexture;
-        private Texture _ndcTexture;
 
         private double _elapsedFrameTime = 0;
-
-        private readonly IEnumerable<TrafficLight> _traffic;
 
         public Game(
             IAppConfig config,
@@ -81,6 +81,7 @@ namespace ProceduralCity
             IRenderer renderer,
             IRenderer ndcRenderer,
             IRenderer skyboxRenderer,
+            IRenderer textRenderer,
             ISkybox skybox,
             ColorGenerator colorGenerator)
         {
@@ -106,6 +107,8 @@ namespace ProceduralCity
 
             _renderer = renderer;
             _ndcRenderer = ndcRenderer;
+            _textRenderer = textRenderer;
+            _textRenderer.AddToScene(_textbox.Text);
             _skyboxRenderer = skyboxRenderer;
 
             _skyboxRenderer.BeforeRender = () =>
@@ -119,8 +122,7 @@ namespace ProceduralCity
             };
             _skyboxRenderer.AddToScene(skybox);
 
-            _traffic = _world.Traffic;
-            _renderer.AddToScene(_traffic); // TODO: rendering traffic should be dynamic, based on the camera frustum
+            _renderer.AddToScene(_world.Traffic); // TODO: rendering traffic should be dynamic, based on the camera frustum
             _renderer.AddToScene(_world.Renderables);
 
             _backbufferTexture = new Texture(_config.ResolutionWidth, config.ResolutionHeight);
@@ -131,8 +133,7 @@ namespace ProceduralCity
                 _config.ResolutionHeight,
                 useDepthBuffer: true);
 
-            _postprocessTexture = new Texture(_config.ResolutionWidth, _config.ResolutionHeight);
-            _postprocessPipeline = new PostprocessPipeline(_logger, _config, _worldRenderer.Texture, _postprocessTexture);
+            _postprocessPipeline = new PostprocessPipeline(_logger, _config, _worldRenderer.Texture);
 
             _fullscreenShader = new Shader("vs.vert", "fullscreen.frag");
             _fullscreenShader.SetUniformValue("tex", new IntUniform
@@ -140,8 +141,7 @@ namespace ProceduralCity
                 Value = 0
             });
 
-            _ndcTexture = _postprocessTexture;
-            var fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
+            var fullScreenQuad = new FullScreenQuad(new[] { _worldRenderer.Texture }, _fullscreenShader);
             _ndcRenderer.AddToScene(fullScreenQuad);
         }
 
@@ -225,9 +225,11 @@ namespace ProceduralCity
             _worldRenderer.Clear();
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix);
-
+            
             if (_isBloomEnabled)
                 _postprocessPipeline.RunPipeline();
+
+            _worldRenderer.RenderToTexture(_textRenderer, _textRendererMatrix, Matrix4.Identity);
 
             GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
             _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity);
@@ -249,8 +251,8 @@ namespace ProceduralCity
             _logger.Information("Window resized: {x}x{y}", _context.Size.X, _context.Size.Y);
             GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
             _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.ClientRectangle.Size.X / _context.ClientRectangle.Size.Y, 1.0f, 4000.0f);
-           _camera.ProjectionMatrix = _projectionMatrix;
-            _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
+            _camera.ProjectionMatrix = _projectionMatrix;
+            _textRendererMatrix = Matrix4.CreateOrthographicOffCenter(0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 0, -1, 1);
             _worldRenderer.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
             _postprocessPipeline.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
         }
@@ -306,19 +308,6 @@ namespace ProceduralCity
 
         private void ToggleBloom()
         {
-            if (_isBloomEnabled)
-            {
-                _ndcTexture = _worldRenderer.Texture;
-            }
-            else
-            {
-                _ndcTexture = _postprocessTexture;
-            }
-
-            _ndcRenderer.Clear();
-            var fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
-            _ndcRenderer.AddToScene(fullScreenQuad);
-
             _isBloomEnabled = !_isBloomEnabled;
         }
 
@@ -342,8 +331,6 @@ namespace ProceduralCity
             _skyboxRenderer.Dispose();
             _fullscreenShader.Dispose();
             _backbufferTexture.Dispose();
-
-            _postprocessTexture.Dispose();
             _postprocessPipeline.Dispose();
         }
     }

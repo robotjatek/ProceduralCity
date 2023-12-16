@@ -22,48 +22,24 @@ namespace ProceduralCity.GameObjects
         private float _saturation;
         private float _value;
 
-        public IEnumerable<IRenderable> Text
-        {
-            get
-            {
-                return _text;
-            }
-        }
+        public IEnumerable<IRenderable> Text => _text;
 
         public float Hue
         {
-            get
-            {
-                return _hue;
-            }
-            set
-            {
-                WithHue(value);
-            }
+            get => _hue;
+            set => WithHue(value);
         }
 
         public float Saturation
         {
-            get
-            {
-                return _saturation;
-            }
-            set
-            {
-                WithSaturation(value);
-            }
+            get => _saturation;
+            set => WithSaturation(value);
         }
 
         public float Value
         {
-            get
-            {
-                return _value;
-            }
-            set
-            {
-                WithValue(value);
-            }
+            get => _value;
+            set => WithValue(value);
         }
 
         public float CursorAdvance
@@ -89,7 +65,7 @@ namespace ProceduralCity.GameObjects
             Value = 1;
         }
 
-        public Textbox WithText(string text, Vector2 position, float scale)
+        public Textbox WithText(string text, Vector2 position = default, float scale = 1.0f)
         {
             _text.Clear();
             var cursorX = 0.0f;

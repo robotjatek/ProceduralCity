@@ -14,10 +14,17 @@ void main()
 
 	if(luminance < u_LuminanceTreshold)
 	{
-		fragmentColor = vec4(0); // Postprocess pipeline is additive. Returning 0 essentially leaves the pixel unchanged.
+		/*
+		 * To calculate bloom, the postprocess effect is blended together with the original input picture.
+		 * So by returning 0 here, the resulting pixel will essentially be the original pixel
+		 */
+		fragmentColor = vec4(0); 
 	}
 	else
 	{
 		fragmentColor = texture(tex, fTexCoord) * clamp(0, 1, smoothstep(0, .4f, 1.0f/u_LuminanceTreshold));
 	}
+
+	// A second option is just to multiply the luminance and the pixels
+	//fragmentColor = texture(tex, fTexCoord) * luminance;
 }
