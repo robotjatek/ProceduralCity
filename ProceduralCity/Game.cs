@@ -22,8 +22,6 @@ using System.Collections.Immutable;
 namespace ProceduralCity
 {
     // High priority tasks
-    //TODO: render onscreen text AFTER the postprocess pipeline
-
     //TODO: show fps counter on screen instead of the titlebar
     //TODO: dynamic text rendering
     //TODO: generate building textures procedurally
@@ -227,9 +225,11 @@ namespace ProceduralCity
             _worldRenderer.Clear();
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix);
-            _worldRenderer.RenderToTexture(_textRenderer, _textRendererMatrix, Matrix4.Identity);
+            
             if (_isBloomEnabled)
                 _postprocessPipeline.RunPipeline();
+
+            _worldRenderer.RenderToTexture(_textRenderer, _textRendererMatrix, Matrix4.Identity);
 
             GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
             _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity);
