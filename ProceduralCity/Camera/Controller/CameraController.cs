@@ -134,11 +134,11 @@ namespace ProceduralCity.Camera.Controller
             _camera.SetVerticalInstant(MathHelper.DegreesToRadians(movement.VerticalAngle));
             if (movement.Direction != MovementDirection.A)
             {
-                _camera.MoveForwardOnAPlane(deltaTime);
+                _camera.MoveBackwardOnAPlane(deltaTime);
             }
             else if (movement.Direction != MovementDirection.B)
             {
-                _camera.MoveBackwardOnAPlane(deltaTime);
+                _camera.MoveForwardOnAPlane(deltaTime);
             }
         }
 
