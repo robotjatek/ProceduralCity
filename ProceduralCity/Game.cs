@@ -23,7 +23,6 @@ namespace ProceduralCity
 {
     // High priority tasks
     //TODO: render onscreen text AFTER the postprocess pipeline
-    //TODO: rethink the postprocess pipeline - reimplement bloom effect
 
     //TODO: show fps counter on screen instead of the titlebar
     //TODO: dynamic text rendering
@@ -45,7 +44,7 @@ namespace ProceduralCity
     class Game : IGame, IDisposable
     {
         private Matrix4 _projectionMatrix = Matrix4.Identity;
-        private Matrix4 _ndcRendererMatrix;
+        private Matrix4 _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
 
         private readonly IAppConfig _config;
         private readonly ILogger _logger;
@@ -71,8 +70,6 @@ namespace ProceduralCity
 
         private bool _isBloomEnabled = true;
         private readonly PostprocessPipeline _postprocessPipeline;
-        private readonly Texture _postprocessTexture;
-        private Texture _ndcTexture;
 
         private double _elapsedFrameTime = 0;
 
@@ -138,8 +135,7 @@ namespace ProceduralCity
                 _config.ResolutionHeight,
                 useDepthBuffer: true);
 
-            _postprocessTexture = new Texture(_config.ResolutionWidth, _config.ResolutionHeight);
-            _postprocessPipeline = new PostprocessPipeline(_logger, _config, _worldRenderer.Texture, _postprocessTexture);
+            _postprocessPipeline = new PostprocessPipeline(_logger, _config, _worldRenderer.Texture);
 
             _fullscreenShader = new Shader("vs.vert", "fullscreen.frag");
             _fullscreenShader.SetUniformValue("tex", new IntUniform
@@ -147,8 +143,7 @@ namespace ProceduralCity
                 Value = 0
             });
 
-            _ndcTexture = _postprocessTexture;
-            var fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
+            var fullScreenQuad = new FullScreenQuad(new[] { _worldRenderer.Texture }, _fullscreenShader);
             _ndcRenderer.AddToScene(fullScreenQuad);
         }
 
@@ -256,8 +251,7 @@ namespace ProceduralCity
             _logger.Information("Window resized: {x}x{y}", _context.Size.X, _context.Size.Y);
             GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
             _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(75), (float)_context.ClientRectangle.Size.X / _context.ClientRectangle.Size.Y, 1.0f, 4000.0f);
-           _camera.ProjectionMatrix = _projectionMatrix;
-            _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
+            _camera.ProjectionMatrix = _projectionMatrix;
             _textRendererMatrix = Matrix4.CreateOrthographicOffCenter(0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 0, -1, 1);
             _worldRenderer.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
             _postprocessPipeline.Resize(_context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 1.0f);
@@ -314,19 +308,6 @@ namespace ProceduralCity
 
         private void ToggleBloom()
         {
-            if (_isBloomEnabled)
-            {
-                _ndcTexture = _worldRenderer.Texture;
-            }
-            else
-            {
-                _ndcTexture = _postprocessTexture;
-            }
-
-            _ndcRenderer.Clear(); // TODO: this may be leaking memory
-            var fullScreenQuad = new FullScreenQuad(new[] { _ndcTexture }, _fullscreenShader);
-            _ndcRenderer.AddToScene(fullScreenQuad);
-
             _isBloomEnabled = !_isBloomEnabled;
         }
 
@@ -350,8 +331,6 @@ namespace ProceduralCity
             _skyboxRenderer.Dispose();
             _fullscreenShader.Dispose();
             _backbufferTexture.Dispose();
-
-            _postprocessTexture.Dispose();
             _postprocessPipeline.Dispose();
         }
     }
