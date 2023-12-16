@@ -12,27 +12,30 @@ namespace ProceduralCity.Renderer.PostProcess
     {
         private readonly ILogger _logger;
         private readonly Texture _inputTexture;
-        private readonly Texture _outputTexture;
+        private readonly Texture _workTexture; // The work texture where intermediate work gets done
 
-        private readonly List<PostProcess> _postprocess;
+        private readonly List<PostProcess> _postprocessEffects;
         private readonly Shader _lumaEffect = new("vs.vert", "PostProcess/luminance.frag");
         private readonly Shader _blendEffect = new("vs.vert", "PostProcess/blend.frag");
         private readonly Shader _horizontalBlurEffect = new("vs.vert", "PostProcess/blur.frag");
         private readonly Shader _verticalBlurEffect = new("vs.vert", "PostProcess/blur.frag");
 
-        public PostprocessPipeline(ILogger logger, IAppConfig config, Texture inputTexture, Texture outputTexture)
+        public PostprocessPipeline(ILogger logger, IAppConfig config, Texture inputTexture)
         {
             _logger = logger;
             _inputTexture = inputTexture; // Rendered 3D world
-            _outputTexture = outputTexture;
+            _workTexture = new Texture(inputTexture.Width, inputTexture.Height);
 
-            _postprocess =
+            _postprocessEffects =
             [
                 // All three needed for the bloom effect
-                new PostProcess(logger, new[] { _inputTexture }, _outputTexture, _lumaEffect),
-                new PostProcess(logger, new[] { _outputTexture }, _outputTexture, _horizontalBlurEffect),
-                new PostProcess(logger, new[] { _outputTexture }, _outputTexture, _verticalBlurEffect),
-                new PostProcess(logger, new[] { _inputTexture, _outputTexture }, _outputTexture, _blendEffect),
+                new PostProcess(logger, new[] { _inputTexture }, _workTexture, _lumaEffect), // Extract pixels that are above a given luminance threshold. Pixels below the threshold are black
+                new PostProcess(logger, new[] { _workTexture }, _workTexture, _horizontalBlurEffect), // Blur the output of the luminance effect horziontally
+                new PostProcess(logger, new[] { _workTexture }, _workTexture, _verticalBlurEffect), // Blur the image further vertically
+                // The output after this stage is the pixels that are above the given luminance threshold with blur appied to them. This is a significantly darker picture than the input
+
+                // The last stage blends the output of the previous stage with the input picture
+                new PostProcess(logger, new[] { _inputTexture, _workTexture }, _inputTexture, _blendEffect),
             ];
 
             _lumaEffect.SetUniformValue("u_LuminanceTreshold", new FloatUniform
@@ -71,22 +74,22 @@ namespace ProceduralCity.Renderer.PostProcess
                 Value = new Vector2(0, 1f / _inputTexture.Height)
             });
 
-            _logger.Information("Post-process pipeline has been set up with {postprocess_count} effects", _postprocess.Count);
+            _logger.Information("Post-process pipeline has been set up with {postprocess_count} effects", _postprocessEffects.Count);
         }
 
         public void RunPipeline()
         {
-            foreach (var p in _postprocess)
+            foreach (var effect in _postprocessEffects)
             {
-                p.DoPostProcess();
+                effect.DoPostProcess();
             }
         }
 
         public void Resize(int width, int height, float scale)
         {
-            foreach (var p in _postprocess)
+            foreach (var effect in _postprocessEffects)
             {
-                p.Resize(width, height, scale);
+                effect.Resize(width, height, scale);
             }
         }
 
@@ -102,7 +105,9 @@ namespace ProceduralCity.Renderer.PostProcess
                     _blendEffect.Dispose();
                     _horizontalBlurEffect.Dispose();
                     _verticalBlurEffect.Dispose();
-                    foreach (var p in _postprocess)
+                    _workTexture.Dispose();
+
+                    foreach (var p in _postprocessEffects)
                     {
                         p.Dispose();
                     }

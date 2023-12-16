@@ -18,12 +18,12 @@ namespace ProceduralCity.Utils
         {
             return new[]
             {
-                new Vector3(position.X, position.Y, 0),
-                new Vector3(position.X, position.Y + height, 0),
-                new Vector3(position.X + width, position.Y, 0),
-                new Vector3(position.X + width, position.Y, 0),
-                new Vector3(position.X, position.Y + height, 0),
-                new Vector3(position.X + width, position.Y + height, 0),
+                new Vector3(position.X, position.Y, 0.0f),
+                new Vector3(position.X + width, position.Y, 0.0f),
+                new Vector3(position.X, position.Y + height, 0.0f),
+                new Vector3(position.X, position.Y + height, 0.0f),
+                new Vector3(position.X + width, position.Y, 0.0f),
+                new Vector3(position.X + width, position.Y + height, 0.0f)
             };
         }
 
@@ -41,11 +41,11 @@ namespace ProceduralCity.Utils
             return new[]
             {
                 new Vector2(position.X, 1.0f - position.Y),
-                new Vector2(position.X, 1.0f - (position.Y + height)),
-                new Vector2(position.X + width, 1.0f - position.Y),
                 new Vector2(position.X + width, 1.0f - position.Y),
                 new Vector2(position.X, 1.0f - (position.Y + height)),
-                new Vector2(position.X + width, 1.0f -(position.Y + height)),
+                new Vector2(position.X, 1.0f - (position.Y + height)),
+                new Vector2(position.X + width, 1.0f - position.Y),
+                new Vector2(position.X + width, 1.0f - (position.Y + height)),
             };
         }
 
