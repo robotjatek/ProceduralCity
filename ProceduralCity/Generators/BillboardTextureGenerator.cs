@@ -95,7 +95,7 @@ namespace ProceduralCity.Generators
                 var word = GenerateBillboardText();
 
                 using var text = new Textbox("Consolas")
-                    .WithText(word, new Vector2(), 1.5f)
+                    .WithText(word, new Vector2(), 1.25f)
                     .WithHue(1.0f)
                     .WithSaturation(0)
                     .WithValue(1.0f);

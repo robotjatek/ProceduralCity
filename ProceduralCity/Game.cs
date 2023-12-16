@@ -105,6 +105,9 @@ namespace ProceduralCity
             _renderer = renderer;
             _ndcRenderer = ndcRenderer;
             _textRenderer = textRenderer;
+            _textRenderer.BeforeRender = () => GL.Enable(EnableCap.Blend);
+            _textRenderer.AfterRender = () => GL.Disable(EnableCap.Blend);
+
             _skyboxRenderer = skyboxRenderer;
 
             _skyboxRenderer.BeforeRender = () =>
@@ -235,12 +238,12 @@ namespace ProceduralCity
         private void CountFps(FrameEventArgs e)
         {
             _elapsedFrameTime += e.Time;
-            if (_elapsedFrameTime >= 0.4)
+            if (_elapsedFrameTime >= 1.0)
             {
                 var fps = Math.Round(1f / e.Time, 0);
                 _context.Title = $"{_config.WindowTitle} - FPS: {fps}";
 
-                _fpsCounterTextbox.WithText(text: $"{fps} FPS", scale: 0.4f);
+                _fpsCounterTextbox.WithText(text: $"{fps} FPS", scale: 0.5f);
                 _textRenderer.Clear();
                 _textRenderer.AddToScene(_fpsCounterTextbox.Text);
 

@@ -54,14 +54,20 @@ _textRenderer = textRenderer;
 _textRenderer.AddToScene(_text.Text);
 ```
 
-You may or may not need to enable blending before rendering:
+You may or may not need to enable blending before rendering. Enabling blending will result smoother edges on the text especially when using scaling.
 
 ```csharp
 _textRenderer.BeforeRender = () => GL.Enable(EnableCap.Blend);
 _textRenderer.AfterRender = () =>  GL.Disable(EnableCap.Blend);
 ```
+Blending disabled:
+![Blending disabled](images/text_blending_disabled.png)
+
+Blending enabled:
+![Blending enabled](images/text_blending_enabled.png)
 
 ### OnRenderFrame:
+
 ```csharp
 _worldRenderer.Clear();
 _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix, _modelMatrix);
