@@ -67,7 +67,7 @@ namespace ProceduralCity
 
             var nativeWindowSettings = new NativeWindowSettings
             {
-                Size = new Vector2i(appConfig.ResolutionWidth, appConfig.ResolutionHeight),
+                ClientSize = new Vector2i(appConfig.ResolutionWidth, appConfig.ResolutionHeight),
                 Title = appConfig.WindowTitle,
             };
 
