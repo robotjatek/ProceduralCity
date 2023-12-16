@@ -74,3 +74,14 @@ _context.SwapBuffers();
 ```csharp
 _textRendererMatrix = Matrix4.CreateOrthographicOffCenter(0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 0, -1, 1);
 ```
+
+## Dynamic text rendering
+
+It is possible to render dynamically changing text by calling `WithText` on the textbox instance again and re-adding the new meshes to the renderer:
+
+```csharp
+_textbox.WithText(text: $"{fps} FPS", scale: 0.4f);
+_textRenderer.Clear();
+_textRenderer.AddToScene(_textbox.Text);
+```
+

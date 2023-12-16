@@ -240,8 +240,8 @@ namespace ProceduralCity
                 var fps = Math.Round(1f / e.Time, 0);
                 _context.Title = $"{_config.WindowTitle} - FPS: {fps}";
 
-                _textRenderer.Clear();
                 _textbox.WithText(text: $"{fps} FPS", scale: 0.4f);
+                _textRenderer.Clear();
                 _textRenderer.AddToScene(_textbox.Text);
 
                 _elapsedFrameTime = 0;
