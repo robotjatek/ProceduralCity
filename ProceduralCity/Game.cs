@@ -166,14 +166,18 @@ namespace ProceduralCity
 
             var sites = _world.BspTree.GetLeavesInFrustum(_camera).ToImmutableArray();
 
-            var culledTrafficInstanes = sites
+            var visibleTrafficInstances = sites
                 .SelectMany(site => site.Traffic)
                 .AsParallel()
-                .Where(traffic => _camera.IsInViewFrustum(traffic.Position))
+                /* 
+                 * This may not worth the effort at all. Per site culling culls most of the traffic outside the view frustum already.
+                 * There is little to win here (IF ANY!) with one more per light pass
+                 */
+                //.Where(traffic => _camera.IsInViewFrustum(traffic.Position)) 
                 .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is further than 700f
                 .ToImmutableArray();
 
-            Parallel.ForEach(culledTrafficInstanes, t => t.Move((float)e.Time)); // Only animate visible traffic
+            Parallel.ForEach(visibleTrafficInstances, t => t.Move((float)e.Time)); // Only animate visible traffic
         }
 
         private void HandleCameraInput(FrameEventArgs e, KeyboardState keyboardState)

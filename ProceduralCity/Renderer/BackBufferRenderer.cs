@@ -75,6 +75,13 @@ namespace ProceduralCity.Renderer
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
+        /// <summary>
+        /// Uses the passed renderer to render an image to a framebuffer. The result of the rendering is in the <see cref="Texture"/> property
+        /// </summary>
+        /// <param name="renderer">The used renderer</param>
+        /// <param name="projection">The projection matrix used in rendering</param>
+        /// <param name="view">The view matrix used in rendering</param>
+        /// <remarks>The per-model model matrix is inside the meshes rendered by the <paramref name="renderer"/></remarks>
         public void RenderToTexture(IRenderer renderer, Matrix4 projection, Matrix4 view)
         {
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, _frameBufferId);
@@ -84,6 +91,9 @@ namespace ProceduralCity.Renderer
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
+        /// <summary>
+        /// Clears the currently bound framebuffer
+        /// </summary>
         public void Clear()
         {
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, _frameBufferId);
@@ -91,6 +101,10 @@ namespace ProceduralCity.Renderer
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         }
 
+        /// <summary>
+        /// Clears the currently bound framebuffer to a given color.
+        /// </summary>
+        /// <param name="color"></param>
         public void Clear(Color4 color)
         {
             GL.ClearColor(color);
