@@ -22,8 +22,6 @@ using System.Collections.Immutable;
 namespace ProceduralCity
 {
     // High priority tasks
-    //TODO: show fps counter on screen instead of the titlebar
-    //TODO: dynamic text rendering
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
@@ -52,8 +50,7 @@ namespace ProceduralCity
 
         private readonly IRenderer _textRenderer;
         private Matrix4 _textRendererMatrix = Matrix4.Identity;
-        private readonly Textbox _textbox = new Textbox("Consolas")
-            .WithText("Árvíztűrő tükörfúrógép", new Vector2(10, 0));
+        private readonly Textbox _textbox = new("Consolas");
 
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
@@ -108,7 +105,6 @@ namespace ProceduralCity
             _renderer = renderer;
             _ndcRenderer = ndcRenderer;
             _textRenderer = textRenderer;
-            _textRenderer.AddToScene(_textbox.Text);
             _skyboxRenderer = skyboxRenderer;
 
             _skyboxRenderer.BeforeRender = () =>
@@ -225,7 +221,7 @@ namespace ProceduralCity
             _worldRenderer.Clear();
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix);
-            
+
             if (_isBloomEnabled)
                 _postprocessPipeline.RunPipeline();
 
@@ -241,7 +237,13 @@ namespace ProceduralCity
             _elapsedFrameTime += e.Time;
             if (_elapsedFrameTime >= 0.4)
             {
-                _context.Title = $"{_config.WindowTitle} - FPS: {Math.Round(1f / e.Time, 0)}";
+                var fps = Math.Round(1f / e.Time, 0);
+                _context.Title = $"{_config.WindowTitle} - FPS: {fps}";
+
+                _textRenderer.Clear();
+                _textbox.WithText(text: $"{fps} FPS", scale: 0.4f);
+                _textRenderer.AddToScene(_textbox.Text);
+
                 _elapsedFrameTime = 0;
             }
         }
@@ -332,6 +334,7 @@ namespace ProceduralCity
             _fullscreenShader.Dispose();
             _backbufferTexture.Dispose();
             _postprocessPipeline.Dispose();
+            _textbox.Dispose();
         }
     }
 }
