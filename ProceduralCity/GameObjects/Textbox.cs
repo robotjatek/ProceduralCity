@@ -69,7 +69,7 @@ namespace ProceduralCity.GameObjects
         {
             _text.Clear();
             var cursorX = 0.0f;
-            var maxCharacterHeight = _fontConfig.Characters.Max(c => c.Value.Height);
+            var maxCharacterHeight = _fontConfig.Characters.Max(c => c.Value.Height) * scale;
 
             foreach (var character in text)
             {
