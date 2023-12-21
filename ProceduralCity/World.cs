@@ -21,6 +21,8 @@ namespace ProceduralCity
 
         public IEnumerable<TrafficLight> Traffic => _trafficLights;
 
+        public IEnumerable<IRenderable> Renderables => _renderables;
+
         public World(IGroundGenerator groundGenerator, IBuildingGenerator buildingGenerator, ILogger logger)
         {
             _logger = logger;
@@ -41,14 +43,6 @@ namespace ProceduralCity
 
             var buildings = _buildingGenerator.GenerateBuildings(sites);
             _renderables.AddRange(buildings);
-        }
-
-        public IEnumerable<IRenderable> Renderables
-        {
-            get
-            {
-                return _renderables;
-            }
         }
 
         private bool disposedValue = false;

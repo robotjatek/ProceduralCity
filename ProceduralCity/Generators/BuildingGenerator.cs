@@ -7,6 +7,8 @@ using ProceduralCity.Buildings;
 using ProceduralCity.Config;
 using ProceduralCity.Renderer;
 using ProceduralCity.Renderer.Uniform;
+using ProceduralCity.Utils;
+
 using Serilog;
 
 namespace ProceduralCity.Generators
@@ -23,15 +25,16 @@ namespace ProceduralCity.Generators
         internal static readonly string[] fragmentShaders = ["fs.frag", "fog.frag"];
         private readonly Shader _buildingShader;
         private readonly Vector2 _areaBorder;
-        private readonly Random _random = new();
+        private readonly RandomService _randomService;
         private readonly Texture[] _buildingTextures;
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
         private readonly IBillboardBuilder _billboardBuilder;
 
-        public BuildingGenerator(ILogger logger, IAppConfig config, IBillboardBuilder billboardBuilder, ColorGenerator colorGenerator)
+        public BuildingGenerator(ILogger logger, IAppConfig config, IBillboardBuilder billboardBuilder, ColorGenerator colorGenerator, RandomService randomService)
         {
             _config = config;
+            _randomService = randomService;
 
             _buildingShader = new Shader("vs.vert", fragmentShaders);
             _buildingShader.SetUniformValue("tex", new IntUniform
@@ -56,7 +59,7 @@ namespace ProceduralCity.Generators
             {
                 var position = new Vector3(site.StartPosition.X + _areaBorder.X, 0, site.StartPosition.Y + _areaBorder.Y);
                 var area = site.EndPosition - site.StartPosition - (_areaBorder * 2);
-                var texture = _buildingTextures[_random.Next(_buildingTextures.Length)];
+                var texture = _buildingTextures[_randomService.Next(_buildingTextures.Length)];
                 var building = CreateRandomBuilding(position, area, texture);
                 buildings.Add(building);
             }
@@ -68,13 +71,13 @@ namespace ProceduralCity.Generators
 
         private IBuilding CreateRandomBuilding(Vector3 position, Vector2 area, Texture texture)
         {
-            var type = (BuildingType)_random.Next(Enum.GetValues(typeof(BuildingType)).Length);
-            var height = _random.Next(_config.MinBuildingHeight, _config.MaxBuildingHeight);
+            var type = (BuildingType)_randomService.Next(Enum.GetValues(typeof(BuildingType)).Length);
+            var height = _randomService.Next(_config.MinBuildingHeight, _config.MaxBuildingHeight);
 
             return type switch
             {
                 BuildingType.Simple => new Building(position, area, texture, _buildingShader, height),
-                BuildingType.Tower => new TowerBuilding(position, area, texture, _buildingShader, height, _billboardBuilder),
+                BuildingType.Tower => new TowerBuilding(position, area, texture, _buildingShader, height, _billboardBuilder, _randomService),
                 _ => throw new NotImplementedException(),
             };
         }

@@ -25,7 +25,20 @@ namespace ProceduralCity
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
+    //TODO: Further traffic light optimizations:
+    //    Preparation:
+    //          - Global random number service with configurable seed to have consistent runs.
+    //          - Measure number of frames for a minute.
+    //    Optimizations:
+    //          - One mesh per traffic light -- halves the need for Model matrices
+    //              -- gl_FrontFacing in shader, use separate renderer, disable backface culling before render. Red color on backface, white on frontface
+    //          - Fix light position problem - position should mean the center of the light
+    //          - Update traffic lights on a lower framerate
+    //          - Calculate model matrix on gpu for traffic lights => create a vertex shader that is the variation of the instanced_vert. Send position vector and lookat vector instead of model matrix
+    //              -- There is a matrix invert call in the computation. Rethink the way traffic lights are transformed
     //TODO: Do not render hidden traffic lights
+    //      -- I may need to clear the traffic renderer meshes every frame (which could be lower than the actual render frames) and re-add only the visible meshes.
+    //      -- That way only ~1-2k matrices are needed to upload every frame instead of 100k
     //TODO: Building LOD levels
 
     // Low priority tasks
@@ -51,6 +64,10 @@ namespace ProceduralCity
         private readonly IRenderer _textRenderer;
         private Matrix4 _textRendererMatrix = Matrix4.Identity;
         private readonly Textbox _fpsCounterTextbox = new("Consolas");
+        private readonly Textbox _visibleLightsTextbox = new("Consolas");
+        private readonly Textbox _visibleLightMeshesTextbox = new("Consolas");
+        private readonly Textbox _allLightsTextbox = new("Consolas");
+        private readonly Textbox _allLightMatricesToUploadTextbox = new("Consolas");
 
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
@@ -177,6 +194,11 @@ namespace ProceduralCity
                 .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is further than 700f
                 .ToImmutableArray();
 
+            _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstances.Length}", new Vector2(0, 30), 0.5f);
+            _visibleLightMeshesTextbox.WithText($"Meshes to update: {visibleTrafficInstances.SelectMany(t => t.Meshes).Count()}", new Vector2(0, 60), 0.5f);
+            _allLightsTextbox.WithText($"All traffic lights: {_world.Traffic.Count()}", new Vector2(0, 90), 0.5f);
+            _allLightMatricesToUploadTextbox.WithText($"All light matrices to upload: {_world.Traffic.SelectMany(t => t.Meshes).Count()}", new Vector2(0, 120), 0.5f);
+
             Parallel.ForEach(visibleTrafficInstances, t => t.Move((float)e.Time)); // Only animate visible traffic
         }
 
@@ -221,7 +243,14 @@ namespace ProceduralCity
 
         private void OnRenderFrame(FrameEventArgs e)
         {
-            CountFps(e);
+            _textRenderer.Clear();
+            _textRenderer.AddToScene(_fpsCounterTextbox.Text);
+            _textRenderer.AddToScene(_visibleLightsTextbox.Text);
+            _textRenderer.AddToScene(_visibleLightMeshesTextbox.Text);
+            _textRenderer.AddToScene(_allLightsTextbox.Text);
+            _textRenderer.AddToScene(_allLightMatricesToUploadTextbox.Text);
+
+            CountFps(e.Time);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             var viewMatrix = _camera.ViewMatrix;
 
@@ -239,17 +268,13 @@ namespace ProceduralCity
             _context.SwapBuffers();
         }
 
-        private void CountFps(FrameEventArgs e)
+        private void CountFps(double elapsed)
         {
-            _elapsedFrameTime += e.Time;
+            _elapsedFrameTime += elapsed;
             if (_elapsedFrameTime >= 1.0)
             {
-                var fps = Math.Round(1f / e.Time, 0);
-                _context.Title = $"{_config.WindowTitle} - FPS: {fps}";
-
+                var fps = Math.Round(1f / elapsed, 0);
                 _fpsCounterTextbox.WithText(text: $"{fps} FPS", scale: 0.5f);
-                _textRenderer.Clear();
-                _textRenderer.AddToScene(_fpsCounterTextbox.Text);
 
                 _elapsedFrameTime = 0;
             }

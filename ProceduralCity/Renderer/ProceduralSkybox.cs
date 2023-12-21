@@ -6,6 +6,8 @@ using OpenTK.Mathematics;
 
 using ProceduralCity.Generators;
 using ProceduralCity.Renderer.Uniform;
+using ProceduralCity.Utils;
+
 using Serilog;
 
 namespace ProceduralCity.Renderer
@@ -13,10 +15,10 @@ namespace ProceduralCity.Renderer
     class ProceduralSkybox : ISkybox
     {
         private readonly ILogger _logger;
-        private readonly Random _random = new();
         private readonly List<Mesh> _meshes = [];
         private readonly Shader _shader;
         private readonly ColorGenerator _colorGenerator;
+        private readonly RandomService _randomService;
 
         public IEnumerable<Mesh> Meshes
         {
@@ -26,11 +28,12 @@ namespace ProceduralCity.Renderer
             }
         }
 
-        public ProceduralSkybox(ILogger logger, ColorGenerator colorGenerator)
+        public ProceduralSkybox(ILogger logger, ColorGenerator colorGenerator, RandomService randomService)
         {
             _logger = logger;
             _shader = new Shader("skybox/skybox.vert", "skybox/proceduralSkybox.frag");
             _colorGenerator = colorGenerator;
+            _randomService = randomService;
 
             GenerateSky();
 
@@ -60,10 +63,10 @@ namespace ProceduralCity.Renderer
 
         private void SetSeeds()
         {
-            var x = (float)(_random.NextDouble() * 1000f);
-            var y = (float)(_random.NextDouble() * 1000f);
-            var z = (float)(_random.NextDouble() * 1000f);
-            var scale = (float)(_random.NextDouble() * 10000f);
+            var x = (float)(_randomService.NextDouble() * 1000f);
+            var y = (float)(_randomService.NextDouble() * 1000f);
+            var z = (float)(_randomService.NextDouble() * 1000f);
+            var scale = (float)(_randomService.NextDouble() * 10000f);
             _logger.Information("Setting sky seed values: x: {x}, y: {y}, z: {z}, scale: {scale}", x, y, z, scale);
 
             _shader.SetUniformValue("u_seed_x", new FloatUniform
@@ -104,7 +107,7 @@ namespace ProceduralCity.Renderer
 
         private void SetCloudCutoffValue()
         {
-            var cutoff = _random.Next(450, 650) / 1000.0f;
+            var cutoff = _randomService.Next(450, 650) / 1000.0f;
             _shader.SetUniformValue("u_cloud_cutoff", new FloatUniform
             {
                 Value = cutoff

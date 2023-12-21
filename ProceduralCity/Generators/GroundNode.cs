@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Mathematics;
 
@@ -48,7 +47,7 @@ namespace ProceduralCity.Generators
             _boundingBox = new BoundingBox(TopLeftCorner, TopRightCorner, BottomLeftCorner, BottomRightCorner, config.MaxBuildingHeight);
         }
 
-        public IEnumerable<GroundNode> Split(Random random)
+        public IEnumerable<GroundNode> Split(RandomService random)
         {
             var verticalLength = (int)VerticalLength();
             var horizontalLength = (int)HorizontalLength();

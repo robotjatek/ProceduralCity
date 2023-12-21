@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ProceduralCity.Utils;
+
+using System;
 
 namespace ProceduralCity.Camera.Controller.Movements
 {
@@ -13,11 +15,10 @@ namespace ProceduralCity.Camera.Controller.Movements
             PLANE_STRAFE
         }
 
-        public static IMovement BuildRandomMovement(MovementParams buildParams)
+        public static IMovement BuildRandomMovement(MovementParams buildParams, RandomService randomService)
         {
-            Random _random = new();
             var enumValues = Enum.GetValues(typeof(MovementType));
-            var movementType = (MovementType)enumValues.GetValue(_random.Next(enumValues.Length));
+            var movementType = (MovementType)enumValues.GetValue(randomService.Next(enumValues.Length));
             var distanceToCityCenter = (buildParams.CityCenterPosition - buildParams.CameraPosition).Length;
 
             switch (movementType)
@@ -32,13 +33,13 @@ namespace ProceduralCity.Camera.Controller.Movements
                 case MovementType.ROTATE:
                     return new RotateMovement
                     {
-                        Direction = (MovementDirection)_random.Next(2)
+                        Direction = (MovementDirection)randomService.Next(2)
                     };
                 case MovementType.STAND:
                     return new StandMovement();
                 case MovementType.PLANE:
                     {
-                        var verticalAngle = _random.Next(-90, 0); // -90 straight down, 0 staight up (in deg)
+                        var verticalAngle = randomService.Next(-90, 0); // -90 straight down, 0 staight up (in deg)
                         return new PlaneMovement
                         {
                             VerticalAngle = verticalAngle,
@@ -47,7 +48,7 @@ namespace ProceduralCity.Camera.Controller.Movements
                     }
                 case MovementType.PLANE_STRAFE:
                     {
-                        var verticalAngle = _random.Next(-90, 0); // -90 straight down, 0 staight up (in deg)
+                        var verticalAngle = randomService.Next(-90, 0); // -90 straight down, 0 staight up (in deg)
                         return new PlaneStrafeMovement
                         {
                             VerticalAngle = verticalAngle,
