@@ -16,7 +16,7 @@ namespace ProceduralCity.Generators
     class GroundGenerator : IGroundGenerator, IDisposable
     {
         private Vector2 _worldSize;
-        private readonly Random _random = new();
+        private readonly RandomService _randomService;
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
         private readonly Shader _planeShader = new("vs.vert", new string[] { "FlatColored.frag", "fog.frag" });
@@ -31,10 +31,11 @@ namespace ProceduralCity.Generators
             new Vector3(1f, 0.718f, 0.298f), //High Pressure Sodium
         ];
 
-        public GroundGenerator(IAppConfig config, ILogger logger, ColorGenerator colorGenerator)
+        public GroundGenerator(IAppConfig config, ILogger logger, ColorGenerator colorGenerator, RandomService randomService)
         {
             _config = config;
             _logger = logger;
+            _randomService = randomService;
             _colorGenerator = colorGenerator;
             _worldSize = new Vector2(config.WorldSize);
 
@@ -64,7 +65,7 @@ namespace ProceduralCity.Generators
         }
 
         private readonly Shader _headLightShader = new("instanced.vert", "street_light.frag"); //TODO: maybe one shader only, and set uniforms before render?
-        private readonly Shader _rearLightShader = new("instanced.vert", "street_light.frag");
+        private readonly Shader _rearLightShader = new("instanced.vert", "street_light.frag"); //TODO: do not use the street_light shader
 
         public IEnumerable<TrafficLight> CreateTrafficLights(IEnumerable<GroundNode> sites)
         {
@@ -120,11 +121,11 @@ namespace ProceduralCity.Generators
             {
                 var maxSpeed = 10.00f;
                 var minSpeed = 5.00f;
-                var speed = (float)_random.NextDouble() * (maxSpeed - minSpeed) + minSpeed;
+                var speed = (float)_randomService.NextDouble() * (maxSpeed - minSpeed) + minSpeed;
 
-                var x = (float)_random.NextDouble() * (finish.Position.X - start.Position.X) + start.Position.X;
-                var y = (float)_random.NextDouble() * (finish.Position.Y - start.Position.Y) + start.Position.Y;
-                var z = (float)_random.NextDouble() * (finish.Position.Z - start.Position.Z) + start.Position.Z;
+                var x = (float)_randomService.NextDouble() * (finish.Position.X - start.Position.X) + start.Position.X;
+                var y = (float)_randomService.NextDouble() * (finish.Position.Y - start.Position.Y) + start.Position.Y;
+                var z = (float)_randomService.NextDouble() * (finish.Position.Z - start.Position.Z) + start.Position.Z;
 
                 var position = new Vector3(x, y, z);
                 yield return new TrafficLight(position, finish, _headLightShader, _rearLightShader, speed);
@@ -133,7 +134,7 @@ namespace ProceduralCity.Generators
 
         public IEnumerable<IRenderable> CreateStreetLights(IEnumerable<GroundNode> sites)
         {
-            var lightColor = _lightColors[_random.Next(_lightColors.Count)];
+            var lightColor = _lightColors[_randomService.Next(_lightColors.Count)];
             _lightShader.SetUniformValue("u_color", new Vector3Uniform
             {
                 Value = lightColor
@@ -202,7 +203,7 @@ namespace ProceduralCity.Generators
 
             foreach (var node in nodes)
             {
-                SplitNodes(node.Split(_random), currentLevel, maxLevel);
+                SplitNodes(node.Split(_randomService), currentLevel, maxLevel);
             }
         }
 

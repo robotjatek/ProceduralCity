@@ -41,9 +41,10 @@ namespace ProceduralCity.GameObjects
             // PrimitiveUtils.CreateBacksideVertices was originally meant to create 3D objects in view space. Here it is abused to create a 2D object in model space
             var vertices = PrimitiveUtils.CreateBacksideVertices( 
                 position: new Vector3(0), // Initial vertex position does not matter when constructing the object, because we handle this object as if it is in model space (as every other should be)
-                area: new Vector2(2, 0), // First parameter of the area is the WIDTH. As this function is a 3D object creator function, the second argument of the "area" has no meaining here.
+                area: new Vector2(2, 0), // First parameter of the area is the WIDTH. As this function is a 3D object creator function, the second argument of the "area" has no meaning here.
                 height: 1); 
-            var uvs = PrimitiveUtils.CreateBackUVs(); // TODO: kellenek UV-k? Empty array miért nem jó? => empty array-jel nem rendereli ki...
+            var uvs = PrimitiveUtils.CreateBackUVs();   // TODO: kellenek UV-k? Empty array miért nem jó? => empty array-jel nem rendereli ki... 
+                                                        // A streetlight shader van újrahasználva itt is, a textúra koordináták alapján számolja ki a center koordinátát
 
             var mesh = new Mesh(vertices, uvs, _headlightShader)
             {
@@ -77,7 +78,8 @@ namespace ProceduralCity.GameObjects
         {
             var direction = _target.Position - _position;
             direction.Normalize();
-            var look = Matrix4.LookAt(_position, _target.Position, UP).Inverted();
+            var look = Matrix4.LookAt(_position, _target.Position, UP).Inverted(); // TODO: calculate lookat in vertex shader instead of the CPU
+            // TODO: this Inverted() call complicates things. It may be beneficial to calculate traffic light look in a different way.
             _position += direction * _speed * elapsedTime;
             Model = look;
         }

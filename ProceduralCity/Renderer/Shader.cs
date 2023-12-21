@@ -33,8 +33,8 @@ namespace ProceduralCity.Renderer
             var vertexFiles = vertexShaders.Select(LoadTextFile);
             var fragmentFiles = fragmentShaders.Select(LoadTextFile);
 
-            var vertexHandles = vertexFiles.Select(vertexHandle => CompileShader(vertexHandle, ShaderType.VertexShader)).ToArray();
-            var fragmentHandles = fragmentFiles.Select(fragmentHandle => CompileShader(fragmentHandle, ShaderType.FragmentShader));
+            var vertexHandles = vertexFiles.Select(vertexSource => CompileShader(vertexSource, ShaderType.VertexShader));
+            var fragmentHandles = fragmentFiles.Select(fragmentSource => CompileShader(fragmentSource, ShaderType.FragmentShader));
             int[] shaderHandles = [..vertexHandles, ..fragmentHandles];
                 
             ProgramId = LinkShaders(shaderHandles);
@@ -117,6 +117,7 @@ namespace ProceduralCity.Renderer
 
         protected virtual void Dispose(bool disposing)
         {
+            Log.Information("Disposing Shader program {Id}", ProgramId);
             if (!disposedValue)
             {
                 //if (disposing)
