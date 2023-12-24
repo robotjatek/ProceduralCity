@@ -37,6 +37,10 @@ namespace ProceduralCity
     //TODO: Do not render hidden traffic lights
     //      -- I may need to clear the traffic renderer meshes every frame (which could be lower than the actual render frames) and re-add only the visible meshes.
     //      -- That way only ~1-2k matrices are needed to upload every frame instead of 100k
+    //          ---- UPDATE: clearing the renderer and re-adding all the meshes does not work this time, because setting up an InstancedBatch takes a long time.
+    //          Clearing and re-adding every frame effectively means every frame is a first frame.
+    //          A more sophistacted method is needed reusing the already existing structure and only updating the model matrices and the instance count
+    //              ---- Maybe return The IBatch reference when calling Renderer.AddToScene?
     //TODO: Building LOD levels
 
     // Low priority tasks
@@ -193,7 +197,7 @@ namespace ProceduralCity
 
             var visibleTraffic = _world.BspTree.GetLeavesInFrustum(_camera).SelectMany(site => site.Traffic);
 
-            var visibleTrafficInstances = visibleTraffic
+            var visibleTrafficInstancesToUpdate = visibleTraffic
                 .AsParallel()
                 /* 
                  * This may not worth the effort at all. Per site culling culls most of the traffic outside the view frustum already.
@@ -201,13 +205,13 @@ namespace ProceduralCity
                  */
                 //.Where(traffic => _camera.IsInViewFrustum(traffic.Position)) 
                 .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is further than 700f
-                .ToImmutableArray();
+                .ToImmutableList();
 
-            _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstances.Length}", new Vector2(0, 30), 0.5f);
-            _lightsInFrustumTextbox.WithText($"Traffic lights in camera frustum: {visibleTraffic.Count()}", new Vector2(0, 60), 0.5f);
+            _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstancesToUpdate.Count}", new Vector2(0, 30), 0.5f);
+            _visibleLightMeshesTextbox.WithText($"Meshes to update: {visibleTrafficInstancesToUpdate.SelectMany(t => t.Meshes).Count()}", new Vector2(0, 60), 0.5f);
             _allLightsTextbox.WithText($"All traffic lights: {_world.Traffic.Count()}", new Vector2(0, 90), 0.5f);
 
-            Parallel.ForEach(visibleTrafficInstances, t => t.Move((float)e.Time)); // Only animate visible traffic
+            Parallel.ForEach(visibleTrafficInstancesToUpdate, t => t.Move((float)e.Time)); // Only animate visible traffic
         }
 
         private void HandleCameraInput(FrameEventArgs e, KeyboardState keyboardState)

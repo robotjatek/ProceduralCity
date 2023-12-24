@@ -152,6 +152,7 @@ namespace ProceduralCity.Renderer
                 GL.DeleteVertexArray(_vaoId);
                 GL.DeleteBuffer(_vertexVboId);
                 GL.DeleteBuffer(_uvVboId);
+                GL.DeleteBuffer(_instancedModelVbo);
 
                 disposedValue = true;
             }
