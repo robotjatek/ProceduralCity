@@ -27,10 +27,9 @@ namespace ProceduralCity
     //TODO: more building types
     //TODO: add more variety to the existing building types
     //TODO: Further traffic light optimizations:
-    //    Before optimizations ~4000-4100 frames in 30 seconds, ~8000 frames in 60 seconds
+    //    Before optimizations: ~4000-4100 frames in 30 seconds, ~8000 frames in 60 seconds
+    //    After reducing mesh count to one: ~5400 frames in 30 seconds, ~11000 frames in 60 seconds
     //    Optimizations:
-    //          - One mesh per traffic light -- halves the need for Model matrices
-    //              -- gl_FrontFacing in shader, use separate renderer, disable backface culling before render. Red color on backface, white on frontface
     //          - Fix light position problem - position should mean the center of the light
     //          - Update traffic lights on a lower framerate
     //          - Calculate model matrix on gpu for traffic lights => create a vertex shader that is the variation of the instanced_vert. Send position vector and lookat vector instead of model matrix
@@ -63,6 +62,7 @@ namespace ProceduralCity
         private readonly IRenderer _renderer;
         private readonly IRenderer _ndcRenderer;
         private readonly IRenderer _skyboxRenderer;
+        private readonly IRenderer _trafficRenderer;
 
         private readonly IRenderer _textRenderer;
         private Matrix4 _textRendererMatrix = Matrix4.Identity;
@@ -98,6 +98,7 @@ namespace ProceduralCity
             IRenderer ndcRenderer,
             IRenderer skyboxRenderer,
             IRenderer textRenderer,
+            IRenderer trafficRenderer,
             ISkybox skybox,
             ColorGenerator colorGenerator)
         {
@@ -141,7 +142,11 @@ namespace ProceduralCity
             };
             _skyboxRenderer.AddToScene(skybox);
 
-            _renderer.AddToScene(_world.Traffic); // TODO: rendering traffic should be dynamic, based on the camera frustum
+            _trafficRenderer = trafficRenderer;
+            _trafficRenderer.AddToScene(_world.Traffic); // TODO: rendering traffic should be dynamic, based on the camera frustum
+            _trafficRenderer.BeforeRender = () => GL.Disable(EnableCap.CullFace);
+            _trafficRenderer.AfterRender = () => GL.Enable(EnableCap.CullFace);
+
             _renderer.AddToScene(_world.Renderables);
 
             _backbufferTexture = new Texture(_config.ResolutionWidth, config.ResolutionHeight);
@@ -260,6 +265,7 @@ namespace ProceduralCity
             _worldRenderer.Clear();
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix);
+            _worldRenderer.RenderToTexture(_trafficRenderer, _projectionMatrix, viewMatrix);
 
             if (_isBloomEnabled)
                 _postprocessPipeline.RunPipeline();
@@ -381,6 +387,7 @@ namespace ProceduralCity
             _visibleLightsTextbox.Dispose();
             _lightsInFrustumTextbox.Dispose();
             _allLightsTextbox.Dispose();
-    }
+            _trafficRenderer.Dispose();
+        }
     }
 }

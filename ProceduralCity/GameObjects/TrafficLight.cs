@@ -12,8 +12,7 @@ namespace ProceduralCity.GameObjects
         private static readonly Vector3 UP = new(0, 1, 0);
         private Vector3 _position;
         private Waypoint _target;
-        private readonly Shader _headlightShader; //TODO: disable backface culling on this and use 1 mesh only with 1 shader
-        private readonly Shader _rearLightShader;
+        private readonly Shader _lightShader;
         private readonly List<Mesh> _meshes = [];
 
         public Matrix4 Model { get; private set; } = Matrix4.Identity;
@@ -22,16 +21,14 @@ namespace ProceduralCity.GameObjects
 
         public Vector3 Position { get { return _position; } }
 
-        public TrafficLight(Vector3 position, Waypoint target, Shader headLightShader, Shader rearLightShader, float speed)
+        public TrafficLight(Vector3 position, Waypoint target, Shader lightShader, float speed)
         {
             _speed = speed;
             _position = position;
             _target = target;
-            _headlightShader = headLightShader;
-            _rearLightShader = rearLightShader;
+            _lightShader = lightShader;
 
             CreateHeadLight();
-            CreateBackLight();
 
             Move(0); // Transform the object to its initial position
         }
@@ -44,21 +41,8 @@ namespace ProceduralCity.GameObjects
                 area: new Vector2(2, 0), // First parameter of the area is the WIDTH. As this function is a 3D object creator function, the second argument of the "area" has no meaning here.
                 height: 1); 
             var uvs = PrimitiveUtils.CreateBackUVs();   // TODO: kellenek UV-k? Empty array miért nem jó? => empty array-jel nem rendereli ki... 
-                                                        // A streetlight shader van újrahasználva itt is, a textúra koordináták alapján számolja ki a center koordinátát
 
-            var mesh = new Mesh(vertices, uvs, _headlightShader)
-            {
-                IsInstanced = true
-            };
-            _meshes.Add(mesh);
-        }
-
-        private void CreateBackLight()
-        {
-            var vertices = PrimitiveUtils.CreateFrontVertices(new Vector3(0), new Vector2(2, 0), 1);
-            var uvs = PrimitiveUtils.CreateFrontUvs();
-
-            var mesh = new Mesh(vertices, uvs, _rearLightShader)
+            var mesh = new Mesh(vertices, uvs, _lightShader)
             {
                 IsInstanced = true
             };
@@ -71,7 +55,6 @@ namespace ProceduralCity.GameObjects
             TransformObject(elapsedTime);
 
             _meshes[0].Model = Model;
-            _meshes[1].Model = Model;
         }
 
         private void TransformObject(float elapsedTime)
