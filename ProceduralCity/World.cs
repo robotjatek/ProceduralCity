@@ -17,7 +17,7 @@ namespace ProceduralCity
         private readonly ILogger _logger;
         private readonly GroundNodeTree _groundNodeTree;
 
-        public GroundNodeTree BspTree => _groundNodeTree;
+        public GroundNodeTree GroundNodeTree => _groundNodeTree;
 
         public IEnumerable<TrafficLight> Traffic => _trafficLights;
 
