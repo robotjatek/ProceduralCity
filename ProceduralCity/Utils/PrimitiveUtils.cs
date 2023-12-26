@@ -2,10 +2,28 @@
 
 using OpenTK.Mathematics;
 
+using ProceduralCity.Renderer;
+
 namespace ProceduralCity.Utils
 {
     static class PrimitiveUtils
     {
+        private static Mesh _trafficMesh;
+
+        public static Mesh CreateTrafficMesh(Shader shader)
+        {
+            _trafficMesh ??= new Mesh(
+                    // PrimitiveUtils.CreateBacksideVertices was originally meant to create 3D objects in view space. Here it is abused to create a 2D object in model space
+                    vertices: CreateBacksideVertices(
+                        position: new Vector3(0), // Initial vertex position does not matter when constructing the object, because we handle this object as if it is in model space (as every other should be)
+                        area: new Vector2(2, 0), // First parameter of the area is the WIDTH. As this function is a 3D object creator function, the second argument of the "area" has no meaning here.
+                        height: 1),
+                    uvs: CreateBackUVs(),
+                    shader: shader);
+
+            return _trafficMesh;
+        }
+
         /// <summary>
         /// Creates vertices for charaters in a textbox.
         /// Usually should be used in conjuction with CreateCharacterUVs

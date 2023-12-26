@@ -29,18 +29,18 @@ namespace ProceduralCity
     //TODO: Further traffic light optimizations:
     //    Before optimizations: ~4000-4100 frames in 30 seconds, ~8000 frames in 60 seconds
     //    After reducing mesh count to one: ~5400 frames in 30 seconds, ~11000 frames in 60 seconds
-    //    Optimizations:
-    //          - Fix light position problem - position should mean the center of the light
+    //    Rendering only the lights that are in the camera frustum is a hit and miss:
+    //         -- FPS can go up into unseen heights: ~500-700 FPS
+    //         -- But in the avarage use-case and in the used test scenario FPS was hit very hard:
+    //              Down to ~9000 from the previous ~11000 in 60 seconds (that is -18%)
+    //         -- There may be some hope if occlusion culling is utilized with this
+    //    TODO: Optimizations:
+    //          - Feature toggle in the configuration file to disable hidden traffic light culling -- MUST before merging back to the optimization_branch
     //          - Update traffic lights on a lower framerate
+    //          - Fix light position problem - position should mean the center of the light
     //          - Calculate model matrix on gpu for traffic lights => create a vertex shader that is the variation of the instanced_vert. Send position vector and lookat vector instead of model matrix
     //              -- There is a matrix invert call in the computation. Rethink the way traffic lights are transformed
-    //TODO: Do not render hidden traffic lights
-    //      -- I may need to clear the traffic renderer meshes every frame (which could be lower than the actual render frames) and re-add only the visible meshes.
-    //      -- That way only ~1-2k matrices are needed to upload every frame instead of 100k
-    //          ---- UPDATE: clearing the renderer and re-adding all the meshes does not work this time, because setting up an InstancedBatch takes a long time.
-    //          Clearing and re-adding every frame effectively means every frame is a first frame.
-    //          A more sophistacted method is needed reusing the already existing structure and only updating the model matrices and the instance count
-    //              ---- Maybe return The IBatch reference when calling Renderer.AddToScene?
+    //          - Occlusion cull traffic lights -- must before re-enabling traffic_culling
     //TODO: Building LOD levels
 
     // Low priority tasks
@@ -67,6 +67,8 @@ namespace ProceduralCity
         private readonly IRenderer _ndcRenderer;
         private readonly IRenderer _skyboxRenderer;
         private readonly IRenderer _trafficRenderer;
+        private readonly Matrix4[] _trafficMatrixCache;
+        private readonly InstancedBatch _trafficInstanceBatch;
 
         private readonly IRenderer _textRenderer;
         private Matrix4 _textRendererMatrix = Matrix4.Identity;
@@ -147,7 +149,8 @@ namespace ProceduralCity
             _skyboxRenderer.AddToScene(skybox);
 
             _trafficRenderer = trafficRenderer;
-            _trafficRenderer.AddToScene(_world.Traffic); // TODO: rendering traffic should be dynamic, based on the camera frustum
+            _trafficInstanceBatch = _trafficRenderer.AddAsInstanced(_world.Traffic.First().Meshes.First());
+            _trafficMatrixCache = new Matrix4[_world.Traffic.Count()];
             _trafficRenderer.BeforeRender = () => GL.Disable(EnableCap.CullFace);
             _trafficRenderer.AfterRender = () => GL.Enable(EnableCap.CullFace);
 
@@ -207,9 +210,20 @@ namespace ProceduralCity
                 .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is further than 700f
                 .ToImmutableList();
 
+
+            var trafficModels = visibleTraffic.Select(t => t.Model);
+            var trafficCount = trafficModels.Count();
+            Parallel.ForEach(
+                trafficModels,
+                (modelMatrix, _, i) =>
+                {
+                    _trafficMatrixCache[i] = modelMatrix;
+                });
+            _trafficInstanceBatch.UpdateModels(_trafficMatrixCache, trafficCount);
+
             _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstancesToUpdate.Count}", new Vector2(0, 30), 0.5f);
-            _visibleLightMeshesTextbox.WithText($"Meshes to update: {visibleTrafficInstancesToUpdate.SelectMany(t => t.Meshes).Count()}", new Vector2(0, 60), 0.5f);
-            _allLightsTextbox.WithText($"All traffic lights: {_world.Traffic.Count()}", new Vector2(0, 90), 0.5f);
+            _lightsInFrustumTextbox.WithText($"Traffic lights in camera frustum: {trafficCount}", new Vector2(0, 60), 0.5f);
+            _allTrafficLightsTextbox.WithText($"All traffic lights: {_world.Traffic.Count()}", new Vector2(0, 90), 0.5f);
 
             Parallel.ForEach(visibleTrafficInstancesToUpdate, t => t.Move((float)e.Time)); // Only animate visible traffic
         }
@@ -259,7 +273,7 @@ namespace ProceduralCity
             _textRenderer.AddToScene(_fpsCounterTextbox.Text);
             _textRenderer.AddToScene(_visibleLightsTextbox.Text);
             _textRenderer.AddToScene(_lightsInFrustumTextbox.Text);
-            _textRenderer.AddToScene(_allLightsTextbox.Text);
+            _textRenderer.AddToScene(_allTrafficLightsTextbox.Text);
             _textRenderer.AddToScene(_benchmarkTextbox.Text);
 
             CountFps(e.Time);
@@ -390,7 +404,7 @@ namespace ProceduralCity
             _fpsCounterTextbox.Dispose();
             _visibleLightsTextbox.Dispose();
             _lightsInFrustumTextbox.Dispose();
-            _allLightsTextbox.Dispose();
+            _allTrafficLightsTextbox.Dispose();
             _trafficRenderer.Dispose();
         }
     }

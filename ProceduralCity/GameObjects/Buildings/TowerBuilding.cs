@@ -14,10 +14,7 @@ namespace ProceduralCity.Buildings
         private readonly ITexture _texture;
         private readonly RandomService _randomService;
 
-        public IEnumerable<Mesh> Meshes
-        {
-            get { return _meshes; }
-        }
+        public IEnumerable<Mesh> Meshes => _meshes;
 
         public TowerBuilding(Vector3 position, Vector2 area, Texture texture, Shader shader, float height, IBillboardBuilder billboardBuilder, RandomService randomService)
         {

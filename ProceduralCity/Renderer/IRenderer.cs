@@ -16,6 +16,8 @@ namespace ProceduralCity.Renderer
 
         void AddToScene(IRenderable renderable);
 
+        InstancedBatch AddAsInstanced(Mesh mesh);
+
         void Clear();
     }
 }

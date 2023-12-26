@@ -35,26 +35,13 @@ namespace ProceduralCity.GameObjects
 
         private void CreateHeadLight()
         {
-            // PrimitiveUtils.CreateBacksideVertices was originally meant to create 3D objects in view space. Here it is abused to create a 2D object in model space
-            var vertices = PrimitiveUtils.CreateBacksideVertices( 
-                position: new Vector3(0), // Initial vertex position does not matter when constructing the object, because we handle this object as if it is in model space (as every other should be)
-                area: new Vector2(2, 0), // First parameter of the area is the WIDTH. As this function is a 3D object creator function, the second argument of the "area" has no meaning here.
-                height: 1); 
-            var uvs = PrimitiveUtils.CreateBackUVs();   // TODO: kellenek UV-k? Empty array miért nem jó? => empty array-jel nem rendereli ki... 
-
-            var mesh = new Mesh(vertices, uvs, _lightShader)
-            {
-                IsInstanced = true
-            };
-            _meshes.Add(mesh);
+            _meshes.Add(PrimitiveUtils.CreateTrafficMesh(_lightShader));
         }
 
         public void Move(float elapsedTime)
         {
             CalculateTarget();
             TransformObject(elapsedTime);
-
-            _meshes[0].Model = Model;
         }
 
         private void TransformObject(float elapsedTime)

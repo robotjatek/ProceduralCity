@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
@@ -9,17 +8,14 @@ using ProceduralCity.Renderer.Uniform;
 
 namespace ProceduralCity.Renderer
 {
-    // TODO: remove and add objects dynamically
-    // TODO: do not update matrices for culled objects
     class InstancedBatch(Shader shader, IEnumerable<ITexture> textures) : IBatch, IDisposable
     {
         private readonly Shader _shader = shader;
         private readonly IEnumerable<ITexture> _textures = textures;
         private readonly List<Vector3> _vertices = [];
         private readonly List<Vector2> _UVs = [];
+        private int _instanceCount = 0;
 
-        private readonly List<Mesh> _meshes = [];
-        private Matrix4[] _instanceModelMatrixValues; // Temp array for model matrix updates.
         private bool disposedValue;
         private bool _ready = false;
         private int _vaoId;
@@ -43,9 +39,20 @@ namespace ProceduralCity.Renderer
                 _vertices.AddRange(m.Vertices);
                 _UVs.AddRange(m.UVs);
             }
-            _meshes.Add(m);
+        }
 
-            // TODO: dynamically update the instance models in every frame to only contain data for meshes that are not culled
+        /// <summary>
+        /// Updates the Model matrices for the instanced meshes
+        /// </summary>
+        /// <param name="models">
+        /// The model matrices to upload to the GPU
+        /// Always a full-sized array, but only the beginning is relevant as everything after the <paramref name="instanceCount"/> is just old junk data</param>
+        /// <param name="instanceCount">The usable matrix count at the beginning of the array. Will set the <see cref="_instanceCount"/> member variable too"/></param>
+        public void UpdateModels(Matrix4[] models, int instanceCount)
+        {
+            _instanceCount = instanceCount;
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
+            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, _instanceCount * Vector4.SizeInBytes * 4, models);
         }
 
         public void Draw(Matrix4 projection, Matrix4 view)
@@ -54,8 +61,6 @@ namespace ProceduralCity.Renderer
             {
                 Setup();
             }
-
-            SetupInstancedArray();
 
             GL.BindVertexArray(_vaoId);
             var textureOffset = 0;
@@ -75,7 +80,7 @@ namespace ProceduralCity.Renderer
             });
 
             _shader.Use();
-            GL.DrawArraysInstanced(PrimitiveType.Triangles, 0, Vertices.Length, _meshes.Count);
+            GL.DrawArraysInstanced(PrimitiveType.Triangles, 0, Vertices.Length, _instanceCount);
             GL.BindVertexArray(0);
         }
 
@@ -88,7 +93,6 @@ namespace ProceduralCity.Renderer
             _vertices.Clear();
             UVs = [.. _UVs];
             _UVs.Clear();
-            _instanceModelMatrixValues = new Matrix4[_meshes.Count];
 
             _vaoId = GL.GenVertexArray();
             GL.BindVertexArray(_vaoId);
@@ -107,7 +111,7 @@ namespace ProceduralCity.Renderer
 
             _instancedModelVbo = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, _meshes.Count * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, _instanceCount * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
             GL.EnableVertexAttribArray(3);
             GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 0);
             GL.VertexAttribDivisor(3, 1);
@@ -127,17 +131,6 @@ namespace ProceduralCity.Renderer
             GL.BindVertexArray(0);
             _ready = true;
             _shader.Use();
-        }
-
-        private void SetupInstancedArray()
-        {
-            Parallel.For(0, _meshes.Count, (i) =>
-            {
-                _instanceModelMatrixValues[i] = _meshes[i].Model;
-            });
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, _instanceModelMatrixValues.Length * Vector4.SizeInBytes * 4, _instanceModelMatrixValues);
         }
 
         protected virtual void Dispose(bool disposing)
