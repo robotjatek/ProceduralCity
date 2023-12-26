@@ -72,7 +72,7 @@ namespace ProceduralCity
         private readonly Textbox _fpsCounterTextbox = new("Consolas");
         private readonly Textbox _visibleLightsTextbox = new("Consolas");
         private readonly Textbox _lightsInFrustumTextbox = new("Consolas");
-        private readonly Textbox _allLightsTextbox = new("Consolas");
+        private readonly Textbox _allTrafficLightsTextbox = new("Consolas");
 
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
