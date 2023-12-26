@@ -28,14 +28,11 @@ namespace ProceduralCity
     //TODO: add more variety to the existing building types
     //TODO: Further traffic light optimizations:
     //    Before optimizations: ~4000-4100 frames in 30 seconds, ~8000 frames in 60 seconds
-    //    After reducing mesh count to one: ~5400 frames in 30 seconds, ~11000 frames in 60 seconds
-    //    Rendering only the lights that are in the camera frustum is a hit and miss:
+    //    After reducing mesh count to one: ~5400 frames in 30 seconds, ~10000 frames in 60 seconds
+    //    Rendering only the lights that are in the camera frustum: ~111000 frames in 60 seconds in general situations, BUT:
     //         -- FPS can go up into unseen heights: ~500-700 FPS
-    //         -- But in the avarage use-case and in the used test scenario FPS was hit very hard:
-    //              Down to ~9000 from the previous ~11000 in 60 seconds (that is -18%)
-    //         -- There may be some hope if occlusion culling is utilized with this
+    //         -- Occlusion culling potentially can make this much faster
     //    TODO: Optimizations:
-    //          - Feature toggle in the configuration file to disable hidden traffic light culling -- MUST before merging back to the optimization_branch
     //          - Update traffic lights on a lower framerate
     //          - Fix light position problem - position should mean the center of the light
     //          - Calculate model matrix on gpu for traffic lights => create a vertex shader that is the variation of the instanced_vert. Send position vector and lookat vector instead of model matrix
