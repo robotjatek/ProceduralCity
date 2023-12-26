@@ -68,9 +68,8 @@ namespace ProceduralCity
         private Matrix4 _textRendererMatrix = Matrix4.Identity;
         private readonly Textbox _fpsCounterTextbox = new("Consolas");
         private readonly Textbox _visibleLightsTextbox = new("Consolas");
-        private readonly Textbox _visibleLightMeshesTextbox = new("Consolas");
+        private readonly Textbox _lightsInFrustumTextbox = new("Consolas");
         private readonly Textbox _allLightsTextbox = new("Consolas");
-        private readonly Textbox _allLightMatricesToUploadTextbox = new("Consolas");
 
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
@@ -187,10 +186,9 @@ namespace ProceduralCity
             HandleCameraInput(e, keyboardState);
             _cameraController.Update((float)e.Time);
 
-            var sites = _world.BspTree.GetLeavesInFrustum(_camera).ToImmutableArray();
+            var visibleTraffic = _world.BspTree.GetLeavesInFrustum(_camera).SelectMany(site => site.Traffic);
 
-            var visibleTrafficInstances = sites
-                .SelectMany(site => site.Traffic)
+            var visibleTrafficInstances = visibleTraffic
                 .AsParallel()
                 /* 
                  * This may not worth the effort at all. Per site culling culls most of the traffic outside the view frustum already.
@@ -201,9 +199,8 @@ namespace ProceduralCity
                 .ToImmutableArray();
 
             _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstances.Length}", new Vector2(0, 30), 0.5f);
-            _visibleLightMeshesTextbox.WithText($"Meshes to update: {visibleTrafficInstances.SelectMany(t => t.Meshes).Count()}", new Vector2(0, 60), 0.5f);
+            _lightsInFrustumTextbox.WithText($"Traffic lights in camera frustum: {visibleTraffic.Count()}", new Vector2(0, 60), 0.5f);
             _allLightsTextbox.WithText($"All traffic lights: {_world.Traffic.Count()}", new Vector2(0, 90), 0.5f);
-            _allLightMatricesToUploadTextbox.WithText($"All light matrices to upload: {_world.Traffic.SelectMany(t => t.Meshes).Count()}", new Vector2(0, 120), 0.5f);
 
             Parallel.ForEach(visibleTrafficInstances, t => t.Move((float)e.Time)); // Only animate visible traffic
         }
@@ -252,9 +249,8 @@ namespace ProceduralCity
             _textRenderer.Clear();
             _textRenderer.AddToScene(_fpsCounterTextbox.Text);
             _textRenderer.AddToScene(_visibleLightsTextbox.Text);
-            _textRenderer.AddToScene(_visibleLightMeshesTextbox.Text);
+            _textRenderer.AddToScene(_lightsInFrustumTextbox.Text);
             _textRenderer.AddToScene(_allLightsTextbox.Text);
-            _textRenderer.AddToScene(_allLightMatricesToUploadTextbox.Text);
             _textRenderer.AddToScene(_benchmarkTextbox.Text);
 
             CountFps(e.Time);
@@ -383,9 +379,8 @@ namespace ProceduralCity
             _postprocessPipeline.Dispose();
             _fpsCounterTextbox.Dispose();
             _visibleLightsTextbox.Dispose();
-            _visibleLightMeshesTextbox.Dispose();
+            _lightsInFrustumTextbox.Dispose();
             _allLightsTextbox.Dispose();
-            _allLightMatricesToUploadTextbox.Dispose();
     }
     }
 }
