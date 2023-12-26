@@ -27,7 +27,7 @@ namespace ProceduralCity
     //TODO: more building types
     //TODO: add more variety to the existing building types
     //TODO: Further traffic light optimizations:
-    //    Before optimizations ~4000-4100 frames in 30 seconds
+    //    Before optimizations ~4000-4100 frames in 30 seconds, ~8000 frames in 60 seconds
     //    Optimizations:
     //          - One mesh per traffic light -- halves the need for Model matrices
     //              -- gl_FrontFacing in shader, use separate renderer, disable backface culling before render. Red color on backface, white on frontface
@@ -273,7 +273,7 @@ namespace ProceduralCity
             GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
             _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity);
             _context.SwapBuffers();
-            if (_stopwatch.ElapsedMilliseconds < 30000) // Collect data for 30 seconds
+            if (_stopwatch.ElapsedMilliseconds < 60000) // Collect data for 60 seconds
             {
                 _frames++;
             }
@@ -382,6 +382,10 @@ namespace ProceduralCity
             _backbufferTexture.Dispose();
             _postprocessPipeline.Dispose();
             _fpsCounterTextbox.Dispose();
-        }
+            _visibleLightsTextbox.Dispose();
+            _visibleLightMeshesTextbox.Dispose();
+            _allLightsTextbox.Dispose();
+            _allLightMatricesToUploadTextbox.Dispose();
+    }
     }
 }
