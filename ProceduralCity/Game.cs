@@ -18,6 +18,7 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace ProceduralCity
 {
@@ -26,9 +27,7 @@ namespace ProceduralCity
     //TODO: more building types
     //TODO: add more variety to the existing building types
     //TODO: Further traffic light optimizations:
-    //    Preparation:
-    //          - Global random number service with configurable seed to have consistent runs.
-    //          - Measure number of frames for a minute.
+    //    Before optimizations ~4000-4100 frames in 30 seconds
     //    Optimizations:
     //          - One mesh per traffic light -- halves the need for Model matrices
     //              -- gl_FrontFacing in shader, use separate renderer, disable backface culling before render. Red color on backface, white on frontface
@@ -52,6 +51,10 @@ namespace ProceduralCity
     //TODO: add state change capability to the renderer
     class Game : IGame, IDisposable
     {
+        private Stopwatch _stopwatch = new();
+        private int _frames = 0;
+        private readonly Textbox _benchmarkTextbox = new("Consolas");
+
         private Matrix4 _projectionMatrix = Matrix4.Identity;
         private Matrix4 _ndcRendererMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
 
@@ -99,6 +102,7 @@ namespace ProceduralCity
             ISkybox skybox,
             ColorGenerator colorGenerator)
         {
+            _benchmarkTextbox.WithText("Collecting data...", new Vector2(0, 150), 0.5f);
             _camera = camera;
             _cameraController = cameraController;
             _cameraController.SetFadeout = SetFadeout;
@@ -159,6 +163,8 @@ namespace ProceduralCity
 
             var fullScreenQuad = new FullScreenQuad(new[] { _worldRenderer.Texture }, _fullscreenShader);
             _ndcRenderer.AddToScene(fullScreenQuad);
+
+            _stopwatch.Start();
         }
 
         private void ConfigureContext()
@@ -249,6 +255,7 @@ namespace ProceduralCity
             _textRenderer.AddToScene(_visibleLightMeshesTextbox.Text);
             _textRenderer.AddToScene(_allLightsTextbox.Text);
             _textRenderer.AddToScene(_allLightMatricesToUploadTextbox.Text);
+            _textRenderer.AddToScene(_benchmarkTextbox.Text);
 
             CountFps(e.Time);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -266,6 +273,14 @@ namespace ProceduralCity
             GL.Viewport(0, 0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y);
             _ndcRenderer.RenderScene(_ndcRendererMatrix, Matrix4.Identity);
             _context.SwapBuffers();
+            if (_stopwatch.ElapsedMilliseconds < 30000) // Collect data for 30 seconds
+            {
+                _frames++;
+            }
+            else
+            {
+                _benchmarkTextbox.WithText($"Frames: {_frames}", new Vector2(0, 150), 0.5f);
+            }
         }
 
         private void CountFps(double elapsed)
