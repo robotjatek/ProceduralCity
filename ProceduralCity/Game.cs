@@ -29,7 +29,7 @@ namespace ProceduralCity
     //TODO: Further traffic light optimizations:
     //    Before optimizations: ~4000-4100 frames in 30 seconds, ~8000 frames in 60 seconds
     //    After reducing mesh count to one: ~5400 frames in 30 seconds, ~10000 frames in 60 seconds
-    //    Rendering only the lights that are in the camera frustum: ~111000 frames in 60 seconds in general situations, BUT:
+    //    Rendering only the lights that are in the camera frustum: ~11000 frames in 60 seconds in general situations, BUT:
     //         -- FPS can go up into unseen heights: ~500-700 FPS
     //         -- Occlusion culling potentially can make this much faster
     //    TODO: Optimizations:
@@ -37,7 +37,7 @@ namespace ProceduralCity
     //          - Fix light position problem - position should mean the center of the light
     //          - Calculate model matrix on gpu for traffic lights => create a vertex shader that is the variation of the instanced_vert. Send position vector and lookat vector instead of model matrix
     //              -- There is a matrix invert call in the computation. Rethink the way traffic lights are transformed
-    //          - Occlusion cull traffic lights -- must before re-enabling traffic_culling
+    //          - Occlusion cull traffic lights
     //TODO: Building LOD levels
 
     // Low priority tasks
