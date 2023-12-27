@@ -36,7 +36,6 @@ namespace ProceduralCity
     //    TODO: Optimizations:
     //          - Fix light position problem - position should mean the center of the light
     //          - Calculate model matrix on gpu for traffic lights => create a vertex shader that is the variation of the instanced_vert. Send position vector and lookat vector instead of model matrix
-    //              -- There is a matrix invert call in the computation. Rethink the way traffic lights are transformed
     //TODO: Occlusion cull traffic lights
     //TODO: Building LOD levels
 

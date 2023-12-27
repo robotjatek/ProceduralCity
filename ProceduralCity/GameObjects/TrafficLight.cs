@@ -48,10 +48,21 @@ namespace ProceduralCity.GameObjects
         {
             var direction = _target.Position - _position;
             direction.Normalize();
-            var look = Matrix4.LookAt(_position, _target.Position, UP).Inverted(); // TODO: calculate lookat in vertex shader instead of the CPU
-            // TODO: this Inverted() call complicates things. It may be beneficial to calculate traffic light look in a different way.
+
+            // Calculate to LookAt matrix by hand. This way no Invert is needed.
+            var right = Vector3.Cross(direction, UP);
+            right.Normalize();
+
+            var up = Vector3.Cross(right, direction);
+            up.Normalize();
+
+            Model = new Matrix4(
+                new Vector4(right, 0),
+                new Vector4(up, 0),
+                new Vector4(-direction, 0),
+                new Vector4(_position, 1));
+
             _position += direction * _speed * elapsedTime;
-            Model = look;
         }
 
         private void CalculateTarget()
