@@ -52,7 +52,7 @@ namespace ProceduralCity.Renderer
         {
             _instanceCount = instanceCount;
             GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, _instanceCount * Vector4.SizeInBytes * 4, models);
+            GL.BufferData(BufferTarget.ArrayBuffer, instanceCount * Vector4.SizeInBytes * 4, models, BufferUsageHint.DynamicDraw);
         }
 
         public void Draw(Matrix4 projection, Matrix4 view)
@@ -111,7 +111,6 @@ namespace ProceduralCity.Renderer
 
             _instancedModelVbo = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, _instanceCount * Vector4.SizeInBytes * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
             GL.EnableVertexAttribArray(3);
             GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 4 * Vector4.SizeInBytes, 0);
             GL.VertexAttribDivisor(3, 1);

@@ -32,12 +32,12 @@ namespace ProceduralCity
     //    Rendering only the lights that are in the camera frustum: ~11000 frames in 60 seconds in general situations, BUT:
     //         -- FPS can go up into unseen heights: ~500-700 FPS
     //         -- Occlusion culling potentially can make this much faster
+    //    Updating traffic lights at 60 fps: ~52000 frames in 60 seconds
     //    TODO: Optimizations:
-    //          - Update traffic lights on a lower framerate
     //          - Fix light position problem - position should mean the center of the light
     //          - Calculate model matrix on gpu for traffic lights => create a vertex shader that is the variation of the instanced_vert. Send position vector and lookat vector instead of model matrix
     //              -- There is a matrix invert call in the computation. Rethink the way traffic lights are transformed
-    //          - Occlusion cull traffic lights
+    //TODO: Occlusion cull traffic lights
     //TODO: Building LOD levels
 
     // Low priority tasks
@@ -189,12 +189,24 @@ namespace ProceduralCity
             _context.Run();
         }
 
+
+        private double timeSinceLastTrafficUpdate = 0;
+
         private void OnUpdateFrame(FrameEventArgs e)
         {
             var keyboardState = _context.KeyboardState;
             HandleCameraInput(e, keyboardState);
             _cameraController.Update((float)e.Time);
 
+            if (timeSinceLastTrafficUpdate > 1.0f / _config.TrafficLightUpdateRate)
+            {
+                UpdateTraffic(timeSinceLastTrafficUpdate);
+            }
+            timeSinceLastTrafficUpdate += e.Time;
+        }
+
+        private void UpdateTraffic(double delta)
+        {
             var visibleTraffic = _world.BspTree.GetLeavesInFrustum(_camera).SelectMany(site => site.Traffic);
 
             var visibleTrafficInstancesToUpdate = visibleTraffic
@@ -217,12 +229,13 @@ namespace ProceduralCity
                     _trafficMatrixCache[i] = modelMatrix;
                 });
             _trafficInstanceBatch.UpdateModels(_trafficMatrixCache, trafficCount);
+            Parallel.ForEach(visibleTrafficInstancesToUpdate, t => t.Move((float)delta)); // Only animate visible traffic
 
             _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstancesToUpdate.Count}", new Vector2(0, 30), 0.5f);
             _lightsInFrustumTextbox.WithText($"Traffic lights in camera frustum: {trafficCount}", new Vector2(0, 60), 0.5f);
             _allTrafficLightsTextbox.WithText($"All traffic lights: {_world.Traffic.Count()}", new Vector2(0, 90), 0.5f);
 
-            Parallel.ForEach(visibleTrafficInstancesToUpdate, t => t.Move((float)e.Time)); // Only animate visible traffic
+            timeSinceLastTrafficUpdate = 0;
         }
 
         private void HandleCameraInput(FrameEventArgs e, KeyboardState keyboardState)
