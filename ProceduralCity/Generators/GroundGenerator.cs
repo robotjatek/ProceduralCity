@@ -64,30 +64,21 @@ namespace ProceduralCity.Generators
             });
         }
 
-        private readonly Shader _headLightShader = new("instanced.vert", "street_light.frag"); //TODO: maybe one shader only, and set uniforms before render?
-        private readonly Shader _rearLightShader = new("instanced.vert", "street_light.frag"); //TODO: do not use the street_light shader
+        private readonly Shader trafficLightShader = new("instanced.vert", "traffic_light.frag");
 
         public IEnumerable<TrafficLight> CreateTrafficLights(IEnumerable<GroundNode> sites)
         {
             var traffic = new List<TrafficLight>();
-            _headLightShader.SetUniformValue("u_color", new Vector3Uniform
-            {
-                Value = new Vector3(1f, 0.945f, 0.878f)
-            });
-            _rearLightShader.SetUniformValue("u_color", new Vector3Uniform
-            {
-                Value = new Vector3(0.9f, 0.2f, 0.1f)
-            });
 
             var areaBorder = new Vector2(_config.AreaBorderSize - 10);
             foreach (var site in sites)
             {
                 var corners = new[]
                 {
-                    new Vector3(site.StartPosition.X + areaBorder.X, 0, site.StartPosition.Y + areaBorder.Y),
-                    new Vector3(site.EndPosition.X - areaBorder.X, 0, site.StartPosition.Y + areaBorder.Y),
-                    new Vector3(site.EndPosition.X - areaBorder.X, 0, site.EndPosition.Y - areaBorder.Y),
-                    new Vector3(site.StartPosition.X + areaBorder.X, 0, site.EndPosition.Y - areaBorder.Y)
+                    new Vector3(site.TopLeftCorner.X + areaBorder.X, 0, site.TopLeftCorner.Y + areaBorder.Y),
+                    new Vector3(site.TopRightCorner.X - areaBorder.X, 0, site.TopRightCorner.Y + areaBorder.Y),
+                    new Vector3(site.BottomRightCorner.X - areaBorder.X, 0, site.BottomRightCorner.Y - areaBorder.Y),
+                    new Vector3(site.BottomLeftCorner.X + areaBorder.X, 0, site.BottomLeftCorner.Y - areaBorder.Y),
                 };
 
                 var firstWaypoint = Waypoint.CreateCircle(corners);
@@ -128,7 +119,7 @@ namespace ProceduralCity.Generators
                 var z = (float)_randomService.NextDouble() * (finish.Position.Z - start.Position.Z) + start.Position.Z;
 
                 var position = new Vector3(x, y, z);
-                yield return new TrafficLight(position, finish, _headLightShader, _rearLightShader, speed);
+                yield return new TrafficLight(position, finish, trafficLightShader, speed);
             }
         }
 
@@ -217,8 +208,7 @@ namespace ProceduralCity.Generators
                 {
                     _planeShader.Dispose();
                     _lightShader.Dispose();
-                    _headLightShader.Dispose();
-                    _rearLightShader.Dispose();
+                    trafficLightShader.Dispose();
                 }
 
                 disposedValue = true;

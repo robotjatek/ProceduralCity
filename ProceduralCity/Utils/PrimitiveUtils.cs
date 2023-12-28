@@ -2,10 +2,46 @@
 
 using OpenTK.Mathematics;
 
+using ProceduralCity.Renderer;
+
 namespace ProceduralCity.Utils
 {
     static class PrimitiveUtils
     {
+        private static Mesh _trafficMesh;
+
+        public static Mesh CreateTrafficMesh(Shader shader)
+        {
+            _trafficMesh ??= new Mesh(
+                    vertices: CreateTrafficLightVertices(),
+                    uvs: CreateTrafficLightUVs(),
+                    shader: shader);
+
+            return _trafficMesh;
+        }
+
+        private static IEnumerable<Vector3> CreateTrafficLightVertices()
+        {
+            yield return new Vector3(-0.5f, 0.5f, 0);
+            yield return new Vector3(0.5f, -0.5f, 0);
+            yield return new Vector3(0.5f, 0.5f, 0);
+
+            yield return new Vector3(-0.5f, 0.5f, 0);
+            yield return new Vector3(-0.5f, -0.5f, 0);
+            yield return new Vector3(0.5f, -0.5f, 0);
+        }
+
+        private static IEnumerable<Vector2> CreateTrafficLightUVs()
+        {
+            yield return new Vector2(0, 1);
+            yield return new Vector2(1, 0);
+            yield return new Vector2(1, 1);
+
+            yield return new Vector2(0, 1);
+            yield return new Vector2(0, 0);
+            yield return new Vector2(1, 0);
+        }
+
         /// <summary>
         /// Creates vertices for charaters in a textbox.
         /// Usually should be used in conjuction with CreateCharacterUVs

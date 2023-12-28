@@ -62,6 +62,9 @@
     <None Update="Shaders\street_light.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Shaders\traffic_light.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\vs.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

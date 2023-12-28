@@ -12,13 +12,7 @@ namespace ProceduralCity.Buildings
         private readonly ITexture _texture;
         private readonly Shader _shader;
 
-        public IEnumerable<Mesh> Meshes
-        {
-            get
-            {
-                return _meshes;
-            }
-        }
+        public IEnumerable<Mesh> Meshes => _meshes;
 
         public Building(Vector3 position, Vector2 area, Texture texture, Shader shader, float height)
         {

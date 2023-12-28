@@ -24,7 +24,7 @@ namespace ProceduralCity.GameObjects
             {
                 waypoints.Add(new Waypoint
                 {
-                    Position = p
+                    Position = p + new Vector3(0, 0.5f, 0)
                 });
             }
 

@@ -46,21 +46,28 @@ namespace ProceduralCity.Renderer
                     throw new InvalidOperationException("Shader can not be null");
                 }
 
-                var textureHash = mesh.Textures.Select(t => t.Id).CalculateHash();
-                var shaderId = mesh.Shader.ProgramId;
-                var key = (textureHash, shaderId);
-
+                var key = CreateBatchKey(mesh);
                 if (_batches.TryGetValue(key, out IBatch batch))
                 {
                     batch.AddMesh(mesh);
                 }
                 else
                 {
-                    var toAdd = CreateBatch(mesh.IsInstanced, mesh.Shader, mesh.Textures);
+                    var toAdd = new ObjectBatch(mesh.Shader, mesh.Textures);
                     toAdd.AddMesh(mesh);
                     _batches.Add(key, toAdd);
                 }
             }
+        }
+
+        public InstancedBatch AddAsInstanced(Mesh mesh)
+        {
+            var batch = new InstancedBatch(mesh.Shader, mesh.Textures);
+            batch.AddMesh(mesh);
+
+            var key = CreateBatchKey(mesh);
+            _batches.Add(key, batch);
+            return batch;
         }
 
         public void Clear()
@@ -80,14 +87,12 @@ namespace ProceduralCity.Renderer
             }
         }
 
-        private static IBatch CreateBatch(bool instanced, Shader shader, IEnumerable<ITexture> textures)
+        private static (int textureHash, int shaderId) CreateBatchKey(Mesh mesh)
         {
-            if (instanced)
-            {
-                return new InstancedBatch(shader, textures);
-            }
-
-            return new ObjectBatch(shader, textures);
+            var textureHash = mesh.Textures.Select(t => t.Id).CalculateHash();
+            var shaderId = mesh.Shader.ProgramId;
+            var key = (textureHash, shaderId);
+            return key;
         }
     }
 }

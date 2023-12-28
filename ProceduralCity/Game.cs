@@ -26,18 +26,8 @@ namespace ProceduralCity
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
-    //TODO: Further traffic light optimizations:
-    //    Before optimizations ~4000-4100 frames in 30 seconds, ~8000 frames in 60 seconds
-    //    Optimizations:
-    //          - One mesh per traffic light -- halves the need for Model matrices
-    //              -- gl_FrontFacing in shader, use separate renderer, disable backface culling before render. Red color on backface, white on frontface
-    //          - Fix light position problem - position should mean the center of the light
-    //          - Update traffic lights on a lower framerate
-    //          - Calculate model matrix on gpu for traffic lights => create a vertex shader that is the variation of the instanced_vert. Send position vector and lookat vector instead of model matrix
-    //              -- There is a matrix invert call in the computation. Rethink the way traffic lights are transformed
-    //TODO: Do not render hidden traffic lights
-    //      -- I may need to clear the traffic renderer meshes every frame (which could be lower than the actual render frames) and re-add only the visible meshes.
-    //      -- That way only ~1-2k matrices are needed to upload every frame instead of 100k
+    //TODO: fix misaligned streetlight strips
+    //TODO: Occlusion cull traffic lights
     //TODO: Building LOD levels
 
     // Low priority tasks
@@ -63,13 +53,16 @@ namespace ProceduralCity
         private readonly IRenderer _renderer;
         private readonly IRenderer _ndcRenderer;
         private readonly IRenderer _skyboxRenderer;
+        private readonly IRenderer _trafficRenderer;
+        private readonly Matrix4[] _trafficMatrixCache;
+        private readonly InstancedBatch _trafficInstanceBatch;
 
         private readonly IRenderer _textRenderer;
         private Matrix4 _textRendererMatrix = Matrix4.Identity;
         private readonly Textbox _fpsCounterTextbox = new("Consolas");
         private readonly Textbox _visibleLightsTextbox = new("Consolas");
         private readonly Textbox _lightsInFrustumTextbox = new("Consolas");
-        private readonly Textbox _allLightsTextbox = new("Consolas");
+        private readonly Textbox _allTrafficLightsTextbox = new("Consolas");
 
         private readonly ISkybox _skybox;
         private readonly ICamera _camera;
@@ -98,6 +91,7 @@ namespace ProceduralCity
             IRenderer ndcRenderer,
             IRenderer skyboxRenderer,
             IRenderer textRenderer,
+            IRenderer trafficRenderer,
             ISkybox skybox,
             ColorGenerator colorGenerator)
         {
@@ -141,7 +135,12 @@ namespace ProceduralCity
             };
             _skyboxRenderer.AddToScene(skybox);
 
-            _renderer.AddToScene(_world.Traffic); // TODO: rendering traffic should be dynamic, based on the camera frustum
+            _trafficRenderer = trafficRenderer;
+            _trafficInstanceBatch = _trafficRenderer.AddAsInstanced(_world.Traffic.First().Meshes.First());
+            _trafficMatrixCache = new Matrix4[_world.Traffic.Count()];
+            _trafficRenderer.BeforeRender = () => GL.Disable(EnableCap.CullFace);
+            _trafficRenderer.AfterRender = () => GL.Enable(EnableCap.CullFace);
+
             _renderer.AddToScene(_world.Renderables);
 
             _backbufferTexture = new Texture(_config.ResolutionWidth, config.ResolutionHeight);
@@ -180,15 +179,27 @@ namespace ProceduralCity
             _context.Run();
         }
 
+
+        private double timeSinceLastTrafficUpdate = 0;
+
         private void OnUpdateFrame(FrameEventArgs e)
         {
             var keyboardState = _context.KeyboardState;
             HandleCameraInput(e, keyboardState);
             _cameraController.Update((float)e.Time);
 
+            if (timeSinceLastTrafficUpdate > 1.0f / _config.TrafficLightUpdateRate)
+            {
+                UpdateTraffic(timeSinceLastTrafficUpdate);
+            }
+            timeSinceLastTrafficUpdate += e.Time;
+        }
+
+        private void UpdateTraffic(double delta)
+        {
             var visibleTraffic = _world.BspTree.GetLeavesInFrustum(_camera).SelectMany(site => site.Traffic);
 
-            var visibleTrafficInstances = visibleTraffic
+            var visibleTrafficInstancesToUpdate = visibleTraffic
                 .AsParallel()
                 /* 
                  * This may not worth the effort at all. Per site culling culls most of the traffic outside the view frustum already.
@@ -196,13 +207,27 @@ namespace ProceduralCity
                  */
                 //.Where(traffic => _camera.IsInViewFrustum(traffic.Position)) 
                 .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is further than 700f
-                .ToImmutableArray();
+                .ToImmutableList();
 
-            _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstances.Length}", new Vector2(0, 30), 0.5f);
-            _lightsInFrustumTextbox.WithText($"Traffic lights in camera frustum: {visibleTraffic.Count()}", new Vector2(0, 60), 0.5f);
-            _allLightsTextbox.WithText($"All traffic lights: {_world.Traffic.Count()}", new Vector2(0, 90), 0.5f);
 
-            Parallel.ForEach(visibleTrafficInstances, t => t.Move((float)e.Time)); // Only animate visible traffic
+            var trafficModels = visibleTraffic.Select(t => t.Model);
+            var trafficCount = trafficModels.Count();
+            Parallel.ForEach(
+                trafficModels,
+                (modelMatrix, _, i) =>
+                {
+                    _trafficMatrixCache[i] = modelMatrix;
+                });
+            _trafficInstanceBatch.UpdateModels(_trafficMatrixCache, trafficCount); /* Only updating model matrices that are in the camera frustum.
+                                                                                    * The whole matrix will be uploaded, but only the beginning of
+                                                                                    * the matrix contains relevant data.*/
+            Parallel.ForEach(visibleTrafficInstancesToUpdate, t => t.Move((float)delta)); // Only animate visible traffic
+
+            _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstancesToUpdate.Count}", new Vector2(0, 30), 0.5f);
+            _lightsInFrustumTextbox.WithText($"Traffic lights in camera frustum: {trafficCount}", new Vector2(0, 60), 0.5f);
+            _allTrafficLightsTextbox.WithText($"All traffic lights: {_world.Traffic.Count()}", new Vector2(0, 90), 0.5f);
+
+            timeSinceLastTrafficUpdate = 0;
         }
 
         private void HandleCameraInput(FrameEventArgs e, KeyboardState keyboardState)
@@ -250,7 +275,7 @@ namespace ProceduralCity
             _textRenderer.AddToScene(_fpsCounterTextbox.Text);
             _textRenderer.AddToScene(_visibleLightsTextbox.Text);
             _textRenderer.AddToScene(_lightsInFrustumTextbox.Text);
-            _textRenderer.AddToScene(_allLightsTextbox.Text);
+            _textRenderer.AddToScene(_allTrafficLightsTextbox.Text);
             _textRenderer.AddToScene(_benchmarkTextbox.Text);
 
             CountFps(e.Time);
@@ -260,6 +285,7 @@ namespace ProceduralCity
             _worldRenderer.Clear();
             _worldRenderer.RenderToTexture(_skyboxRenderer, _projectionMatrix, new Matrix4(new Matrix3(viewMatrix)));
             _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix);
+            _worldRenderer.RenderToTexture(_trafficRenderer, _projectionMatrix, viewMatrix);
 
             if (_isBloomEnabled)
                 _postprocessPipeline.RunPipeline();
@@ -380,7 +406,8 @@ namespace ProceduralCity
             _fpsCounterTextbox.Dispose();
             _visibleLightsTextbox.Dispose();
             _lightsInFrustumTextbox.Dispose();
-            _allLightsTextbox.Dispose();
-    }
+            _allTrafficLightsTextbox.Dispose();
+            _trafficRenderer.Dispose();
+        }
     }
 }
