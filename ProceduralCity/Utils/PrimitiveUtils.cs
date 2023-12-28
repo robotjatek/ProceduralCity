@@ -13,15 +13,33 @@ namespace ProceduralCity.Utils
         public static Mesh CreateTrafficMesh(Shader shader)
         {
             _trafficMesh ??= new Mesh(
-                    // PrimitiveUtils.CreateBacksideVertices was originally meant to create 3D objects in view space. Here it is abused to create a 2D object in model space
-                    vertices: CreateBacksideVertices(
-                        position: new Vector3(0), // Initial vertex position does not matter when constructing the object, because we handle this object as if it is in model space (as every other should be)
-                        area: new Vector2(2, 0), // First parameter of the area is the WIDTH. As this function is a 3D object creator function, the second argument of the "area" has no meaning here.
-                        height: 1),
-                    uvs: CreateBackUVs(),
+                    vertices: CreateTrafficLightVertices(),
+                    uvs: CreateTrafficLightUVs(),
                     shader: shader);
 
             return _trafficMesh;
+        }
+
+        private static IEnumerable<Vector3> CreateTrafficLightVertices()
+        {
+            yield return new Vector3(-0.5f, 0.5f, 0);
+            yield return new Vector3(0.5f, -0.5f, 0);
+            yield return new Vector3(0.5f, 0.5f, 0);
+
+            yield return new Vector3(-0.5f, 0.5f, 0);
+            yield return new Vector3(-0.5f, -0.5f, 0);
+            yield return new Vector3(0.5f, -0.5f, 0);
+        }
+
+        private static IEnumerable<Vector2> CreateTrafficLightUVs()
+        {
+            yield return new Vector2(0, 1);
+            yield return new Vector2(1, 0);
+            yield return new Vector2(1, 1);
+
+            yield return new Vector2(0, 1);
+            yield return new Vector2(0, 0);
+            yield return new Vector2(1, 0);
         }
 
         /// <summary>

@@ -75,10 +75,10 @@ namespace ProceduralCity.Generators
             {
                 var corners = new[]
                 {
-                    new Vector3(site.StartPosition.X + areaBorder.X, 0, site.StartPosition.Y + areaBorder.Y),
-                    new Vector3(site.EndPosition.X - areaBorder.X, 0, site.StartPosition.Y + areaBorder.Y),
-                    new Vector3(site.EndPosition.X - areaBorder.X, 0, site.EndPosition.Y - areaBorder.Y),
-                    new Vector3(site.StartPosition.X + areaBorder.X, 0, site.EndPosition.Y - areaBorder.Y)
+                    new Vector3(site.TopLeftCorner.X + areaBorder.X, 0, site.TopLeftCorner.Y + areaBorder.Y),
+                    new Vector3(site.TopRightCorner.X - areaBorder.X, 0, site.TopRightCorner.Y + areaBorder.Y),
+                    new Vector3(site.BottomRightCorner.X - areaBorder.X, 0, site.BottomRightCorner.Y - areaBorder.Y),
+                    new Vector3(site.BottomLeftCorner.X + areaBorder.X, 0, site.BottomLeftCorner.Y - areaBorder.Y),
                 };
 
                 var firstWaypoint = Waypoint.CreateCircle(corners);

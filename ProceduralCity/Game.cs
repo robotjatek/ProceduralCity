@@ -26,16 +26,7 @@ namespace ProceduralCity
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
-    //TODO: Further traffic light optimizations:
-    //    Before optimizations: ~4000-4100 frames in 30 seconds, ~8000 frames in 60 seconds
-    //    After reducing mesh count to one: ~5400 frames in 30 seconds, ~10000 frames in 60 seconds
-    //    Rendering only the lights that are in the camera frustum: ~11000 frames in 60 seconds in general situations, BUT:
-    //         -- FPS can go up into unseen heights: ~500-700 FPS
-    //         -- Occlusion culling potentially can make this much faster
-    //    Updating traffic lights at 60 fps: ~52000 frames in 60 seconds
-    //    TODO: Optimizations:
-    //          - Fix light position problem - position should mean the center of the light
-    //          - Calculate model matrix on gpu for traffic lights => create a vertex shader that is the variation of the instanced_vert. Send position vector and lookat vector instead of model matrix
+    //TODO: fix misaligned streetlight strips
     //TODO: Occlusion cull traffic lights
     //TODO: Building LOD levels
 
@@ -227,7 +218,9 @@ namespace ProceduralCity
                 {
                     _trafficMatrixCache[i] = modelMatrix;
                 });
-            _trafficInstanceBatch.UpdateModels(_trafficMatrixCache, trafficCount);
+            _trafficInstanceBatch.UpdateModels(_trafficMatrixCache, trafficCount); /* Only updating model matrices that are in the camera frustum.
+                                                                                    * The whole matrix will be uploaded, but only the beginning of
+                                                                                    * the matrix contains relevant data.*/
             Parallel.ForEach(visibleTrafficInstancesToUpdate, t => t.Move((float)delta)); // Only animate visible traffic
 
             _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstancesToUpdate.Count}", new Vector2(0, 30), 0.5f);

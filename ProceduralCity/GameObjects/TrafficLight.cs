@@ -49,7 +49,9 @@ namespace ProceduralCity.GameObjects
             var direction = _target.Position - _position;
             direction.Normalize();
 
-            // Calculate to LookAt matrix by hand. This way no Invert is needed.
+            // Calculate to LookAt matrix by hand. This way no Invert is needed
+            // The old calculation looked like this: var look = Matrix4.LookAt(_position, _target.Position, UP).Inverted();
+            // Note the .Inverted call at the end
             var right = Vector3.Cross(direction, UP);
             right.Normalize();
 
@@ -62,7 +64,7 @@ namespace ProceduralCity.GameObjects
                 new Vector4(-direction, 0),
                 new Vector4(_position, 1));
 
-            _position += direction * _speed * elapsedTime;
+            _position += direction * _speed * elapsedTime;            
         }
 
         private void CalculateTarget()

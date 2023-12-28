@@ -47,7 +47,9 @@ namespace ProceduralCity.Renderer
         /// <param name="models">
         /// The model matrices to upload to the GPU
         /// Always a full-sized array, but only the beginning is relevant as everything after the <paramref name="instanceCount"/> is just old junk data</param>
-        /// <param name="instanceCount">The usable matrix count at the beginning of the array. Will set the <see cref="_instanceCount"/> member variable too"/></param>
+        /// <param name="instanceCount">The usable matrix count at the beginning of the array.
+        /// Will set the <see cref="_instanceCount"/> member variable too. Any other matrix data outside of this index is outside of the camera frustum
+        /// and can be considered garbage data</param>
         public void UpdateModels(Matrix4[] models, int instanceCount)
         {
             _instanceCount = instanceCount;
