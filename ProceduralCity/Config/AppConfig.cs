@@ -46,5 +46,7 @@ namespace ProceduralCity.Config
         public float BloomTreshold { get; set; }
 
         public int TrafficLightUpdateRate { get; set; }
+
+        public int? RandomServiceSeed { get; set; } = -1;
     }
 }

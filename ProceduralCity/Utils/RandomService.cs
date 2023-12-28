@@ -9,9 +9,15 @@ public class RandomService
 {
     private readonly Random _random;
 
-    public RandomService(int seed)
+    public RandomService(int? seed)
     {
-        _random = new Random(seed);
+        if (seed is null || seed < 0)
+        {
+            _random = new Random();
+            return;
+        }
+
+        _random = new Random(seed.Value);
     }
 
     public int Next()
