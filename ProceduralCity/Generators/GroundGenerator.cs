@@ -132,7 +132,7 @@ namespace ProceduralCity.Generators
             });            
             _logger.Information("Set streetlight color to: {lightColor}", lightColor);
 
-            var areaBorder = new Vector2(_config.AreaBorderSize - 4);
+            var areaBorder = new Vector2(_config.AreaBorderSize);
             var lightSize = new Vector2(2, 2);
             foreach (var site in sites)
             {
@@ -141,13 +141,13 @@ namespace ProceduralCity.Generators
 
                 for (int i = (int)position.X + 2 + 1; i <= position.X + area.X; i += 12)
                 {
-                    var northPosition = new Vector3(i, position.Y, position.Z);
+                    var northPosition = new Vector3(i, position.Y, position.Z - 3);
                     var northVertices = PrimitiveUtils.CreateTopVertices(northPosition, lightSize, 0.2f);
                     var northUvs = PrimitiveUtils.CreateTopUVs(1, 1);
 
                     yield return new StreetLightStrip(northVertices, northUvs, _lightShader);
 
-                    var southPosition = new Vector3(i, position.Y, position.Z + area.Y + 2);
+                    var southPosition = new Vector3(i, position.Y, position.Z + area.Y + 1);
                     var southVertices = PrimitiveUtils.CreateTopVertices(southPosition, lightSize, 0.2f);
                     var southUvs = PrimitiveUtils.CreateTopUVs(1, 1);
 
@@ -156,13 +156,13 @@ namespace ProceduralCity.Generators
 
                 for (int i = (int)position.Z + 2 + 1; i <= position.Z + area.Y; i += 12)
                 {
-                    var westPosition = new Vector3(position.X, position.Y, i);
+                    var westPosition = new Vector3(position.X - 3, position.Y, i);
                     var westVertices = PrimitiveUtils.CreateTopVertices(westPosition, lightSize, 0.2f);
                     var westUvs = PrimitiveUtils.CreateTopUVs(1, 1);
 
                     yield return new StreetLightStrip(westVertices, westUvs, _lightShader);
 
-                    var eastPosition = new Vector3(position.X + area.X + 2, position.Y, i);
+                    var eastPosition = new Vector3(position.X + area.X + 1, position.Y, i);
                     var eastVertices = PrimitiveUtils.CreateTopVertices(eastPosition, lightSize, 0.2f);
                     var eastUvs = PrimitiveUtils.CreateTopUVs(1, 1);
 

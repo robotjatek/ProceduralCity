@@ -26,7 +26,6 @@ namespace ProceduralCity
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
-    //TODO: fix misaligned streetlight strips
     //TODO: Occlusion cull traffic lights
     //TODO: Building LOD levels
 
