@@ -1,4 +1,6 @@
-﻿using OpenTK.Mathematics;
+﻿using ProceduralCity.Utils;
+
+using OpenTK.Mathematics;
 
 using ProceduralCity.Generators;
 
@@ -19,11 +21,10 @@ namespace ProceduralCity.Camera.Controller.Movements
             PATH,
         }
 
-        public static IMovement BuildRandomMovement(MovementParams buildParams)
+        public static IMovement BuildRandomMovement(MovementParams buildParams, RandomService randomService)
         {
-            Random _random = new();
             var enumValues = Enum.GetValues(typeof(MovementType));
-            var movementType = (MovementType)enumValues.GetValue(_random.Next(enumValues.Length));
+            var movementType = (MovementType)enumValues.GetValue(randomService.Next(enumValues.Length));
             var distanceToCityCenter = (buildParams.CityCenterPosition - buildParams.CameraPosition).Length;
 
             switch (MovementType.PATH)
@@ -38,13 +39,13 @@ namespace ProceduralCity.Camera.Controller.Movements
                 case MovementType.ROTATE:
                     return new RotateMovement
                     {
-                        Direction = (MovementDirection)_random.Next(2)
+                        Direction = (MovementDirection)randomService.Next(2)
                     };
                 case MovementType.STAND:
                     return new StandMovement();
                 case MovementType.PLANE:
                     {
-                        var verticalAngle = _random.Next(-90, 0); // -90 straight down, 0 staight up (in deg)
+                        var verticalAngle = randomService.Next(-90, 0); // -90 straight down, 0 staight up (in deg)
                         return new PlaneMovement
                         {
                             VerticalAngle = verticalAngle,
@@ -53,7 +54,7 @@ namespace ProceduralCity.Camera.Controller.Movements
                     }
                 case MovementType.PLANE_STRAFE:
                     {
-                        var verticalAngle = _random.Next(-90, 0); // -90 straight down, 0 staight up (in deg)
+                        var verticalAngle = randomService.Next(-90, 0); // -90 straight down, 0 staight up (in deg)
                         return new PlaneStrafeMovement
                         {
                             VerticalAngle = verticalAngle,
@@ -69,7 +70,7 @@ namespace ProceduralCity.Camera.Controller.Movements
                     // Select a neigbouring waypoint
                     // Build a path with the start and the selected neighbour
 
-                    var levelChilds = buildParams.World.GroundNodeTree.Root.Children;
+                    var levelChilds = buildParams.World.BspTree.Root.Children;
                     var allPossibleWaypointsOnTheCurrentLevel = levelChilds.SelectMany(r => new[]
                     {
                         r.TopLeftCorner,
@@ -77,12 +78,12 @@ namespace ProceduralCity.Camera.Controller.Movements
                         r.BottomLeftCorner,
                         r.BottomRightCorner
                     })
-                        .Where(n => NotOnWorldCorners(buildParams.World.GroundNodeTree.Root, n)) // Exclude the world corners (0,0), (0,MAX_Y), (MAX_X,0), (MAX_X, MAX_Y)
+                        .Where(n => NotOnWorldCorners(buildParams.World.BspTree.Root, n)) // Exclude the world corners (0,0), (0,MAX_Y), (MAX_X,0), (MAX_X, MAX_Y)
                         .Distinct();
 
-                    var randomWaypoint = allPossibleWaypointsOnTheCurrentLevel.ElementAt(_random.Next(allPossibleWaypointsOnTheCurrentLevel.Count()));
+                    var randomWaypoint = allPossibleWaypointsOnTheCurrentLevel.ElementAt(randomService.Next(allPossibleWaypointsOnTheCurrentLevel.Count()));
 
-                    var nodes = buildParams.World.GroundNodeTree.Root.NodesOnPoint(randomWaypoint);
+                    var nodes = buildParams.World.BspTree.Root.NodesOnPoint(randomWaypoint);
                     var nextPossibleWaypoints = nodes.SelectMany(n => (new[]
                     {
                         n.TopLeftCorner,
@@ -92,13 +93,13 @@ namespace ProceduralCity.Camera.Controller.Movements
                     })).Except(new[] { randomWaypoint })
                     .Where(n => // Only differ in EXACTLY one coordinate (either X or Y) essentially giving back a neighbour AND not on world corners
                     {
-                        return DiffersInOneAxisOnly(n, randomWaypoint) && NotOnWorldCorners(buildParams.World.GroundNodeTree.Root, n);
+                        return DiffersInOneAxisOnly(n, randomWaypoint) && NotOnWorldCorners(buildParams.World.BspTree.Root, n);
 
                     })
                     .Distinct();
-                    var randomNextWaypoint = nextPossibleWaypoints.ElementAt(_random.Next(nextPossibleWaypoints.Count()));
+                    var randomNextWaypoint = nextPossibleWaypoints.ElementAt(randomService.Next(nextPossibleWaypoints.Count()));
 
-                    var nn = buildParams.World.GroundNodeTree.Root.NodesOnPoint(randomNextWaypoint).ToArray();
+                    var nn = buildParams.World.BspTree.Root.NodesOnPoint(randomNextWaypoint).ToArray();
 
                     // Partially completed:
                     // select 1 random out of the 9 possible

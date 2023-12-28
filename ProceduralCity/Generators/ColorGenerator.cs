@@ -1,12 +1,12 @@
 ﻿using OpenTK.Mathematics;
 
-using System;
+using ProceduralCity.Utils;
 
 namespace ProceduralCity.Generators
 {
     public class ColorGenerator
     {
-        private readonly Random _random = new();
+        private readonly RandomService _randomService;
 
         // RGB colors
         private readonly Color4[] _cloudColors =
@@ -47,15 +47,16 @@ namespace ProceduralCity.Generators
             get => MixedColor(Primary, Secondary);
         }
         
-        public ColorGenerator()
+        public ColorGenerator(RandomService randomService)
         {
+            _randomService = randomService;
             GenerateColors();
         }
 
         public void GenerateColors()
         {
-            var primaryIndex = _random.Next(0, _cloudColors.Length);
-            var secondaryIndex = _random.Next(0, _cloudColors.Length);
+            var primaryIndex = _randomService.Next(0, _cloudColors.Length);
+            var secondaryIndex = _randomService.Next(0, _cloudColors.Length);
 
             Primary = _cloudColors[primaryIndex];
             Secondary =  _cloudColors[secondaryIndex];

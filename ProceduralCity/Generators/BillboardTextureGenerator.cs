@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
 using ProceduralCity.Config;
 using ProceduralCity.GameObjects;
 using ProceduralCity.Renderer;
+using ProceduralCity.Utils;
+
 using Serilog;
 
 namespace ProceduralCity.Generators
 {
     class BillboardTextureGenerator : IBillboardTextureGenerator
     {
-        private readonly Random _random = new();
+        private readonly RandomService _randomService;
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
         private readonly Matrix4 _projectionMatrix;
@@ -79,10 +80,11 @@ namespace ProceduralCity.Generators
             "Bank"
         ];
 
-        public BillboardTextureGenerator(ILogger logger, IAppConfig config)
+        public BillboardTextureGenerator(ILogger logger, IAppConfig config, RandomService randomService)
         {
             _config = config;
             _logger = logger;
+            _randomService = randomService;
             _projectionMatrix = Matrix4.CreateOrthographicOffCenter(0, _config.BillboardTextureWidth, _config.BillboardTextureHeight, 0, -1, 1);
         }
 
@@ -95,7 +97,7 @@ namespace ProceduralCity.Generators
                 var word = GenerateBillboardText();
 
                 using var text = new Textbox("Consolas")
-                    .WithText(word, new Vector2(), 1.5f)
+                    .WithText(word, new Vector2(), 1.25f)
                     .WithHue(1.0f)
                     .WithSaturation(0)
                     .WithValue(1.0f);
@@ -116,11 +118,11 @@ namespace ProceduralCity.Generators
 
         private string GenerateBillboardText()
         {
-            var prefix = _prefixes[_random.Next(_prefixes.Length)];
-            var first = _first[_random.Next(_first.Length)];
-            var second = _second[_random.Next(_second.Length)];
+            var prefix = _prefixes[_randomService.Next(_prefixes.Length)];
+            var first = _first[_randomService.Next(_first.Length)];
+            var second = _second[_randomService.Next(_second.Length)];
 
-            var word = _random.Next() % 2 == 0 ? $"{prefix}{first}" : $"{first} {second}";
+            var word = _randomService.Next() % 2 == 0 ? $"{prefix}{first}" : $"{first} {second}";
             _logger.Debug("Billboard text: {word}", word);
             return word;
         }

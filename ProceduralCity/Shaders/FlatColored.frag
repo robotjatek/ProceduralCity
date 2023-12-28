@@ -3,7 +3,7 @@
 // Dependencies: exponentialFog definition
 
 // A shader for untextured meshes. Needs a color value provided as a uniform.
-// Flat colored meshes are affected by the value too. Should be linked with a shader containing the definition of the exponential fog function.
+// Flat colored meshes are affected by the fog too. Should be linked with a shader containing the definition of the exponential fog function.
 
 in vec2 texCoords;
 out vec4 fragColor;

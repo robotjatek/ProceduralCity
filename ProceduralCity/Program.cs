@@ -7,6 +7,8 @@ using ProceduralCity.Camera.Controller;
 using ProceduralCity.Config;
 using ProceduralCity.Generators;
 using ProceduralCity.Renderer;
+using ProceduralCity.Utils;
+
 using Serilog;
 
 namespace ProceduralCity
@@ -32,6 +34,7 @@ namespace ProceduralCity
             builder.Register(c => logger).As<ILogger>().SingleInstance();
             builder.Register(c => appConfig).As<IAppConfig>().SingleInstance();
             builder.Register(c => context).As<OpenGlContext>().SingleInstance();
+            builder.Register(c => new RandomService(appConfig.RandomServiceSeed)).SingleInstance();
             builder.RegisterType<Game>().As<IGame>().OnRelease(game => game.Dispose()).InstancePerLifetimeScope();
             builder.Register(c => new Camera.Camera(new Vector3(-1, 120, -1), 45, 0)).As<ICamera>().SingleInstance();
             builder.RegisterType<CameraController>().SingleInstance();

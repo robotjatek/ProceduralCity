@@ -12,8 +12,7 @@ namespace ProceduralCity.GameObjects
         private static readonly Vector3 UP = new(0, 1, 0);
         private Vector3 _position;
         private Waypoint _target;
-        private readonly Shader _headlightShader; //TODO: disable backface culling on this and use 1 mesh only with 1 shader
-        private readonly Shader _rearLightShader;
+        private readonly Shader _lightShader;
         private readonly List<Mesh> _meshes = [];
 
         public Matrix4 Model { get; private set; } = Matrix4.Identity;
@@ -22,64 +21,50 @@ namespace ProceduralCity.GameObjects
 
         public Vector3 Position { get { return _position; } }
 
-        public TrafficLight(Vector3 position, Waypoint target, Shader headLightShader, Shader rearLightShader, float speed)
+        public TrafficLight(Vector3 position, Waypoint target, Shader lightShader, float speed)
         {
             _speed = speed;
             _position = position;
             _target = target;
-            _headlightShader = headLightShader;
-            _rearLightShader = rearLightShader;
+            _lightShader = lightShader;
 
             CreateHeadLight();
-            CreateBackLight();
 
             Move(0); // Transform the object to its initial position
         }
 
         private void CreateHeadLight()
         {
-            // PrimitiveUtils.CreateBacksideVertices was originally meant to create 3D objects in view space. Here it is abused to create a 2D object in model space
-            var vertices = PrimitiveUtils.CreateBacksideVertices( 
-                position: new Vector3(0), // Initial vertex position does not matter when constructing the object, because we handle this object as if it is in model space (as every other should be)
-                area: new Vector2(2, 0), // First parameter of the area is the WIDTH. As this function is a 3D object creator function, the second argument of the "area" has no meaining here.
-                height: 1); 
-            var uvs = PrimitiveUtils.CreateBackUVs(); // TODO: kellenek UV-k? Empty array miért nem jó? => empty array-jel nem rendereli ki...
-
-            var mesh = new Mesh(vertices, uvs, _headlightShader)
-            {
-                IsInstanced = true
-            };
-            _meshes.Add(mesh);
-        }
-
-        private void CreateBackLight()
-        {
-            var vertices = PrimitiveUtils.CreateFrontVertices(new Vector3(0), new Vector2(2, 0), 1);
-            var uvs = PrimitiveUtils.CreateFrontUvs();
-
-            var mesh = new Mesh(vertices, uvs, _rearLightShader)
-            {
-                IsInstanced = true
-            };
-            _meshes.Add(mesh);
+            _meshes.Add(PrimitiveUtils.CreateTrafficMesh(_lightShader));
         }
 
         public void Move(float elapsedTime)
         {
             CalculateTarget();
             TransformObject(elapsedTime);
-
-            _meshes[0].Model = Model;
-            _meshes[1].Model = Model;
         }
 
         private void TransformObject(float elapsedTime)
         {
             var direction = _target.Position - _position;
             direction.Normalize();
-            var look = Matrix4.LookAt(_position, _target.Position, UP).Inverted();
-            _position += direction * _speed * elapsedTime;
-            Model = look;
+
+            // Calculate to LookAt matrix by hand. This way no Invert is needed
+            // The old calculation looked like this: var look = Matrix4.LookAt(_position, _target.Position, UP).Inverted();
+            // Note the .Inverted call at the end
+            var right = Vector3.Cross(direction, UP);
+            right.Normalize();
+
+            var up = Vector3.Cross(right, direction);
+            up.Normalize();
+
+            Model = new Matrix4(
+                new Vector4(right, 0),
+                new Vector4(up, 0),
+                new Vector4(-direction, 0),
+                new Vector4(_position, 1));
+
+            _position += direction * _speed * elapsedTime;            
         }
 
         private void CalculateTarget()

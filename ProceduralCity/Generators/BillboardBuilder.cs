@@ -13,16 +13,16 @@ namespace ProceduralCity.Generators
     class BillboardBuilder : IBillboardBuilder, IDisposable
     {
         //TODO: generate billboard coordinates in model space, then transform them with a model matrix
-        private readonly Random _random = new();
         private readonly Texture[] _billboardTextures;
         private readonly IAppConfig _config;
         private readonly Shader _shader = new("vs.vert", new[] { "billboard.frag", "colorTools.frag" });
         private readonly ColorGenerator _colorGenerator;
+        private readonly RandomService _randomService;
 
-        public BillboardBuilder(IAppConfig config, IBillboardTextureGenerator billboardTextureGenerator, ColorGenerator colorGenerator)
+        public BillboardBuilder(IAppConfig config, IBillboardTextureGenerator billboardTextureGenerator, ColorGenerator colorGenerator, RandomService randomService)
         {
             _config = config;
-
+            _randomService = randomService;
             _colorGenerator = colorGenerator;
             _colorGenerator.OnColorChanged += () =>
             {
@@ -43,7 +43,7 @@ namespace ProceduralCity.Generators
 
         public Billboard CreateNorthFacingBillboard(Vector3 position, Vector2 area, float height)
         {
-            var texture = _billboardTextures.ElementAt(_random.Next(_billboardTextures.Length));
+            var texture = _billboardTextures.ElementAt(_randomService.Next(_billboardTextures.Length));
             var width = CalculateBillboardWidth(height);
             area.X = width;
             position.Z += 0.05f;
@@ -57,7 +57,7 @@ namespace ProceduralCity.Generators
 
         public Billboard CreateSouthFacingBillboard(Vector3 position, Vector2 area, float height)
         {
-            var texture = _billboardTextures.ElementAt(_random.Next(_billboardTextures.Length));
+            var texture = _billboardTextures.ElementAt(_randomService.Next(_billboardTextures.Length));
             var width = CalculateBillboardWidth(height);
             position.X = position.X + area.X - width; //compensate position because of the worldspace coordinates
             area.X = width;
@@ -72,7 +72,7 @@ namespace ProceduralCity.Generators
 
         public Billboard CreateWestFacingBillboard(Vector3 position, Vector2 area, float height)
         {
-            var texture = _billboardTextures.ElementAt(_random.Next(_billboardTextures.Length));
+            var texture = _billboardTextures.ElementAt(_randomService.Next(_billboardTextures.Length));
             var width = CalculateBillboardWidth(height);
             area.Y = width;
             position.X -= 0.05f;
@@ -86,7 +86,7 @@ namespace ProceduralCity.Generators
 
         public Billboard CreateEastFacingBillboard(Vector3 position, Vector2 area, float height)
         {
-            var texture = _billboardTextures.ElementAt(_random.Next(_billboardTextures.Length));
+            var texture = _billboardTextures.ElementAt(_randomService.Next(_billboardTextures.Length));
             var width = CalculateBillboardWidth(height);
             position.Z = position.Z + area.Y - width; //compensate position because of the worldspace coordinates
             area.Y = width;

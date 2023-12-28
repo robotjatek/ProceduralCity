@@ -38,6 +38,7 @@ using OpenTK.Mathematics;
 
 using ProceduralCity.Camera.Controller.Movements;
 using ProceduralCity.Config;
+using ProceduralCity.Utils;
 
 using System;
 using System.Linq;
@@ -56,6 +57,7 @@ namespace ProceduralCity.Camera.Controller
         private readonly ICamera _camera;
         private readonly IAppConfig _configuration;
         private readonly Vector3 _cityCenterPosition;
+        private readonly RandomService _randomService;
 
         private float _elapsedTimeSinceLastStateChange = 0;
         private readonly double _maxDistance;
@@ -67,10 +69,11 @@ namespace ProceduralCity.Camera.Controller
         public SetFadeoutDelegate SetFadeout { get; set; }
 
 
-        public CameraController(ICamera camera, IAppConfig configuration, IWorld world)
+        public CameraController(ICamera camera, IAppConfig configuration, RandomService randomService, IWorld world)
         {
             _camera = camera;
             _configuration = configuration;
+            _randomService = randomService;
             _world = world;
 
             _cityCenterPosition = new Vector3(_configuration.WorldSize / 2, _configuration.MaxBuildingHeight, _configuration.WorldSize / 2);
@@ -215,11 +218,10 @@ namespace ProceduralCity.Camera.Controller
         //TODO: make this private
         public void TeleportToNewPosition()
         {
-            var rnd = new Random();
-            var height = rnd.Next(_configuration.MaxBuildingHeight + 10, _configuration.MaxBuildingHeight + 200);
+            var height = _randomService.Next(_configuration.MaxBuildingHeight + 10, _configuration.MaxBuildingHeight + 200);
             var minDistanceToCenter = 2000f;
-            var randomAngle = (float)(new Random().NextDouble() * 2 * Math.PI);
-            var randomDistance = minDistanceToCenter + (float)(new Random().NextDouble() * (_configuration.WorldSize / 2.0f - minDistanceToCenter));
+            var randomAngle = (float)(_randomService.NextDouble() * 2 * Math.PI);
+            var randomDistance = minDistanceToCenter + (float)(_randomService.NextDouble() * (_configuration.WorldSize / 2.0f - minDistanceToCenter));
             var randomPoint = PolarToCartesian(randomDistance, randomAngle);
             var randomCoordinate = new Vector2(_configuration.WorldSize / 2.0f, _configuration.WorldSize / 2.0f) + randomPoint;
 
@@ -250,7 +252,7 @@ namespace ProceduralCity.Camera.Controller
                 World = _world,
             };
 
-            _chosenMovement = MovementBuilder.BuildRandomMovement(buildParams);
+            _chosenMovement = MovementBuilder.BuildRandomMovement(buildParams, _randomService);
         }
 
         private void LookAtCityCenter()

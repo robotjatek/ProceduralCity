@@ -12,16 +12,15 @@ namespace ProceduralCity.Buildings
         private readonly List<Mesh> _meshes = [];
         private readonly Shader _shader;
         private readonly ITexture _texture;
+        private readonly RandomService _randomService;
 
-        public IEnumerable<Mesh> Meshes
-        {
-            get { return _meshes; }
-        }
+        public IEnumerable<Mesh> Meshes => _meshes;
 
-        public TowerBuilding(Vector3 position, Vector2 area, Texture texture, Shader shader, float height, IBillboardBuilder billboardBuilder)
+        public TowerBuilding(Vector3 position, Vector2 area, Texture texture, Shader shader, float height, IBillboardBuilder billboardBuilder, RandomService randomService)
         {
             _texture = texture;
             _shader = shader;
+            _randomService = randomService;
 
             var blockToppingArea = new Vector2(area.X + 3, area.Y + 3);
             var lastPosition = new Vector3(position);
@@ -53,7 +52,7 @@ namespace ProceduralCity.Buildings
                 {
                     if (northSouthSideLength >= builder.CalculateBillboardWidth(3))
                     {
-                        var billboard = CoinFlip.Flip() ?
+                        var billboard = _randomService.FlipCoin() ?
                             builder.CreateNorthFacingBillboard(position, area, 3) :
                             builder.CreateSouthFacingBillboard(position, area, 3);
 
@@ -64,7 +63,7 @@ namespace ProceduralCity.Buildings
                 {
                     if (eastWestSideLength >= builder.CalculateBillboardWidth(3))
                     {
-                        var billboard = CoinFlip.Flip() ?
+                        var billboard = _randomService.FlipCoin() ?
                             builder.CreateWestFacingBillboard(position, area, 3) :
                             builder.CreateEastFacingBillboard(position, area, 3);
 

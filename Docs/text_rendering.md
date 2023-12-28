@@ -54,14 +54,20 @@ _textRenderer = textRenderer;
 _textRenderer.AddToScene(_text.Text);
 ```
 
-You may or may not need to enable blending before rendering:
+You may or may not need to enable blending before rendering. Enabling blending will result smoother edges on the text especially when using scaling.
 
 ```csharp
 _textRenderer.BeforeRender = () => GL.Enable(EnableCap.Blend);
 _textRenderer.AfterRender = () =>  GL.Disable(EnableCap.Blend);
 ```
+Blending disabled:
+![Blending disabled](images/text_blending_disabled.png)
+
+Blending enabled:
+![Blending enabled](images/text_blending_enabled.png)
 
 ### OnRenderFrame:
+
 ```csharp
 _worldRenderer.Clear();
 _worldRenderer.RenderToTexture(_renderer, _projectionMatrix, viewMatrix, _modelMatrix);
@@ -74,3 +80,14 @@ _context.SwapBuffers();
 ```csharp
 _textRendererMatrix = Matrix4.CreateOrthographicOffCenter(0, _context.ClientRectangle.Size.X, _context.ClientRectangle.Size.Y, 0, -1, 1);
 ```
+
+## Dynamic text rendering
+
+It is possible to render dynamically changing text by calling `WithText` on the textbox instance again and re-adding the new meshes to the renderer:
+
+```csharp
+_textbox.WithText(text: $"{fps} FPS", scale: 0.4f);
+_textRenderer.Clear();
+_textRenderer.AddToScene(_textbox.Text);
+```
+

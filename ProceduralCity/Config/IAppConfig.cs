@@ -35,5 +35,9 @@ namespace ProceduralCity.Config
         int BillboardLineHeight { get; set; }
 
         float BloomTreshold { get; set; }
+
+        int TrafficLightUpdateRate { get; set; }
+
+        int? RandomServiceSeed { get; set; }
     }
 }

@@ -17,9 +17,11 @@ namespace ProceduralCity
         private readonly ILogger _logger;
         private readonly GroundNodeTree _groundNodeTree;
 
-        public GroundNodeTree GroundNodeTree => _groundNodeTree;
+        public GroundNodeTree BspTree => _groundNodeTree;
 
         public IEnumerable<TrafficLight> Traffic => _trafficLights;
+
+        public IEnumerable<IRenderable> Renderables => _renderables;
 
         public World(IGroundGenerator groundGenerator, IBuildingGenerator buildingGenerator, ILogger logger)
         {
@@ -41,14 +43,6 @@ namespace ProceduralCity
 
             var buildings = _buildingGenerator.GenerateBuildings(sites);
             _renderables.AddRange(buildings);
-        }
-
-        public IEnumerable<IRenderable> Renderables
-        {
-            get
-            {
-                return _renderables;
-            }
         }
 
         private bool disposedValue = false;
