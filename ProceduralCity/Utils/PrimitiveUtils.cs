@@ -22,13 +22,13 @@ namespace ProceduralCity.Utils
 
         private static IEnumerable<Vector3> CreateTrafficLightVertices()
         {
-            yield return new Vector3(-0.5f, 0.5f, 0);
-            yield return new Vector3(0.5f, -0.5f, 0);
-            yield return new Vector3(0.5f, 0.5f, 0);
+            yield return new Vector3(-1.0f, 1.0f, 0);
+            yield return new Vector3(1.0f, -1.0f, 0);
+            yield return new Vector3(1.0f, 1.0f, 0);
 
-            yield return new Vector3(-0.5f, 0.5f, 0);
-            yield return new Vector3(-0.5f, -0.5f, 0);
-            yield return new Vector3(0.5f, -0.5f, 0);
+            yield return new Vector3(-1f, 1f, 0);
+            yield return new Vector3(-1f, -1f, 0);
+            yield return new Vector3(1f, -1f, 0);
         }
 
         private static IEnumerable<Vector2> CreateTrafficLightUVs()
