@@ -34,9 +34,14 @@ namespace ProceduralCity.Buildings
             var windowX = _randomService.Next(0, numWindowsX);
             var windowY = _randomService.Next(0, numWindowsY);
 
-            var startX = (float)windowX / numWindowsX;
-            var startY = (float)windowY / numWindowsY;
-            var textureStartPosition = new Vector2(startX, startY);
+            Vector2[] textureStartPositions =
+            [
+                RandomWindowUV(numWindowsX, numWindowsY),
+                RandomWindowUV(numWindowsX, numWindowsY),
+                RandomWindowUV(numWindowsX, numWindowsY),
+                RandomWindowUV(numWindowsX, numWindowsY),
+            ];
+
             var scaleX = 2.5f;
             var scaleY = 2.5f;
 
@@ -47,12 +52,23 @@ namespace ProceduralCity.Buildings
                     height,
                     windowWidth,
                     windowHeight,
-                    textureStartPosition,
+                    textureStartPositions,
                     scaleXFrontBack: scaleX,
                     scaleXLeftRight: scaleX, // TODO: 
                     scaleY),
                 new[] { _texture },
                 _shader);
+        }
+
+        // TODO: maybe one abstraction level higher?
+        private Vector2 RandomWindowUV(int numWindowsX, int numWindowsY)
+        {
+            var windowX = _randomService.Next(0, numWindowsX);
+            var windowY = _randomService.Next(0, numWindowsY);
+            var startX = (float)windowX / numWindowsX;
+            var startY = (float)windowY / numWindowsY;
+            var textureStartPosition = new Vector2(startX, startY);
+            return textureStartPosition;
         }
     }
 }

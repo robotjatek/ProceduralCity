@@ -271,7 +271,7 @@ namespace ProceduralCity.Utils
             float height,
             float windowWidth,
             float windowHeight,
-            Vector2 textureStartPosition,
+            Vector2[] textureStartPositions,
             float scaleXFrontBack,
             float scaleXLeftRight,
             float scaleWindowHeight)
@@ -280,24 +280,24 @@ namespace ProceduralCity.Utils
             var UVs = new List<Vector2>();
             UVs.AddRange(
                 CreateBackUVs(
-                    textureStartPosition,
+                    textureStartPositions[0],
                     windowWidth * area.X / scaleXFrontBack,
                     windowHeight * height / scaleWindowHeight));
             UVs.AddRange(
                 CreateFrontUvs(
-                    textureStartPosition,
+                    textureStartPositions[1],
                     windowWidth * area.X / scaleXFrontBack,
                     windowHeight * height / scaleWindowHeight));
 
             UVs.AddRange(
                 CreateRightUVs(
-                    textureStartPosition,
+                    textureStartPositions[2],
                     windowHeight * height / scaleWindowHeight,
                     windowWidth * area.Y / scaleXLeftRight));
 
             UVs.AddRange(
                 CreateLeftUVs(
-                    textureStartPosition,
+                    textureStartPositions[3],
                     windowHeight * height / scaleWindowHeight,
                     windowWidth * area.Y / scaleXLeftRight));
 

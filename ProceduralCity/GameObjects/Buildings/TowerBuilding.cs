@@ -86,9 +86,13 @@ namespace ProceduralCity.Buildings
             var windowWidth = 1f / numWindowsX;
             var windowHeight = 1f / numWindowsY;
 
-            // TODO: 4 different start positions for the 4 sides.
-            // Randomly select a window
-            var textureStartPosition = RandomWindowUV(numWindowsX, numWindowsY);
+            Vector2[] textureStartPositions = 
+            [
+                RandomWindowUV(numWindowsX, numWindowsY),
+                RandomWindowUV(numWindowsX, numWindowsY),
+                RandomWindowUV(numWindowsX, numWindowsY),
+                RandomWindowUV(numWindowsX, numWindowsY),
+            ];
 
             var scaleWindowHeight = height / 2; // Two floors per section
             var scaleXFrontBackTemp = area.X * windowWidth;
@@ -104,7 +108,7 @@ namespace ProceduralCity.Buildings
                     height,
                     windowWidth,
                     windowHeight,
-                    textureStartPosition,
+                    textureStartPositions,
                     scaleXFrontBack: scaleXFrontBack,
                     scaleXLeftRight: scaleXLeftRight,
                     scaleWindowHeight),
@@ -122,6 +126,7 @@ namespace ProceduralCity.Buildings
         }
 
         // TODO: maybe one abstraction level higher?
+        // Randomly select a window
         private Vector2 RandomWindowUV(int numWindowsX, int numWindowsY)
         {
             var windowX = _randomService.Next(0, numWindowsX);
