@@ -319,7 +319,7 @@ namespace ProceduralCity
             if (_elapsedFrameTime >= 1.0)
             {
                 var fps = Math.Round(1f / elapsed, 0);
-                _fpsCounterTextbox.WithText(text: $"{fps} FPS", scale: 0.5f);
+                _fpsCounterTextbox.WithText(text: $"{fps} FPS | Frametime: {elapsed * 1000:0.00} ms", scale: 0.5f);
 
                 _elapsedFrameTime = 0;
             }
