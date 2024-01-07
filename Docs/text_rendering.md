@@ -72,7 +72,7 @@ Blending enabled:
 
 Make sure that you've disabled depth testing before rendering text to prevent text clipping through objects:
 
-```charp
+```csharp
 _textRenderer.BeforeRender = () => GL.Disable(EnableCap.DepthTest);
 ```
 
