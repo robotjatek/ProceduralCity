@@ -45,6 +45,30 @@ namespace ProceduralCity.Renderer
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
         }
 
+        // TODO: make this private, and use the static CreateGrayScaleTexture instead
+        public Texture(int width, int height, byte[] data, PixelInternalFormat pixelInternalFormat, PixelFormat pixelFormat)
+        {
+            if (width * height * 3 != data.Length)
+            {
+                throw new ArgumentException("The given resoulution does not match the datasize!");
+            }
+
+            Width = width;
+            Height = height;
+            Id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, Id);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, pixelInternalFormat, width, height, 0, pixelFormat, PixelType.UnsignedByte, data);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+        }
+
+        public static Texture CreateGrayscaleTexture(int width, int height, byte[] data)
+        {
+            return new Texture(width, height, data, PixelInternalFormat.R8, PixelFormat.Red);
+        }
+
         public Texture(string fileName, string defaultFolder = "Textures")
         {
             Path = $"{defaultFolder}/{fileName}";

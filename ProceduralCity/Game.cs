@@ -74,7 +74,7 @@ namespace ProceduralCity
         private readonly Texture _backbufferTexture;
         private readonly Shader _fullscreenShader;
 
-        private bool _isBloomEnabled = true;
+        private bool _isBloomEnabled = false;
         private readonly PostprocessPipeline _postprocessPipeline;
 
         private double _elapsedFrameTime = 0;
@@ -117,9 +117,18 @@ namespace ProceduralCity
 
             _renderer = renderer;
             _ndcRenderer = ndcRenderer;
+
             _textRenderer = textRenderer;
-            _textRenderer.BeforeRender = () => GL.Enable(EnableCap.Blend);
-            _textRenderer.AfterRender = () => GL.Disable(EnableCap.Blend);
+            _textRenderer.BeforeRender = () =>
+            {
+                GL.Enable(EnableCap.Blend);
+                GL.Disable(EnableCap.DepthTest);
+            };
+            _textRenderer.AfterRender = () =>
+            {
+                GL.Disable(EnableCap.Blend);
+                GL.Enable(EnableCap.DepthTest);
+            };
 
             _skyboxRenderer = skyboxRenderer;
 
@@ -207,7 +216,7 @@ namespace ProceduralCity
                 //.Where(traffic => _camera.IsInViewFrustum(traffic.Position)) 
                 .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is further than 700f
                 .ToImmutableList();
-
+            Parallel.ForEach(visibleTrafficInstancesToUpdate, t => t.Move((float)delta)); // Only animate visible traffic
 
             var trafficModels = visibleTraffic.Select(t => t.Model);
             var trafficCount = trafficModels.Count();
@@ -217,10 +226,10 @@ namespace ProceduralCity
                 {
                     _trafficMatrixCache[i] = modelMatrix;
                 });
+            // TODO: try mapbuffer-unmapbuffer
             _trafficInstanceBatch.UpdateModels(_trafficMatrixCache, trafficCount); /* Only updating model matrices that are in the camera frustum.
                                                                                     * The whole matrix will be uploaded, but only the beginning of
                                                                                     * the matrix contains relevant data.*/
-            Parallel.ForEach(visibleTrafficInstancesToUpdate, t => t.Move((float)delta)); // Only animate visible traffic
 
             _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstancesToUpdate.Count}", new Vector2(0, 30), 0.5f);
             _lightsInFrustumTextbox.WithText($"Traffic lights in camera frustum: {trafficCount}", new Vector2(0, 60), 0.5f);

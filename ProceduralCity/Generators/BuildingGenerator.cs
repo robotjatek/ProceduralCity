@@ -30,8 +30,15 @@ namespace ProceduralCity.Generators
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
         private readonly IBillboardBuilder _billboardBuilder;
+        private readonly BuildingTextureGenerator _buildingTextureGenerator;
 
-        public BuildingGenerator(ILogger logger, IAppConfig config, IBillboardBuilder billboardBuilder, ColorGenerator colorGenerator, RandomService randomService)
+        public BuildingGenerator(
+            ILogger logger,
+            IAppConfig config,
+            IBillboardBuilder billboardBuilder,
+            ColorGenerator colorGenerator,
+            RandomService randomService,
+            BuildingTextureGenerator buildingTextureGenerator)
         {
             _config = config;
             _randomService = randomService;
@@ -49,18 +56,20 @@ namespace ProceduralCity.Generators
             _areaBorder = new Vector2(_config.AreaBorderSize);
             _logger = logger;
             _billboardBuilder = billboardBuilder;
+            _buildingTextureGenerator = buildingTextureGenerator;
         }
 
         public IEnumerable<IBuilding> GenerateBuildings(IEnumerable<GroundNode> sites)
         {
             _logger.Information("Generating buildings");
+            var t = _buildingTextureGenerator.GenerateTexture(); // TODO: Dispose
             var buildings = new List<IBuilding>();
             foreach (var site in sites)
             {
                 var position = new Vector3(site.StartPosition.X + _areaBorder.X, 0, site.StartPosition.Y + _areaBorder.Y);
                 var area = site.EndPosition - site.StartPosition - (_areaBorder * 2);
-                var texture = _buildingTextures[_randomService.Next(_buildingTextures.Length)];
-                var building = CreateRandomBuilding(position, area, texture);
+               // var texture = _buildingTextures[_randomService.Next(_buildingTextures.Length)];
+                var building = CreateRandomBuilding(position, area, t);
                 buildings.Add(building);
             }
 
@@ -76,7 +85,7 @@ namespace ProceduralCity.Generators
 
             return type switch
             {
-                BuildingType.Simple => new Building(position, area, texture, _buildingShader, height),
+                BuildingType.Simple => new Building(position, area, texture, _buildingShader, height, _randomService),
                 BuildingType.Tower => new TowerBuilding(position, area, texture, _buildingShader, height, _billboardBuilder, _randomService),
                 _ => throw new NotImplementedException(),
             };

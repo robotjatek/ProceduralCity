@@ -15,7 +15,9 @@ namespace ProceduralCity
             _logger = logger;
             var glVendor = GL.GetString(StringName.Vendor);
             var glRenderer = GL.GetString(StringName.Renderer);
+            var glVersion = GL.GetString(StringName.Version);
             _logger.Information("Vendor: {glVendor} | Renderer: {glRenderer}", glVendor, glRenderer);
+            _logger.Information("OpenGL version: {version}", glVersion);
             VSync = VSyncMode.Off;
         }
 

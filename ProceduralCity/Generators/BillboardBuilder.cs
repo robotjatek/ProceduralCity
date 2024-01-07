@@ -52,7 +52,7 @@ namespace ProceduralCity.Generators
                 texture,
                 _shader,
                 PrimitiveUtils.CreateFrontVertices(position, area, height),
-                PrimitiveUtils.CreateFrontUvs());
+                PrimitiveUtils.CreateFrontUvs(new Vector2(0), 1, 1));
         }
 
         public Billboard CreateSouthFacingBillboard(Vector3 position, Vector2 area, float height)
@@ -67,7 +67,7 @@ namespace ProceduralCity.Generators
                 texture,
                 _shader,
                 PrimitiveUtils.CreateBacksideVertices(position, area, height),
-                PrimitiveUtils.CreateBackUVs());
+                PrimitiveUtils.CreateBackUVs(new Vector2(), 1, 1));
         }
 
         public Billboard CreateWestFacingBillboard(Vector3 position, Vector2 area, float height)
@@ -81,7 +81,7 @@ namespace ProceduralCity.Generators
                 texture,
                 _shader,
                 PrimitiveUtils.CreateLeftVertices(position, area, height),
-                PrimitiveUtils.CreateLeftUVs());
+                PrimitiveUtils.CreateLeftUVs(1, 1));
         }
 
         public Billboard CreateEastFacingBillboard(Vector3 position, Vector2 area, float height)
@@ -96,7 +96,7 @@ namespace ProceduralCity.Generators
                 texture,
                 _shader,
                 PrimitiveUtils.CreateRightVertices(position, area, height),
-                PrimitiveUtils.CreateRightUVs());
+                PrimitiveUtils.CreateRightUVs(1, 1));
         }
 
         private bool disposedValue = false;

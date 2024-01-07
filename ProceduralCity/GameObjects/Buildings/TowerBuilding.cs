@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using OpenTK.Mathematics;
 
+using ProceduralCity.Extensions;
 using ProceduralCity.Generators;
 using ProceduralCity.Renderer;
 using ProceduralCity.Utils;
@@ -75,9 +76,27 @@ namespace ProceduralCity.Buildings
 
         private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height)
         {
+            // TODO: move these up in the call hierarchy
+            // TODO: These should come from the texture generator
+            // Coordinates for the generated texture
+            // - 128 windows per row
+            // - 128 windows per column
+            var numWindowsX = 128;
+            var numWindowsY = 128;
+            var windowWidth = 1f / numWindowsX;
+            var windowHeight = 1f / numWindowsY;
+
+            // TODO: 4 different start positions for the 4 sides.
+            // Randomly select a window
+            var textureStartPosition = RandomWindowUV(numWindowsX, numWindowsY);
+
+            var scaleY = height / 2; // Two floors per section
+            var scalef = area.X * windowWidth;
+            var scaleX = scalef.Clamp(1, scalef); // Make sure that the window does not overflow on the sides by scaling it to an integer value
+
             return new Mesh(
                 PrimitiveUtils.CreateCubeVertices(position, area, height),
-                PrimitiveUtils.CreateCubeUVs(),
+                PrimitiveUtils.CreateCubeUVs(area, height, windowWidth, windowHeight, textureStartPosition, scaleX, scaleY),
                 new[] { _texture },
                 _shader);
         }
@@ -89,6 +108,17 @@ namespace ProceduralCity.Buildings
                 PrimitiveUtils.CreateZeroCubeUVs(),
                 new[] { _texture },
                 _shader);
+        }
+
+        // TODO: maybe one abstraction level higher?
+        private Vector2 RandomWindowUV(int numWindowsX, int numWindowsY)
+        {
+            var windowX = _randomService.Next(0, numWindowsX);
+            var windowY = _randomService.Next(0, numWindowsY);
+            var startX = (float)windowX / numWindowsX;
+            var startY = (float)windowY / numWindowsY;
+            var textureStartPosition = new Vector2(startX, startY);
+            return textureStartPosition;
         }
     }
 }
