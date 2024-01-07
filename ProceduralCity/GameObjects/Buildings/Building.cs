@@ -42,7 +42,15 @@ namespace ProceduralCity.Buildings
 
             return new Mesh(
                 PrimitiveUtils.CreateCubeVertices(position, area, height),
-                PrimitiveUtils.CreateCubeUVs(area, height, windowWidth, windowHeight, textureStartPosition, scaleX, scaleY),
+                PrimitiveUtils.CreateCubeUVs(
+                    area,
+                    height,
+                    windowWidth,
+                    windowHeight,
+                    textureStartPosition,
+                    scaleXFrontBack: scaleX,
+                    scaleXLeftRight: scaleX, // TODO: 
+                    scaleY),
                 new[] { _texture },
                 _shader);
         }

@@ -90,13 +90,24 @@ namespace ProceduralCity.Buildings
             // Randomly select a window
             var textureStartPosition = RandomWindowUV(numWindowsX, numWindowsY);
 
-            var scaleY = height / 2; // Two floors per section
-            var scalef = area.X * windowWidth;
-            var scaleX = scalef.Clamp(1, scalef); // Make sure that the window does not overflow on the sides by scaling it to an integer value
+            var scaleWindowHeight = height / 2; // Two floors per section
+            var scaleXFrontBackTemp = area.X * windowWidth;
+            var scaleXFrontBack = scaleXFrontBackTemp.Clamp(1, scaleXFrontBackTemp); // Make sure that the window does not overflow on the sides by scaling it to an integer value
+
+            var scaleXLeftRightTemp = area.Y * windowWidth;
+            var scaleXLeftRight = scaleXLeftRightTemp.Clamp(1, scaleXLeftRightTemp);
 
             return new Mesh(
                 PrimitiveUtils.CreateCubeVertices(position, area, height),
-                PrimitiveUtils.CreateCubeUVs(area, height, windowWidth, windowHeight, textureStartPosition, scaleX, scaleY),
+                PrimitiveUtils.CreateCubeUVs(
+                    area,
+                    height,
+                    windowWidth,
+                    windowHeight,
+                    textureStartPosition,
+                    scaleXFrontBack: scaleXFrontBack,
+                    scaleXLeftRight: scaleXLeftRight,
+                    scaleWindowHeight),
                 new[] { _texture },
                 _shader);
         }

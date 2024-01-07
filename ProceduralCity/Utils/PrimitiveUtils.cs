@@ -214,24 +214,24 @@ namespace ProceduralCity.Utils
             yield return new Vector2(height, width);
         }
 
-        public static IEnumerable<Vector2> CreateLeftUVs(float width, float height)
+        public static IEnumerable<Vector2> CreateLeftUVs(Vector2 textureStartPosition, float width, float height)
         {
-            yield return new Vector2(0, 0);
-            yield return new Vector2(0, width);
-            yield return new Vector2(height, width);
-            yield return new Vector2(0, 0);
-            yield return new Vector2(height, width);
-            yield return new Vector2(height, 0);
+            yield return new Vector2(textureStartPosition.X, textureStartPosition.Y);
+            yield return new Vector2(textureStartPosition.X, textureStartPosition.Y + width);
+            yield return new Vector2(textureStartPosition.X + height, textureStartPosition.Y + width);
+            yield return new Vector2(textureStartPosition.X, textureStartPosition.Y);
+            yield return new Vector2(textureStartPosition.X + height, textureStartPosition.Y + width);
+            yield return new Vector2(textureStartPosition.X + height, textureStartPosition.Y);
         }
 
-        public static IEnumerable<Vector2> CreateRightUVs(float width, float height)
+        public static IEnumerable<Vector2> CreateRightUVs(Vector2 textureStartPosition, float width, float height)
         {
-            yield return new Vector2(0, 0);
-            yield return new Vector2(0, width);
-            yield return new Vector2(height, 0);
-            yield return new Vector2(0, width);
-            yield return new Vector2(height, width);
-            yield return new Vector2(height, 0);
+            yield return new Vector2(textureStartPosition.X, textureStartPosition.Y);
+            yield return new Vector2(textureStartPosition.X, textureStartPosition.Y + width);
+            yield return new Vector2(textureStartPosition.X + height, textureStartPosition.Y);
+            yield return new Vector2(textureStartPosition.X, textureStartPosition.Y + width);
+            yield return new Vector2(textureStartPosition.X + height, textureStartPosition.Y + width);
+            yield return new Vector2(textureStartPosition.X + height, textureStartPosition.Y);
         }
 
         public static IEnumerable<Vector2> CreateFrontUvs(Vector2 textureStartPosition, float width, float height)
@@ -266,18 +266,40 @@ namespace ProceduralCity.Utils
             return vertices;
         }
 
-        public static IEnumerable<Vector2> CreateCubeUVs(Vector2 area, float height, float windowWidth, float windowHeight, Vector2 textureStartPosition, float scaleX, float scaleY)
+        public static IEnumerable<Vector2> CreateCubeUVs(
+            Vector2 area,
+            float height,
+            float windowWidth,
+            float windowHeight,
+            Vector2 textureStartPosition,
+            float scaleXFrontBack,
+            float scaleXLeftRight,
+            float scaleWindowHeight)
         {
             // TODO: discretize width and height values when generating buildings
-            // TODO: Make generated texture work with the other sides too
             var UVs = new List<Vector2>();
-            UVs.AddRange(CreateBackUVs(textureStartPosition, windowWidth * area.X / scaleX, windowHeight * height / scaleY));
-            UVs.AddRange(CreateFrontUvs(textureStartPosition, windowWidth * area.X / scaleX, windowHeight * height / scaleY));
+            UVs.AddRange(
+                CreateBackUVs(
+                    textureStartPosition,
+                    windowWidth * area.X / scaleXFrontBack,
+                    windowHeight * height / scaleWindowHeight));
+            UVs.AddRange(
+                CreateFrontUvs(
+                    textureStartPosition,
+                    windowWidth * area.X / scaleXFrontBack,
+                    windowHeight * height / scaleWindowHeight));
 
-            //  UVs.AddRange(CreateRightUVs(windowWidth * (area.Y / 10f), windowHeight * (height / 8f)));
-            UVs.AddRange(CreateRightUVs(10, 10));
+            UVs.AddRange(
+                CreateRightUVs(
+                    textureStartPosition,
+                    windowHeight * height / scaleWindowHeight,
+                    windowWidth * area.Y / scaleXLeftRight));
 
-            UVs.AddRange(CreateLeftUVs(10, 10));
+            UVs.AddRange(
+                CreateLeftUVs(
+                    textureStartPosition,
+                    windowHeight * height / scaleWindowHeight,
+                    windowWidth * area.Y / scaleXLeftRight));
 
             UVs.AddRange(CreateZeroTopUVs());
             UVs.AddRange(CreateBottomUVs());
