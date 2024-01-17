@@ -62,6 +62,8 @@ namespace ProceduralCity.Renderer
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
         }
 
         public static Texture CreateGrayscaleTexture(int width, int height, byte[] data)

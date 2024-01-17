@@ -43,7 +43,7 @@ namespace ProceduralCity.Buildings
             ];
 
             var scaleX = 2.5f;
-            var scaleY = 2.5f;
+            var scaleWindowHeight = 2.5f;
 
             return new Mesh(
                 PrimitiveUtils.CreateCubeVertices(position, area, height),
@@ -55,7 +55,7 @@ namespace ProceduralCity.Buildings
                     textureStartPositions,
                     scaleXFrontBack: scaleX,
                     scaleXLeftRight: scaleX, // TODO: 
-                    scaleY),
+                    scaleWindowHeight),
                 new[] { _texture },
                 _shader);
         }
