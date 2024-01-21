@@ -74,7 +74,7 @@ namespace ProceduralCity
         private readonly Texture _backbufferTexture;
         private readonly Shader _fullscreenShader;
 
-        private bool _isBloomEnabled = false;
+        private bool _isBloomEnabled = true;
         private readonly PostprocessPipeline _postprocessPipeline;
 
         private double _elapsedFrameTime = 0;

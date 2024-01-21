@@ -18,7 +18,7 @@ namespace ProceduralCity
             var glVersion = GL.GetString(StringName.Version);
             _logger.Information("Vendor: {glVendor} | Renderer: {glRenderer}", glVendor, glRenderer);
             _logger.Information("OpenGL version: {version}", glVersion);
-            VSync = VSyncMode.Off;
+            VSync = VSyncMode.On;
         }
 
         public void ToggleFullscreen()

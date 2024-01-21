@@ -17,6 +17,9 @@
     <None Update="Shaders\billboard.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Shaders\building.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\colorTools.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
