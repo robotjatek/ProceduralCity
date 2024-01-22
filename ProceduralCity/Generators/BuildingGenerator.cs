@@ -54,7 +54,7 @@ namespace ProceduralCity.Generators
             _randomService = randomService;
 
             // TODO: implement material system: instead of changeing shader objects only uniforms should be updated
-            _buildingShaders = buildingColors.Select(i =>
+            _buildingShaders = buildingColors.Select(color =>
             {
                 var shader = new Shader("vs.vert", fragmentShaders);
 
@@ -65,7 +65,7 @@ namespace ProceduralCity.Generators
 
                 shader.SetUniformValue("buildingColor", new Vector3Uniform
                 {
-                    Value = buildingColors[_randomService.Next(buildingColors.Length)]
+                    Value = color
                 });
 
                 return shader;
