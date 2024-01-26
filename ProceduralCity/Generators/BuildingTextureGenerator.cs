@@ -17,7 +17,6 @@ namespace ProceduralCity.Generators
             _randomService = randomService;
         }
 
-        // TODO: Use compute shaders to generate textures.
         public Texture GenerateTexture()
         {
             var litProbability = _randomService.Next(40, 100) / 100f;
