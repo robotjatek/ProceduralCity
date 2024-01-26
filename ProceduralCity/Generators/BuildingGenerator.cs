@@ -31,7 +31,7 @@ namespace ProceduralCity.Generators
         private readonly ILogger _logger;
         private readonly IAppConfig _config;
         private readonly IBillboardBuilder _billboardBuilder;
-        private readonly Texture _buildingTexture;
+        private readonly BuildingTextureInfo _buildingTexture;
 
         private static readonly Vector3[] buildingColors = 
             [
@@ -98,7 +98,7 @@ namespace ProceduralCity.Generators
             return buildings;
         }
 
-        private IBuilding CreateRandomBuilding(Vector3 position, Vector2 area, Texture texture, Shader shader)
+        private IBuilding CreateRandomBuilding(Vector3 position, Vector2 area, BuildingTextureInfo texture, Shader shader)
         {
             var type = (BuildingType)_randomService.Next(Enum.GetValues(typeof(BuildingType)).Length);
             var height = _randomService.Next(_config.MinBuildingHeight, _config.MaxBuildingHeight);
@@ -138,7 +138,7 @@ namespace ProceduralCity.Generators
                     _logger.Information("Disposing building generator");
 
                     _buildingShaders.ForEach(shader => shader.Dispose());
-                    _buildingTexture.Dispose();
+                    _buildingTexture.Texture.Dispose();
                     _billboardBuilder.Dispose();
                 }
 

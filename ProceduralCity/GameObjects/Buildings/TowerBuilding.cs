@@ -17,9 +17,9 @@ namespace ProceduralCity.Buildings
 
         public IEnumerable<Mesh> Meshes => _meshes;
 
-        public TowerBuilding(Vector3 position, Vector2 area, Texture texture, Shader shader, float height, IBillboardBuilder billboardBuilder, RandomService randomService)
+        public TowerBuilding(Vector3 position, Vector2 area, BuildingTextureInfo texture, Shader shader, float height, IBillboardBuilder billboardBuilder, RandomService randomService)
         {
-            _texture = texture;
+            _texture = texture.Texture;
             _shader = shader;
             _randomService = randomService;
 
@@ -33,7 +33,7 @@ namespace ProceduralCity.Buildings
                 blockToppingPosition.Y += 5;
                 billboardPosition = blockToppingPosition;
 
-                _meshes.Add(CreateTexturedCube(lastPosition, area, 5));
+                _meshes.Add(CreateTexturedCube(lastPosition, area, 5, texture));
                 _meshes.Add(CreateUntexturedCube(blockToppingPosition, blockToppingArea, 3));
 
                 lastPosition.Y += 8;
@@ -74,24 +74,17 @@ namespace ProceduralCity.Buildings
             }
         }
 
-        private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height)
+        private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height, BuildingTextureInfo buildingTextureInfo)
         {
-            // TODO: move these up in the call hierarchy
-            // TODO: These should come from the texture generator
-            // Coordinates for the generated texture
-            // - 128 windows per row
-            // - 128 windows per column
-            var numWindowsX = 128;
-            var numWindowsY = 128;
-            var windowWidth = 1f / numWindowsX;
-            var windowHeight = 1f / numWindowsY;
+            var windowWidth = buildingTextureInfo.WindowWidth;
+            var windowHeight = buildingTextureInfo.WindowHeight;
 
             Vector2[] textureStartPositions = 
             [
-                RandomWindowUV(numWindowsX, numWindowsY),
-                RandomWindowUV(numWindowsX, numWindowsY),
-                RandomWindowUV(numWindowsX, numWindowsY),
-                RandomWindowUV(numWindowsX, numWindowsY),
+                buildingTextureInfo.RandomWindowUV(),
+                buildingTextureInfo.RandomWindowUV(),
+                buildingTextureInfo.RandomWindowUV(),
+                buildingTextureInfo.RandomWindowUV(),
             ];
 
             var scaleWindowHeight = height / 2; // Two floors per section
@@ -123,18 +116,6 @@ namespace ProceduralCity.Buildings
                 PrimitiveUtils.CreateZeroCubeUVs(),
                 new[] { _texture },
                 _shader);
-        }
-
-        // TODO: maybe one abstraction level higher?
-        // Randomly select a window
-        private Vector2 RandomWindowUV(int numWindowsX, int numWindowsY)
-        {
-            var windowX = _randomService.Next(0, numWindowsX);
-            var windowY = _randomService.Next(0, numWindowsY);
-            var startX = (float)windowX / numWindowsX;
-            var startY = (float)windowY / numWindowsY;
-            var textureStartPosition = new Vector2(startX, startY);
-            return textureStartPosition;
         }
     }
 }

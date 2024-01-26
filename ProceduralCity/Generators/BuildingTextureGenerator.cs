@@ -8,6 +8,7 @@ namespace ProceduralCity.Generators
     class BuildingTextureGenerator
     {
         private readonly RandomService _randomService;
+        // TODO: make these configurable
         private const int width = 1024;
         private const int height = 1024;
         private const int windowSizePx = 8;
@@ -17,7 +18,7 @@ namespace ProceduralCity.Generators
             _randomService = randomService;
         }
 
-        public Texture GenerateTexture()
+        public BuildingTextureInfo GenerateTexture()
         {
             var litProbability = _randomService.Next(40, 100) / 100f;
 
@@ -27,14 +28,18 @@ namespace ProceduralCity.Generators
             {
                 for (var j = 0; j < numWindows; j++)
                 {
-                    DrawWindow(i, j, windowSizePx, data, litProbability);
+                    DrawWindow(i, j, data, litProbability);
                 }
             }
 
-            return Texture.CreateGrayscaleTexture(width, height, data);
+            return new BuildingTextureInfo(_randomService)
+            {
+                Texture = Texture.CreateGrayscaleTexture(width, height, data),
+                WindowSizePx = windowSizePx,
+            };
         }
 
-        private void DrawWindow(int positionX, int positionY, int windowSizePx, byte[] data, float litProbability)
+        private void DrawWindow(int positionX, int positionY, byte[] data, float litProbability)
         {
             var regionSizeX = windowSizePx * 4;
             var regionSizeY = windowSizePx * 4;

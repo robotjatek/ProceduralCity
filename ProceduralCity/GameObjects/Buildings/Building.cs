@@ -2,6 +2,7 @@
 
 using OpenTK.Mathematics;
 
+using ProceduralCity.Generators;
 using ProceduralCity.Renderer;
 using ProceduralCity.Utils;
 
@@ -16,30 +17,26 @@ namespace ProceduralCity.Buildings
 
         public IEnumerable<Mesh> Meshes => _meshes;
 
-        public Building(Vector3 position, Vector2 area, Texture texture, Shader shader, float height, RandomService randomService)
+        public Building(Vector3 position, Vector2 area, BuildingTextureInfo buildingTextureInfo, Shader shader, float height, RandomService randomService)
         {
             _randomService = randomService;
-            _texture = texture;
+            _texture = buildingTextureInfo.Texture;
             _shader = shader;
 
-            _meshes.Add(CreateTexturedCube(position, area, height));
+            _meshes.Add(CreateTexturedCube(position, area, height, buildingTextureInfo));
         }
 
-        private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height)
+        private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height, BuildingTextureInfo buildingTextureInfo)
         {
-            var numWindowsX = 128;
-            var numWindowsY = 128;
-            var windowWidth = 1f / numWindowsX;
-            var windowHeight = 1f / numWindowsY;
-            var windowX = _randomService.Next(0, numWindowsX);
-            var windowY = _randomService.Next(0, numWindowsY);
+            var windowWidth = buildingTextureInfo.WindowWidth;
+            var windowHeight = buildingTextureInfo.WindowHeight;
 
             Vector2[] textureStartPositions =
             [
-                RandomWindowUV(numWindowsX, numWindowsY),
-                RandomWindowUV(numWindowsX, numWindowsY),
-                RandomWindowUV(numWindowsX, numWindowsY),
-                RandomWindowUV(numWindowsX, numWindowsY),
+                buildingTextureInfo.RandomWindowUV(),
+                buildingTextureInfo.RandomWindowUV(),
+                buildingTextureInfo.RandomWindowUV(),
+                buildingTextureInfo.RandomWindowUV(),
             ];
 
             var scaleX = 2.5f;
@@ -58,17 +55,6 @@ namespace ProceduralCity.Buildings
                     scaleWindowHeight),
                 new[] { _texture },
                 _shader);
-        }
-
-        // TODO: maybe one abstraction level higher?
-        private Vector2 RandomWindowUV(int numWindowsX, int numWindowsY)
-        {
-            var windowX = _randomService.Next(0, numWindowsX);
-            var windowY = _randomService.Next(0, numWindowsY);
-            var startX = (float)windowX / numWindowsX;
-            var startY = (float)windowY / numWindowsY;
-            var textureStartPosition = new Vector2(startX, startY);
-            return textureStartPosition;
         }
     }
 }
