@@ -24,8 +24,6 @@ namespace ProceduralCity.Config
 
         int MinHorizontalBlockLength { get; set; }
 
-        IEnumerable<string> BuildingTextures { get; set; }
-
         int BillboardTextureNumber { get; set; }
 
         int BillboardTextureWidth { get; set; }

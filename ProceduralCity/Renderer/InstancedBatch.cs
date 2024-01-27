@@ -54,7 +54,7 @@ namespace ProceduralCity.Renderer
         {
             _instanceCount = instanceCount;
             GL.BindBuffer(BufferTarget.ArrayBuffer, _instancedModelVbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, instanceCount * Vector4.SizeInBytes * 4, models, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, models.Length * Vector4.SizeInBytes * 4, models, BufferUsageHint.DynamicDraw);
         }
 
         public void Draw(Matrix4 projection, Matrix4 view)

@@ -46,6 +46,7 @@ namespace ProceduralCity
             builder.RegisterType<BillboardTextureGenerator>().As<IBillboardTextureGenerator>().SingleInstance();
             builder.RegisterType<BillboardBuilder>().As<IBillboardBuilder>().SingleInstance();
             builder.RegisterType<ColorGenerator>().SingleInstance();
+            builder.RegisterType<BuildingTextureGenerator>().SingleInstance();
 
             return builder.Build();
         }

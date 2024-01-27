@@ -27,8 +27,6 @@ namespace ProceduralCity.Config
 
         public float AreaBorderSize { get; set; }
 
-        public IEnumerable<string> BuildingTextures { get; set; }
-
         public int WorldSize { get; set; }
 
         public int MinVerticalBlockLength { get; set; }
