@@ -32,11 +32,13 @@ namespace ProceduralCity.Buildings
             // TODO: dynamic texture scale
             var textureScale = 4;
 
-            var windowWidth = buildingTextureInfo.WindowWidth / textureScale;
-            var windowHeight = buildingTextureInfo.WindowHeight / textureScale;
+            var windowWidth = buildingTextureInfo.WindowWidth;
+            var windowHeight = buildingTextureInfo.WindowHeight;
 
             // Discretize height to fit window size 
             height = (float)Math.Floor(height / textureScale) * textureScale;
+            area.X = (float)Math.Floor(area.X / textureScale) * textureScale;
+            area.Y = (float)Math.Floor(area.Y / textureScale) * textureScale;
 
             // Different texture parts for each sides
             Vector2[] textureStartPositions =
@@ -47,16 +49,6 @@ namespace ProceduralCity.Buildings
                 buildingTextureInfo.RandomWindowUV(),
             ];
 
-            var scaleXFrontBackTemp = area.X * windowWidth * 4;
-            var scaleXFrontBack = 1;
-
-            var scaleXLeftRightTemp = area.Y * windowWidth * 4;
-            var scaleXLeftRight = 1;
-
-            // TODO: scale Y frontback & scaleYleftright -- a window height valójában scaleY és mindkét oldalra külön kell
-            var scaleYFrontBack = scaleXFrontBack; 
-            var scaleYLeftRight = scaleXLeftRight;
-
             return new Mesh(
                 PrimitiveUtils.CreateCubeVertices(position, area, height),
                 PrimitiveUtils.CreateCubeUVs(
@@ -65,11 +57,11 @@ namespace ProceduralCity.Buildings
                     windowWidth,
                     windowHeight,
                     textureStartPositions,
-                    scaleXFrontBack: scaleXFrontBack,
-                    scaleXLeftRight: scaleXLeftRight,
-                    scaleYFrontBack,
-                    scaleYLeftRight),
-                new[] { _texture },
+                    scaleXFrontBack: textureScale,
+                    scaleXLeftRight: textureScale,
+                    textureScale,
+                    textureScale),
+                [_texture],
                 _shader);
         }
     }
