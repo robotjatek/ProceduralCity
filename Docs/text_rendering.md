@@ -54,6 +54,8 @@ _textRenderer = textRenderer;
 _textRenderer.AddToScene(_text.Text);
 ```
 
+### Blending
+
 You may or may not need to enable blending before rendering. Enabling blending will result smoother edges on the text especially when using scaling.
 
 ```csharp
@@ -65,6 +67,22 @@ Blending disabled:
 
 Blending enabled:
 ![Blending enabled](images/text_blending_enabled.png)
+
+### Depth testing
+
+Make sure that you've disabled depth testing before rendering text to prevent text clipping through objects:
+
+```csharp
+_textRenderer.BeforeRender = () => GL.Disable(EnableCap.DepthTest);
+```
+
+Don't forget to re-enable after render:
+
+```csharp
+_textRenderer.BeforeRender = () => GL.Enable(EnableCap.DepthTest);
+```
+
+
 
 ### OnRenderFrame:
 

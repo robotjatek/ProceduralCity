@@ -4,6 +4,6 @@ namespace ProceduralCity.Renderer
 {
     interface IRenderable
     {
-        IEnumerable<Mesh> Meshes { get; }
+        IReadOnlyCollection<Mesh> Meshes { get; }
     }
 }

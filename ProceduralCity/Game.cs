@@ -23,9 +23,10 @@ using System.Diagnostics;
 namespace ProceduralCity
 {
     // High priority tasks
-    //TODO: generate building textures procedurally
+    //TODO: building heights are too uniform
     //TODO: more building types
     //TODO: add more variety to the existing building types
+    //TODO: Create specialized renderers for all of the render tasks in Game.cs - Implement IRenderer, extend Renderer
     //TODO: Occlusion cull traffic lights
     //TODO: Building LOD levels
 
@@ -117,9 +118,18 @@ namespace ProceduralCity
 
             _renderer = renderer;
             _ndcRenderer = ndcRenderer;
+
             _textRenderer = textRenderer;
-            _textRenderer.BeforeRender = () => GL.Enable(EnableCap.Blend);
-            _textRenderer.AfterRender = () => GL.Disable(EnableCap.Blend);
+            _textRenderer.BeforeRender = () =>
+            {
+                GL.Enable(EnableCap.Blend);
+                GL.Disable(EnableCap.DepthTest);
+            };
+            _textRenderer.AfterRender = () =>
+            {
+                GL.Disable(EnableCap.Blend);
+                GL.Enable(EnableCap.DepthTest);
+            };
 
             _skyboxRenderer = skyboxRenderer;
 
@@ -207,7 +217,7 @@ namespace ProceduralCity
                 //.Where(traffic => _camera.IsInViewFrustum(traffic.Position)) 
                 .Where(traffic => Vector3.DistanceSquared(traffic.Position, _camera.Position) < 490000f) // discard everything that is further than 700f
                 .ToImmutableList();
-
+            Parallel.ForEach(visibleTrafficInstancesToUpdate, t => t.Move((float)delta)); // Only animate visible traffic
 
             var trafficModels = visibleTraffic.Select(t => t.Model);
             var trafficCount = trafficModels.Count();
@@ -217,10 +227,10 @@ namespace ProceduralCity
                 {
                     _trafficMatrixCache[i] = modelMatrix;
                 });
+            // TODO: try mapbuffer-unmapbuffer
             _trafficInstanceBatch.UpdateModels(_trafficMatrixCache, trafficCount); /* Only updating model matrices that are in the camera frustum.
                                                                                     * The whole matrix will be uploaded, but only the beginning of
                                                                                     * the matrix contains relevant data.*/
-            Parallel.ForEach(visibleTrafficInstancesToUpdate, t => t.Move((float)delta)); // Only animate visible traffic
 
             _visibleLightsTextbox.WithText($"Traffic to update: {visibleTrafficInstancesToUpdate.Count}", new Vector2(0, 30), 0.5f);
             _lightsInFrustumTextbox.WithText($"Traffic lights in camera frustum: {trafficCount}", new Vector2(0, 60), 0.5f);
@@ -310,7 +320,9 @@ namespace ProceduralCity
             if (_elapsedFrameTime >= 1.0)
             {
                 var fps = Math.Round(1f / elapsed, 0);
-                _fpsCounterTextbox.WithText(text: $"{fps} FPS", scale: 0.5f);
+                _fpsCounterTextbox.WithText(
+                    text: $"{fps} FPS | Frametime: {elapsed * 1000:0.00} ms | VSync: {_context.VSync} | FPS limit: {_context.UpdateFrequency}",
+                    scale: 0.5f);
 
                 _elapsedFrameTime = 0;
             }

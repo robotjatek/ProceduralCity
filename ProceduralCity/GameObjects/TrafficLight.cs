@@ -17,7 +17,7 @@ namespace ProceduralCity.GameObjects
 
         public Matrix4 Model { get; private set; } = Matrix4.Identity;
 
-        public IEnumerable<Mesh> Meshes => _meshes;
+        public IReadOnlyCollection<Mesh> Meshes => _meshes.AsReadOnly();
 
         public Vector3 Position { get { return _position; } }
 

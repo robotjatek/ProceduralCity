@@ -13,13 +13,7 @@ namespace ProceduralCity.GameObjects
         private readonly ITexture _texture;
         private readonly Shader _shader;
 
-        public IEnumerable<Mesh> Meshes
-        {
-            get
-            {
-                return _meshes;
-            }
-        }
+        public IReadOnlyCollection<Mesh> Meshes => _meshes.AsReadOnly();
 
         public float Advance
         {

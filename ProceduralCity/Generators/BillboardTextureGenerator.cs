@@ -121,8 +121,8 @@ namespace ProceduralCity.Generators
             var prefix = _prefixes[_randomService.Next(_prefixes.Length)];
             var first = _first[_randomService.Next(_first.Length)];
             var second = _second[_randomService.Next(_second.Length)];
-
-            var word = _randomService.Next() % 2 == 0 ? $"{prefix}{first}" : $"{first} {second}";
+            var hasPrefix = _randomService.NextDouble() < 0.2;
+            var word = hasPrefix ? $"{prefix}{first}" : $"{first} {second}";
             _logger.Debug("Billboard text: {word}", word);
             return word;
         }

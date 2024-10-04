@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using OpenTK.Mathematics;
 
+using ProceduralCity.Extensions;
 using ProceduralCity.Generators;
 using ProceduralCity.Renderer;
 using ProceduralCity.Utils;
@@ -14,11 +15,11 @@ namespace ProceduralCity.Buildings
         private readonly ITexture _texture;
         private readonly RandomService _randomService;
 
-        public IEnumerable<Mesh> Meshes => _meshes;
+        public IReadOnlyCollection<Mesh> Meshes => _meshes.AsReadOnly();
 
-        public TowerBuilding(Vector3 position, Vector2 area, Texture texture, Shader shader, float height, IBillboardBuilder billboardBuilder, RandomService randomService)
+        public TowerBuilding(Vector3 position, Vector2 area, BuildingTextureInfo texture, Shader shader, float height, IBillboardBuilder billboardBuilder, RandomService randomService)
         {
-            _texture = texture;
+            _texture = texture.Texture;
             _shader = shader;
             _randomService = randomService;
 
@@ -32,7 +33,7 @@ namespace ProceduralCity.Buildings
                 blockToppingPosition.Y += 5;
                 billboardPosition = blockToppingPosition;
 
-                _meshes.Add(CreateTexturedCube(lastPosition, area, 5));
+                _meshes.Add(CreateTexturedCube(lastPosition, area, 5, texture));
                 _meshes.Add(CreateUntexturedCube(blockToppingPosition, blockToppingArea, 3));
 
                 lastPosition.Y += 8;
@@ -73,11 +74,38 @@ namespace ProceduralCity.Buildings
             }
         }
 
-        private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height)
+        private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height, BuildingTextureInfo buildingTextureInfo)
         {
+            var windowWidth = buildingTextureInfo.WindowWidth;
+            var windowHeight = buildingTextureInfo.WindowHeight;
+
+            Vector2[] textureStartPositions = 
+            [
+                buildingTextureInfo.RandomWindowUV(),
+                buildingTextureInfo.RandomWindowUV(),
+                buildingTextureInfo.RandomWindowUV(),
+                buildingTextureInfo.RandomWindowUV(),
+            ];
+
+            var scaleWindowHeight = height / 2; // Two floors per section
+            var scaleXFrontBackTemp = area.X * windowWidth;
+            var scaleXFrontBack = scaleXFrontBackTemp.Clamp(1, scaleXFrontBackTemp); // Make sure that the window does not overflow on the sides by scaling it to an integer value
+
+            var scaleXLeftRightTemp = area.Y * windowWidth;
+            var scaleXLeftRight = scaleXLeftRightTemp.Clamp(1, scaleXLeftRightTemp);
+
             return new Mesh(
                 PrimitiveUtils.CreateCubeVertices(position, area, height),
-                PrimitiveUtils.CreateCubeUVs(),
+                PrimitiveUtils.CreateCubeUVs(
+                    area,
+                    height,
+                    windowWidth,
+                    windowHeight,
+                    textureStartPositions,
+                    scaleXFrontBack: scaleXFrontBack,
+                    scaleXLeftRight: scaleXLeftRight,
+                    scaleWindowHeight,
+                    scaleWindowHeight),
                 new[] { _texture },
                 _shader);
         }
