@@ -22,11 +22,16 @@ Move on a plane while looking down at a certain angle
 Strafe with vertical angle parameter set
 
 In progress:
+- Follow a random path with street level shots too (curves?)
+    -- Inject IWorld instance
+    -- IWorld should contain the sites BSP tree
+    -- Based on the BSP tree calculate a random street coordinate on the street level
+    -- Create a path on the street level
+    -- Move the camera along the path
 
 
 To Do:
 - Select a random movement and move the camera
-    - Follow a random path with street level shots too (curves?) (work in progress on: path_movement branch)
     - Rotate around an arbitrary position/object
  */
 using OpenTK.Mathematics;
@@ -36,16 +41,17 @@ using ProceduralCity.Config;
 using ProceduralCity.Utils;
 
 using System;
+using System.Linq;
 
 namespace ProceduralCity.Camera.Controller
 {
 
     internal class CameraController : IMovementHandler
     {
-        private const int MAX_ELAPSED_TIME_BEFORE_TELEPORT = 10;
+        private const int MAX_ELAPSED_TIME_BEFORE_STATE_CHANGE = 10;
         private const float START_FADEOUTBEFORETELEPORT = 1.5f;
         private const float END_FADEINAFTERTELEPORT = 1.5f;
-        private const float FADEOUT_LENGTH = MAX_ELAPSED_TIME_BEFORE_TELEPORT - START_FADEOUTBEFORETELEPORT;
+        private const float FADEOUT_LENGTH = MAX_ELAPSED_TIME_BEFORE_STATE_CHANGE - START_FADEOUTBEFORETELEPORT;
         private const float FADEIN_LENGTH = END_FADEINAFTERTELEPORT;
 
         private readonly ICamera _camera;
@@ -53,20 +59,22 @@ namespace ProceduralCity.Camera.Controller
         private readonly Vector3 _cityCenterPosition;
         private readonly RandomService _randomService;
 
-        private float _elapsedTimeSinceLastTeleport = 0;
+        private float _elapsedTimeSinceLastStateChange = 0;
         private readonly double _maxDistance;
         private IMovement _chosenMovement = new StandMovement();
         private bool _enabled = true;
+        private readonly IWorld _world;
 
         public delegate void SetFadeoutDelegate(float fadeoutFactor);
         public SetFadeoutDelegate SetFadeout { get; set; }
 
 
-        public CameraController(ICamera camera, IAppConfig configuration, RandomService randomService)
+        public CameraController(ICamera camera, IAppConfig configuration, RandomService randomService, IWorld world)
         {
             _camera = camera;
             _configuration = configuration;
             _randomService = randomService;
+            _world = world;
 
             _cityCenterPosition = new Vector3(_configuration.WorldSize / 2, _configuration.MaxBuildingHeight, _configuration.WorldSize / 2);
             _maxDistance = _configuration.WorldSize * MathHelper.Sqrt(2) * 0.3f;
@@ -76,12 +84,16 @@ namespace ProceduralCity.Camera.Controller
         {
             if (_enabled)
             {
-                _elapsedTimeSinceLastTeleport += deltaTime;
+                _elapsedTimeSinceLastStateChange += deltaTime;
 
-                FadeOut();
-                FadeIn();
+                if (_chosenMovement is not PathMovement)
+                {
+                    FadeOut();
+                    FadeIn();
+                }
 
-                if (_elapsedTimeSinceLastTeleport > MAX_ELAPSED_TIME_BEFORE_TELEPORT)
+                if (_elapsedTimeSinceLastStateChange > MAX_ELAPSED_TIME_BEFORE_STATE_CHANGE
+                    && _chosenMovement is not PathMovement) // TODO: remove this hack and let every movementtype to trigger a change event by themselves
                 {
                     TeleportToNewPosition();
                 }
@@ -145,6 +157,33 @@ namespace ProceduralCity.Camera.Controller
             }
         }
 
+        public void HandlePathMovement(PathMovement movement, float deltaTime)
+        {
+            /*
+             * TODO in the future: use a bezier curve or spline to move between waypoints
+             */
+
+            if (movement.FirstTick)
+            {
+                _camera.Position = movement.Path.First();
+                _camera.LookAt(movement.Path.Skip(1).First());
+                movement.FirstTick = false;
+                movement.CurrentPathIndex = 1;
+            }
+
+            if (movement.CurrentPathIndex < movement.Path.Length)
+            {
+                var currentWaypoint = movement.Path[movement.CurrentPathIndex];
+                _camera.LookAt(currentWaypoint);
+                _camera.MoveForward(deltaTime);
+
+                if (Vector3.Distance(_camera.Position, currentWaypoint) < 1.5f)
+                {
+                    movement.CurrentPathIndex++;
+                }
+            }
+        }
+
         public void ToggleFlyby()
         {
             if (!_enabled)
@@ -158,20 +197,20 @@ namespace ProceduralCity.Camera.Controller
 
         private void FadeIn()
         {
-            if (_elapsedTimeSinceLastTeleport < END_FADEINAFTERTELEPORT)
+            if (_elapsedTimeSinceLastStateChange < END_FADEINAFTERTELEPORT)
             {
-                var fadeTime = _elapsedTimeSinceLastTeleport;
-                var fact = Math.Clamp(fadeTime / FADEIN_LENGTH, 0, 1);
-                SetFadeout?.Invoke(fact);
+                var fadeTime = _elapsedTimeSinceLastStateChange;
+                var factor = Math.Clamp(fadeTime / FADEIN_LENGTH, 0, 1);
+                SetFadeout?.Invoke(factor);
             }
         }
 
         private void FadeOut()
         {
-            if (_elapsedTimeSinceLastTeleport > FADEOUT_LENGTH)
+            if (_elapsedTimeSinceLastStateChange > FADEOUT_LENGTH)
             {
-                var fadeTime = _elapsedTimeSinceLastTeleport - FADEOUT_LENGTH;
-                var fact = Math.Clamp(1.0f - fadeTime / (MAX_ELAPSED_TIME_BEFORE_TELEPORT - FADEOUT_LENGTH), 0, 1);
+                var fadeTime = _elapsedTimeSinceLastStateChange - FADEOUT_LENGTH;
+                var fact = Math.Clamp(1.0f - fadeTime / (MAX_ELAPSED_TIME_BEFORE_STATE_CHANGE - FADEOUT_LENGTH), 0, 1);
                 SetFadeout?.Invoke(fact);
             }
         }
@@ -191,7 +230,7 @@ namespace ProceduralCity.Camera.Controller
 
             LookAtCityCenter();
             PickMovement();
-            _elapsedTimeSinceLastTeleport = 0;
+            _elapsedTimeSinceLastStateChange = 0;
 
         }
 
@@ -210,6 +249,7 @@ namespace ProceduralCity.Camera.Controller
                 CameraPosition = _camera.Position,
                 CityCenterPosition = _cityCenterPosition,
                 MaxDistance = _maxDistance,
+                World = _world,
             };
 
             _chosenMovement = MovementBuilder.BuildRandomMovement(buildParams, _randomService);
