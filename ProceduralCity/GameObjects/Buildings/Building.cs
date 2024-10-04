@@ -29,14 +29,14 @@ namespace ProceduralCity.Buildings
 
         private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height, BuildingTextureInfo buildingTextureInfo)
         {
-            // TODO: dynamic texture scale
-            var textureScale = 4;
 
+            var textureScale = _randomService.Next(2, 10);
             var windowWidth = buildingTextureInfo.WindowWidth;
             var windowHeight = buildingTextureInfo.WindowHeight;
 
-            // Discretize height to fit window size 
+            // Discretize height to fit window size
             height = (float)Math.Floor(height / textureScale) * textureScale;
+            // Discretize area to fit window size
             area.X = (float)Math.Floor(area.X / textureScale) * textureScale;
             area.Y = (float)Math.Floor(area.Y / textureScale) * textureScale;
 

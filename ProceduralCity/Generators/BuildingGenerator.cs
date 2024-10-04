@@ -20,7 +20,7 @@ namespace ProceduralCity.Generators
         enum BuildingType
         {
             Simple,
-       //     Tower,
+            Tower,
             //  Blocky
         }
 
@@ -106,7 +106,7 @@ namespace ProceduralCity.Generators
             return type switch
             {
                 BuildingType.Simple => new Building(position, area, texture, shader, height, _randomService),
-            //    BuildingType.Tower => new TowerBuilding(position, area, texture, shader, height, _billboardBuilder, _randomService),
+                BuildingType.Tower => new TowerBuilding(position, area, texture, shader, height, _billboardBuilder, _randomService),
                 _ => throw new NotImplementedException(),
             };
         }

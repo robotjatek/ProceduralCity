@@ -23,7 +23,7 @@ using System.Diagnostics;
 namespace ProceduralCity
 {
     // High priority tasks
-    //TODO: generate building textures procedurally
+    //TODO: building heights are too uniform
     //TODO: more building types
     //TODO: add more variety to the existing building types
     //TODO: Create specialized renderers for all of the render tasks in Game.cs - Implement IRenderer, extend Renderer
