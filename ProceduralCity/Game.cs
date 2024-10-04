@@ -26,6 +26,7 @@ namespace ProceduralCity
     //TODO: generate building textures procedurally
     //TODO: more building types
     //TODO: add more variety to the existing building types
+    //TODO: Create specialized renderers for all of the render tasks in Game.cs - Implement IRenderer, extend Renderer
     //TODO: Occlusion cull traffic lights
     //TODO: Building LOD levels
 

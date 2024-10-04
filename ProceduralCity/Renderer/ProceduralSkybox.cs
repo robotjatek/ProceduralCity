@@ -20,13 +20,7 @@ namespace ProceduralCity.Renderer
         private readonly ColorGenerator _colorGenerator;
         private readonly RandomService _randomService;
 
-        public IEnumerable<Mesh> Meshes
-        {
-            get
-            {
-                return _meshes;
-            }
-        }
+        public IReadOnlyCollection<Mesh> Meshes => _meshes.AsReadOnly();
 
         public ProceduralSkybox(ILogger logger, ColorGenerator colorGenerator, RandomService randomService)
         {

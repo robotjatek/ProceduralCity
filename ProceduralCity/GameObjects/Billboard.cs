@@ -9,7 +9,7 @@ namespace ProceduralCity.GameObjects
     {
         private readonly List<Mesh> _meshes = [];
 
-        public IEnumerable<Mesh> Meshes => _meshes;
+        public IReadOnlyCollection<Mesh> Meshes => _meshes.AsReadOnly();
 
         public Billboard(Texture texture, Shader shader, IEnumerable<Vector3> vertices, IEnumerable<Vector2> uvs)
         {

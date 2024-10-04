@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using OpenTK.Mathematics;
 
@@ -15,7 +16,7 @@ namespace ProceduralCity.Buildings
         private readonly Shader _shader;
         private readonly RandomService _randomService;
 
-        public IEnumerable<Mesh> Meshes => _meshes;
+        public IReadOnlyCollection<Mesh> Meshes => _meshes.AsReadOnly();
 
         public Building(Vector3 position, Vector2 area, BuildingTextureInfo buildingTextureInfo, Shader shader, float height, RandomService randomService)
         {
@@ -28,9 +29,16 @@ namespace ProceduralCity.Buildings
 
         private Mesh CreateTexturedCube(Vector3 position, Vector2 area, float height, BuildingTextureInfo buildingTextureInfo)
         {
-            var windowWidth = buildingTextureInfo.WindowWidth;
-            var windowHeight = buildingTextureInfo.WindowHeight;
+            // TODO: dynamic texture scale
+            var textureScale = 4;
 
+            var windowWidth = buildingTextureInfo.WindowWidth / textureScale;
+            var windowHeight = buildingTextureInfo.WindowHeight / textureScale;
+
+            // Discretize height to fit window size 
+            height = (float)Math.Floor(height / textureScale) * textureScale;
+
+            // Different texture parts for each sides
             Vector2[] textureStartPositions =
             [
                 buildingTextureInfo.RandomWindowUV(),
@@ -39,8 +47,15 @@ namespace ProceduralCity.Buildings
                 buildingTextureInfo.RandomWindowUV(),
             ];
 
-            var scaleX = 2.5f;
-            var scaleWindowHeight = 2.5f;
+            var scaleXFrontBackTemp = area.X * windowWidth * 4;
+            var scaleXFrontBack = 1;
+
+            var scaleXLeftRightTemp = area.Y * windowWidth * 4;
+            var scaleXLeftRight = 1;
+
+            // TODO: scale Y frontback & scaleYleftright -- a window height valójában scaleY és mindkét oldalra külön kell
+            var scaleYFrontBack = scaleXFrontBack; 
+            var scaleYLeftRight = scaleXLeftRight;
 
             return new Mesh(
                 PrimitiveUtils.CreateCubeVertices(position, area, height),
@@ -50,9 +65,10 @@ namespace ProceduralCity.Buildings
                     windowWidth,
                     windowHeight,
                     textureStartPositions,
-                    scaleXFrontBack: scaleX,
-                    scaleXLeftRight: scaleX, // TODO: 
-                    scaleWindowHeight),
+                    scaleXFrontBack: scaleXFrontBack,
+                    scaleXLeftRight: scaleXLeftRight,
+                    scaleYFrontBack,
+                    scaleYLeftRight),
                 new[] { _texture },
                 _shader);
         }

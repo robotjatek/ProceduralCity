@@ -274,7 +274,8 @@ namespace ProceduralCity.Utils
             Vector2[] textureStartPositions,
             float scaleXFrontBack,
             float scaleXLeftRight,
-            float scaleWindowHeight)
+            float scaleYFrontBack,
+            float scaleYLeftRight)
         {
             // TODO: discretize width and height values when generating buildings
             var UVs = new List<Vector2>();
@@ -282,23 +283,23 @@ namespace ProceduralCity.Utils
                 CreateBackUVs(
                     textureStartPositions[0],
                     windowWidth * area.X / scaleXFrontBack,
-                    windowHeight * height / scaleWindowHeight));
+                    windowHeight * height / scaleYFrontBack));
             UVs.AddRange(
                 CreateFrontUvs(
                     textureStartPositions[1],
                     windowWidth * area.X / scaleXFrontBack,
-                    windowHeight * height / scaleWindowHeight));
+                    windowHeight * height / scaleYFrontBack));
 
             UVs.AddRange(
                 CreateRightUVs(
                     textureStartPositions[2],
-                    windowHeight * height / scaleWindowHeight,
+                    windowHeight * height / scaleYLeftRight,
                     windowWidth * area.Y / scaleXLeftRight));
 
             UVs.AddRange(
                 CreateLeftUVs(
                     textureStartPositions[3],
-                    windowHeight * height / scaleWindowHeight,
+                    windowHeight * height / scaleYLeftRight,
                     windowWidth * area.Y / scaleXLeftRight));
 
             UVs.AddRange(CreateZeroTopUVs());

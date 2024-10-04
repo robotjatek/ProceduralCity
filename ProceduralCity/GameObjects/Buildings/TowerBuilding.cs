@@ -15,7 +15,7 @@ namespace ProceduralCity.Buildings
         private readonly ITexture _texture;
         private readonly RandomService _randomService;
 
-        public IEnumerable<Mesh> Meshes => _meshes;
+        public IReadOnlyCollection<Mesh> Meshes => _meshes.AsReadOnly();
 
         public TowerBuilding(Vector3 position, Vector2 area, BuildingTextureInfo texture, Shader shader, float height, IBillboardBuilder billboardBuilder, RandomService randomService)
         {
@@ -104,6 +104,7 @@ namespace ProceduralCity.Buildings
                     textureStartPositions,
                     scaleXFrontBack: scaleXFrontBack,
                     scaleXLeftRight: scaleXLeftRight,
+                    scaleWindowHeight,
                     scaleWindowHeight),
                 new[] { _texture },
                 _shader);

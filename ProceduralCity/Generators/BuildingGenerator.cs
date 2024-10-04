@@ -20,7 +20,7 @@ namespace ProceduralCity.Generators
         enum BuildingType
         {
             Simple,
-            Tower,
+       //     Tower,
             //  Blocky
         }
 
@@ -53,7 +53,7 @@ namespace ProceduralCity.Generators
             _config = config;
             _randomService = randomService;
 
-            // TODO: implement material system: instead of changeing shader objects only uniforms should be updated
+            // TODO: implement material system: instead of changing shader objects only uniforms should be updated
             _buildingShaders = buildingColors.Select(color =>
             {
                 var shader = new Shader("vs.vert", fragmentShaders);
@@ -106,7 +106,7 @@ namespace ProceduralCity.Generators
             return type switch
             {
                 BuildingType.Simple => new Building(position, area, texture, shader, height, _randomService),
-                BuildingType.Tower => new TowerBuilding(position, area, texture, shader, height, _billboardBuilder, _randomService),
+        //        BuildingType.Tower => new TowerBuilding(position, area, texture, shader, height, _billboardBuilder, _randomService),
                 _ => throw new NotImplementedException(),
             };
         }

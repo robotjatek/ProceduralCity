@@ -9,13 +9,7 @@ namespace ProceduralCity.Renderer.Utils
         private readonly Shader _shader;
         private readonly IEnumerable<ITexture> _textures;
 
-        public IEnumerable<Mesh> Meshes
-        {
-            get
-            {
-                return _meshes;
-            }
-        }
+        public IReadOnlyCollection<Mesh> Meshes => _meshes.AsReadOnly();
 
         public FullScreenQuad(IEnumerable<Texture> textures, Shader shader)
         {

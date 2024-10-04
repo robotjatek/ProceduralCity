@@ -11,13 +11,7 @@ namespace ProceduralCity.GameObjects
     {
         private readonly List<Mesh> _meshes = [];
 
-        public IEnumerable<Mesh> Meshes
-        {
-            get
-            {
-                return _meshes;
-            }
-        }
+        public IReadOnlyCollection<Mesh> Meshes => _meshes.AsReadOnly();
 
         public GroundPlane(Vector3 position, Vector2 size, Shader shader)
         {
