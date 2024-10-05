@@ -23,7 +23,11 @@ using System.Diagnostics;
 namespace ProceduralCity
 {
     // High priority tasks
-    //TODO: building heights are too uniform
+    //TODO: building rooftops
+    //TODO: traffic updates should be spread over all frames instead of updating all every Nth frame
+    //TODO: billboard lights are hard to see because of they are the same color as the background
+
+    // Mid priority tasks
     //TODO: more building types
     //TODO: add more variety to the existing building types
     //TODO: Create specialized renderers for all of the render tasks in Game.cs - Implement IRenderer, extend Renderer
