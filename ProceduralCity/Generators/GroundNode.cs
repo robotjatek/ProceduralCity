@@ -17,7 +17,6 @@ namespace ProceduralCity.Generators
         public BoundingBox BoundingBox => _boundingBox;
 
         public Vector2 StartPosition { get; private set; }  // Top left
-
         public Vector2 EndPosition { get; private set; } // Bottom right
 
         public List<GroundNode> Children { get; private set; } = [];
@@ -95,6 +94,23 @@ namespace ProceduralCity.Generators
         public void AddTrafficLights(IEnumerable<TrafficLight> lights)
         {
             _trafficLights.AddRange(lights);
+        }
+
+        /// <summary>
+        /// Returns all nodes on the current level that are on the given coordinate.
+        /// Returns all colliding nodes. Eg. the "split point" of the node returns all children because this is an overlapping point that all child has.
+        /// </summary>
+        /// <param name="point">The coordinate where we look for a colliding node</param>
+        /// <returns>An enumeration of all colliding nodes on the current level.</returns>
+        public IEnumerable<GroundNode> NodesOnPoint(Vector2 point)
+        {
+            return Children.Where(c => c.IsInsideCurrentNode(point));
+        }
+
+        public bool IsInsideCurrentNode(Vector2 point)
+        {
+            return point.X >= StartPosition.X && point.Y >= StartPosition.Y
+                && point.X <= EndPosition.X && point.Y <= EndPosition.Y;
         }
     }
 }
